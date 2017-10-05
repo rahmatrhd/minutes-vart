@@ -5,10 +5,32 @@
 
 .kanban {
   grid-column: 1;
-  background-color: red
+  background-color: #9CB1BF;
+  overflow: auto;
+  height: 100vh;
+  display: subgrid;
+  grid-template-rows: 1fr 4fr;
+  grid-gap: 10px
 }
 
 .discussion {
   grid-column: 2;
-  background-color: green;
+  background-color: #2D587B;
+  overflow: auto;
+  height: 100vh
+}
+
+.logo {
+  grid-row: 1;
+
+}
+
+.content {
+  grid-row: 2;
+}
+
+img {
+  width: auto;
+  height: 75px;
+  margin-top: 15px
 }
