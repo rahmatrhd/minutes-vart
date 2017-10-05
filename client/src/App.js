@@ -7,6 +7,7 @@ import Chat from './component/chat'
 import ChatRoom from './component/chatRoom'
 import Dashboard from './component/dashboard'
 import Login from './component/login'
+import ChatRoom from './component/chatRoom'
 import './App.css'
 
 class App extends Component {
@@ -19,6 +20,7 @@ class App extends Component {
             <Route exact path='/chat' component={Chat} />
             <Route exact path='/chat-room' component={ChatRoom} />
             <Route exact path='/dashboard' component={Dashboard} />
+            <Route exact path='/chatroom' component={ChatRoom} />
           </div>
         </Router>
       </Provider>

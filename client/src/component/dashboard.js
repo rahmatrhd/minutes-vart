@@ -3,7 +3,7 @@ import {Layout, Collapse, Card, Avatar, Button} from 'antd'
 
 import firebase from './firebaseConfig'
 
-import './App.css'
+import './dashboard.css'
 
 const {Content, Sider} = Layout
 const Panel = Collapse.Panel
@@ -60,7 +60,7 @@ class Dashboard extends Component {
                 <h1>Project Name</h1>
               </div>
             </div>
-            <div className='content'>
+            <div className='kanbancontent'>
               DISINI ISI KANBAN
             </div>
           </div>
@@ -73,9 +73,7 @@ class Dashboard extends Component {
                 </b>
               </div>
               <div className='logout'>
-                <Button type="danger" onClick={ this.logout}>
-                  Logout
-                </Button>
+                <Button type="primary" onClick={ this.logout } style={{background: '#13314D'}}>Logout</Button>
               </div>
             </div>
             <div className='active'>
@@ -83,9 +81,10 @@ class Dashboard extends Component {
                 title="Room title"
                 extra={< a href = "#" > Join < /a>}
                 style={{
-                marginBottom: '10px'
-              }}>
-                <p>Discussion topic</p>
+                marginBottom: '10px',
+                 background: '#13314D'
+              }} bordered={false}>
+                <p style={{color: 'white'}}>Discussion topic</p>
               </Card>
             </div>
             <div className='history'>
