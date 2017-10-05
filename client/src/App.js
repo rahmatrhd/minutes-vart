@@ -5,6 +5,7 @@ import {Provider} from 'react-redux'
 
 import Dashboard from './component/dashboard'
 import Login from './component/login'
+import ChatRoom from './component/chatRoom'
 import './App.css'
 
 class App extends Component {
@@ -15,6 +16,7 @@ class App extends Component {
           <div className= 'app'>
             <Route exact path='/' component={Login} />
             <Route exact path='/dashboard' component={Dashboard} />
+            <Route exact path='/chatroom' component={ChatRoom} />
           </div>
         </Router>
       </Provider>
