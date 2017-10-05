@@ -2,12 +2,50 @@ import React, {Component} from 'react';
 import {Layout, Collapse, Card, Avatar, Button} from 'antd'
 import { BrowserRouter, Link } from 'react-router-dom'
 
+import firebase from './firebaseConfig'
+
 import './dashboard.css'
 
 const {Content, Sider} = Layout
 const Panel = Collapse.Panel
 
 class Dashboard extends Component {
+  constructor() {
+    super()
+    this.state = {
+      username: '',
+      email: '',
+      photoURL: ''
+    }
+  }
+
+  logout() {
+    console.log('Logout')
+    firebase.auth().signOut()
+    .then(() => {
+      console.log('signed out')
+    })
+  }
+
+  stateChangeListener() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        console.log(user)
+        this.setState({
+          username: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL
+        })
+      } else {
+        this.props.history.push('/')
+      }
+    })
+  }
+
+  componentDidMount() {
+    this.stateChangeListener()
+  }
+
   render() {
     return (
       <Layout>
@@ -30,13 +68,13 @@ class Dashboard extends Component {
           <div className='discussion'>
             <div className='info'>
               <div className='userinfo'>
-                <Avatar size="large" icon="user"/><br/>
+                <Avatar size="large" src={this.state.photoURL}/><br/>
                 <b>
-                  USERNAME
+                  { this.state.username }
                 </b>
               </div>
               <div className='logout'>
-                <Button type="primary" style={{background: '#13314D'}}>Logout</Button>
+                <Button type="primary" onClick={ this.logout } style={{background: '#13314D'}}>Logout</Button>
               </div>
             </div>
             <div className='active'>
