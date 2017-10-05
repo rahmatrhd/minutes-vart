@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Layout, Collapse, Card, Avatar, Button} from 'antd'
+import { BrowserRouter, Link } from 'react-router-dom'
 
 import './dashboard.css'
 
@@ -41,7 +42,7 @@ class Dashboard extends Component {
             <div className='active'>
               <Card
                 title="Room title"
-                extra={< a href = "#" > Join < /a>}
+                extra={<Link to='/chatroom'>Join</Link>}
                 style={{
                 marginBottom: '10px',
                  background: '#13314D'

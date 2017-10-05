@@ -9,6 +9,7 @@ import {
   Table
 } from 'antd'
 import {ChatFeed, Message} from 'react-chat-ui'
+import {BrowserRouter, Link} from 'react-router-dom'
 
 import Bubble from './chattext'
 import './chatroom.css'
@@ -82,6 +83,7 @@ class ChatRoom extends Component {
         <div className='task'>
           <div className='innertask'>
             <div className='toptask'>
+              <Link to='/dashboard'>
               <Button
                 shape="circle"
                 icon="arrow-left"
@@ -89,6 +91,7 @@ class ChatRoom extends Component {
                 style={{
                 margin: 15
               }}/>
+              </Link>
             </div>
             <div className='middletask'>
               <h1 style={{
