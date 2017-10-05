@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button } from 'antd'
+import { Button, Layout } from 'antd'
 
 import firebase from './firebaseConfig'
 
@@ -22,12 +22,26 @@ class Login extends Component {
     })
   } // login gmail
 
+  logout() {
+    console.log('Logout')
+    firebase.auth().signOut()
+    .then(() => {
+      console.log('signed out')
+    })
+  }
+
   render() {
     return (
-      <Button type="primary"
-      onClick={this.loginGmail}>
-        Login Gmail
-      </Button>
+      <Layout>
+        <Button type="primary"
+        onClick={this.loginGmail}>
+          Login Gmail
+        </Button>
+        <Button type="primary"
+        onClick={this.logout}>
+          Logout
+        </Button>
+      </Layout>
     )
   }
 }
