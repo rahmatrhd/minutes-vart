@@ -1,12 +1,34 @@
 import React, {Component} from 'react';
-import {Input, Button, Form, Timeline} from 'antd'
+import {
+  Input,
+  Button,
+  Form,
+  Timeline,
+  Card,
+  Icon,
+  Table
+} from 'antd'
 import {ChatFeed, Message} from 'react-chat-ui'
 
 import Bubble from './chattext'
 import './chatroom.css'
 
 const FormItem = Form.Item;
+const {Column, ColumnGroup} = Table;
 
+const data = [{
+  key: '1',
+  task: 'Wireframing',
+  user: 'Brown',
+}, {
+  key: '2',
+  task: 'Layouting',
+  user: 'Green',
+}, {
+  key: '3',
+  task: 'Create Server',
+  user: 'Black',
+}];
 class ChatRoom extends Component {
   constructor() {
     super()
@@ -71,9 +93,11 @@ class ChatRoom extends Component {
             <div className='middletask'>
               <h1 style={{
                 color: 'white'
-              }}>TASK</h1>
+              }}>MY TASK</h1>
               <br/>
-              <Timeline style={{color: 'white'}}>
+              <Timeline style={{
+                color: 'white'
+              }}>
                 <Timeline.Item color="green">Create a services site 2015-09-01</Timeline.Item>
                 <Timeline.Item color="green">Create a services site 2015-09-01</Timeline.Item>
                 <Timeline.Item color="red">
@@ -82,11 +106,52 @@ class ChatRoom extends Component {
                 <Timeline.Item>
                   <p>Technical testing 3 2015-09-01</p>
                 </Timeline.Item>
+                <Timeline.Item color="green">Create a services site 2015-09-01</Timeline.Item>
               </Timeline>
             </div>
           </div>
           <div className='member'>
-            a
+
+            <Card
+              style={{
+              margin: 15,
+              background: '#2D587B'
+            }}
+              noHovering
+              bordered={false}>
+              <Icon
+                type="check-circle"
+                style={{
+                color: 'green',
+                fontSize: 25,
+                float: 'left'
+              }}/>
+              <h2
+                style={{
+                float: 'right',
+                color: 'white'
+              }}>Username</h2>
+            </Card>
+            <Card
+              style={{
+              margin: 15,
+              background: '#2D587B'
+            }}
+              noHovering
+              bordered={false}>
+              <Icon
+                type="check-circle"
+                style={{
+                color: 'green',
+                fontSize: 25,
+                float: 'left'
+              }}/>
+              <h2
+                style={{
+                float: 'right',
+                color: 'white'
+              }}>Username</h2>
+            </Card>
           </div>
         </div>
         <div className='chatbox'>
@@ -121,12 +186,40 @@ class ChatRoom extends Component {
               width: '82%',
               marginRight: '1%'
             }}/>
-            <Button ghost style={{
-              width: '10%'
+            <Button
+              ghost
+              style={{
+              width: '10%',
+              overflow: 'hidden'
             }}>Send</Button>
           </div>
         </div>
-        <div className='minnie'></div>
+        <div className='minnie'>
+          <div className='content'>
+            <h1
+              style={{
+              color: 'white',
+              marginTop: 15
+            }}>MINNIE The Minutes Bot</h1>
+            <br/>
+            <Table dataSource={data} pagination={false} style={{
+              background: '#9CB1BF',
+              width: '23vw'
+            }}>
+              <Column title="Task" dataIndex="task" key="task"/>
+              <Column title="User" dataIndex="user" key="user"/>
+            </Table>
+          </div>
+          <div className='end'>
+            <Button
+              type="danger"
+              size='large'
+              style={{
+              width: '20vw',
+              overflow: 'hidden'
+            }}>End Discussion</Button>
+          </div>
+        </div>
       </div>
     )
   }

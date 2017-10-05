@@ -25,6 +25,8 @@
   height: 100vh;
   background: #184169;
   overflow: auto;
+  display: grid;
+  grid-template-rows: 14fr 1fr;
 }
 
 .chatinput {
@@ -43,12 +45,14 @@
   grid-row: 1;
   display: grid;
   grid-template-rows: 1fr 9fr;
+  overflow: auto;
 }
 
 .member {
   grid-row: 2;
   background: #2D587B;
   overflow: auto;
+  justify-items: center
 }
 
 .toptask {
@@ -58,5 +62,18 @@
 .middletask {
   grid-row: 2;
   overflow: auto;
-  justify-self: center;
+  justify-self: stretch;
+  margin-left: 20px
+}
+
+.end {
+  grid-row: 2;
+  align-self: center;
+  justify-self: center; 
+}
+
+.content {
+  grid-row: 1;
+  overflow: auto;
+  justify-self: center; 
 }
