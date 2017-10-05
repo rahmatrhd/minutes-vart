@@ -8,9 +8,11 @@ class Chat extends Component {
     super()
     this.state = {
       chatText: '',
-      currentUser: 'dumbAss',
-      userId: '008',
-      messages: []
+      currentUser: '',
+      email: '',
+      messages: [],
+      photoURL: '',
+      userId: ''
     }
   }
 
@@ -42,7 +44,23 @@ class Chat extends Component {
     this.setState({ chatText: '' })
   }
 
+  stateChangeListener() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.setState({
+          currentUser: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          userId: user.uid
+        })
+      } else {
+        this.props.history.push('/')
+      }
+    })
+  }
+
   componentDidMount() {
+    this.stateChangeListener()
     this.fetchAllMessages()
   }
 
@@ -51,24 +69,25 @@ class Chat extends Component {
       <div>
         <Form onSubmit={(e) => this.sendChat(e)}>
           <Input
-          placeholder='chat text'
-          onChange={(e) => this.chatChange(e)}
+            placeholder='chat text'
+            value={this.state.chatText}
+            onChange={(e) => this.chatChange(e)}
           />
           <Button htmlType='submit'>
             Send
           </Button>
         </Form>
-          <div>
+        <div>
           <ul>
             {
               this.state.messages.map(msg => {
-                return(
+                return (
                   <li>{msg[1].senderName} -- {msg[1].message}</li>
                 )
               })
             }
           </ul>
-          </div>
+        </div>
       </div>
     )
   }
