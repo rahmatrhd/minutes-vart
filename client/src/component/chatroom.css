@@ -1,0 +1,62 @@
+.wrapper {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+}
+
+.task {
+  grid-column: 1;
+  height: 100vh;
+  background: #184169;
+  display: grid;
+  grid-template-rows: 3fr 2fr;
+}
+
+.chatbox {
+  grid-column: 2;
+  height: 100vh;
+  background: #13314D;
+  justify-items: stretch;
+  display: grid;
+  grid-template-rows: auto 40px
+}
+
+.minnie {
+  grid-column: 3;
+  height: 100vh;
+  background: #184169;
+  overflow: auto;
+}
+
+.chatinput {
+  grid-row: 2;
+  margin-left: 15px;
+  margin-right: 15px;
+  width: 100%
+}
+
+.chattext {
+  grid-row: 1;
+  overflow: auto;
+}
+
+.innertask {
+  grid-row: 1;
+  display: grid;
+  grid-template-rows: 1fr 9fr;
+}
+
+.member {
+  grid-row: 2;
+  background: #2D587B;
+  overflow: auto;
+}
+
+.toptask {
+  grid-row: 1;
+}
+
+.middletask {
+  grid-row: 2;
+  overflow: auto;
+  justify-self: center;
+}

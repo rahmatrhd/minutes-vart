@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Layout, Collapse, Card, Avatar, Button} from 'antd'
 
-import './App.css'
+import './dashboard.css'
 
 const {Content, Sider} = Layout
 const Panel = Collapse.Panel
@@ -35,7 +35,7 @@ class Dashboard extends Component {
                 </b>
               </div>
               <div className='logout'>
-                <Button type="danger">Logout</Button>
+                <Button type="primary" style={{background: '#13314D'}}>Logout</Button>
               </div>
             </div>
             <div className='active'>
