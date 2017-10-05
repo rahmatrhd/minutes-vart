@@ -4,6 +4,7 @@ import store from './store'
 import {Provider} from 'react-redux'
 
 import Dashboard from './component/dashboard'
+import Login from './component/login'
 import './App.css'
 
 class App extends Component {
@@ -12,7 +13,8 @@ class App extends Component {
       <Provider store={store}>
         <Router>
           <div className= 'app'>
-            <Route excat path='/dashboard' component={Dashboard} />
+            <Route exact path='/login' component={Login} />
+            <Route exact path='/dashboard' component={Dashboard} />
           </div>
         </Router>
       </Provider>
