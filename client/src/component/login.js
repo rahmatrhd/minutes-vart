@@ -14,6 +14,7 @@ class Login extends Component {
     .then(result => {
       console.log('username>> ', result.user.displayName)
       console.log('email>> ', result.user.email)
+      console.log('photoURL>> ', result.user.photoURL);
       // var token = result.credential.accessToken  // token gmail seandainya mau disimpen atau dipakai
     })
     .catch(e => {
@@ -30,6 +31,27 @@ class Login extends Component {
     })
   }
 
+  stateChangeListener() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        console.log('Logged')
+        console.log(user)
+        this.props.history.push('/dashboard')
+      } else {
+        console.log('Not Logged')
+      }
+    })
+  }
+
+  componentDidMount() {
+    this.stateChangeListener()
+  }
+
+  authChecker() {
+    let user = firebase.auth().currentUser
+    return console.log(firebase.auth().currentUser)
+  }
+
   render() {
     return (
       <Layout>
@@ -40,6 +62,10 @@ class Login extends Component {
         <Button type="primary"
         onClick={this.logout}>
           Logout
+        </Button>
+        <Button type="primary"
+        onClick={this.authChecker}>
+          Auth check
         </Button>
       </Layout>
     )
