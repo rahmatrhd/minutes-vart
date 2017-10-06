@@ -91,6 +91,15 @@ class Dashboard extends Component {
     this.getAllRooms()
   }
 
+  paketJoin(link) {
+    let ref = firebase
+      .database()
+      .ref(`/rooms/${link}/participant`)
+    ref
+      .push()
+      .set({username: this.state.username})
+  }
+
   render() {
     return (
       <Layout>
@@ -145,29 +154,31 @@ class Dashboard extends Component {
               </div>
             </div>
             <div className='active'>
-              <Input placeholder="Room Name..." />
+              <Input placeholder="Room Name..."/>
               <Button icon="plus" size='large' onClick={() => this.createRoom()}>Add Discussion</Button>
               <br/>
-              <br/> {this
-                .state
-                .roomList
-                .map(room => {
-                  return (
-                    <Card
-                      title={room.topic}
-                      extra={< Link to = {{ pathname: `/chatroom/${room.roomId}` }} > Join < /Link>}
-                      style={{
-                      marginBottom: '10px',
-                      background: '#13314D'
-                    }}
-                      bordered={false}>
-                      <p style={{
-                        color: 'white'
-                      }}>Discussion topic</p>
-                    </Card>
-                  )
-                })
-}
+              <br/> 
+              {
+                  this.state.roomList
+                  .map(room => {
+                    return (
+                      <Card
+                        title={room.topic}
+                        extra={< a onClick = {
+                        (link) => this.paketJoin(room.roomId)
+                      } > Join </a>}
+                        style={{
+                        marginBottom: '10px',
+                        background: '#13314D'
+                      }}
+                        bordered={false}>
+                        <p style={{
+                          color: 'white'
+                        }}>Discussion topic</p>
+                      </Card>
+                    )
+                  })
+                }
             </div>
             <div className='history'>
               <Collapse bordered={false} className='collapse'>
