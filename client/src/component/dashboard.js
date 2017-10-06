@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
+
 import {Layout, Collapse, Card, Avatar, Button, Col, Row} from 'antd'
+import { BrowserRouter, Link } from 'react-router-dom'
+
 
 import firebase from './firebaseConfig'
 
@@ -14,8 +17,26 @@ class Dashboard extends Component {
     this.state = {
       username: '',
       email: '',
-      photoURL: ''
+      photoURL: '',
+      roomList: []
     }
+  }
+
+  getAllRooms() {
+    let ref = firebase.database().ref('/rooms')
+    ref.on('value', snapshot => {
+      // console.log(snapshot.val())
+      let temp = []
+      let list = Object.entries(snapshot.val())
+      console.log('list>>>', list);
+      list.map(li => {
+        temp.push({
+          roomId: li[0],
+          topic: li[1].topic.text || undefined
+        })
+      })
+      this.setState({ roomList: temp })
+    })
   }
 
   logout() {
@@ -43,6 +64,7 @@ class Dashboard extends Component {
 
   componentDidMount() {
     this.stateChangeListener()
+    this.getAllRooms()
   }
 
   render() {
@@ -82,7 +104,7 @@ class Dashboard extends Component {
           <div className='discussion'>
             <div className='info'>
               <div className='userinfo'>
-                <Avatar size="large" src={this.state.photoURL}/><br/>
+                <Avatar size="large" src={this.state.photoURL} /><br/>
                 <b>
                   { this.state.username }
                 </b>
@@ -92,15 +114,25 @@ class Dashboard extends Component {
               </div>
             </div>
             <div className='active'>
-              <Card
-                title="Room title"
-                extra={< a href = "#" > Join < /a>}
-                style={{
-                marginBottom: '10px',
-                 background: '#13314D'
-              }} bordered={false}>
-                <p style={{color: 'white'}}>Discussion topic</p>
-              </Card>
+              {
+                this.state.roomList.map(room => {
+                  return (
+                    <Card
+                      title={ room.topic }
+                      extra={<Link to={{
+                        pathname: `/chatroom/${room.roomId}`
+                      }} >
+                        Join
+                      </Link>}
+                      style={{
+                        marginBottom: '10px',
+                        background: '#13314D'
+                      }} bordered={false}>
+                      <p style={{ color: 'white' }}>Discussion topic</p>
+                    </Card>
+                  )
+                })
+              }
             </div>
             <div className='history'>
               <Collapse bordered={false} className='collapse'>
