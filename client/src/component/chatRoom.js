@@ -58,28 +58,32 @@ class ChatRoom extends Component {
       .database()
       .ref(`/rooms/${this.props.match.params.id}/chat`)
     ref.on('value', snapshot => {
-      let temp = []
-      let messages = Object.entries(snapshot.val())
-      messages.map(msg => {
-        if (msg[1].id === this.state.userId) {
-          msg[1].id = 0
-        }
-        msg[1].key = msg[0]
-        temp.push(msg[1])
-      })
-      this.setState({messages: temp})
+      if (snapshot.val() !== null) {
+        let temp = []
+        let messages = Object.entries(snapshot.val())
+        messages.map(msg => {
+          if (msg[1].id === this.state.userId) {
+            msg[1].id = 0
+          }
+          msg[1].key = msg[0]
+          temp.push(msg[1])
+        })
+        this.setState({messages: temp})
+      }
     })
     let task = firebase
       .database()
       .ref(`/rooms/${this.props.match.params.id}/minnie/todo`)
     task.on('value', snapshot => {
-      let tmp = []
-      let todo = Object.entries(snapshot.val())
-      todo.map(maps => {
-        maps[1].key = maps[0]
-        tmp.push(maps[1])
-      })
-      this.setState({roomTask: tmp})
+      if (snapshot.val() !== null) {
+        let tmp = []
+        let todo = Object.entries(snapshot.val())
+        todo.map(maps => {
+          maps[1].key = maps[0]
+          tmp.push(maps[1])
+        })
+        this.setState({roomTask: tmp})
+      }
       console.log(this.state.roomTask);
     })
   }
