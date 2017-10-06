@@ -88,54 +88,102 @@ class Dashboard extends Component {
                   <Col span={6}>
                     <Card title="BACKLOG" bordered={false}>
                       <div>
-                        <Card>Test Backlog</Card><br />
+                        <Card>Test Backlog
+                          <div>
+                            <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                          </div>  
+                        </Card><br />
                       </div>
                       <div>
-                        <Card>Test Backlog</Card><br />
+                        <Card>Test Backlog
+                          <div>
+                            <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                          </div>  
+                        </Card><br />
                       </div>
                       <div>
-                        <Card>Test Backlog</Card><br />
+                        <Card>Test Backlog
+                          <div>
+                            <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                          </div>  
+                        </Card><br />
                       </div>
                     </Card>
                   </Col>
                   <Col span={6}>
                   <Card title="TODO" bordered={false}>
+                  <div>
+                    <Card>Test Todo
                       <div>
-                        <Card>Test Todo</Card><br />
-                      </div>
+                        <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                      </div>  
+                    </Card><br />
+                  </div>
+                  <div>
+                    <Card>Test Todo
                       <div>
-                        <Card>Test Todo</Card><br />
-                      </div>
+                        <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                      </div>  
+                    </Card><br />
+                  </div>
+                  <div>
+                    <Card>Test Todo
                       <div>
-                        <Card>Test Todo</Card><br />
-                      </div>
-                    </Card>
+                      <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                      </div>  
+                    </Card><br />
+                  </div>
+                </Card>
                   </Col>
                   <Col span={6}>
-                  <Card title="ON GOING" bordered={false}>
+                    <Card title="ON GOING" bordered={false}>
                       <div>
-                        <Card>Test On Going</Card><br />
+                        <Card>Test On Going
+                          <div>
+                            <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                          </div>  
+                        </Card><br />
                       </div>
                       <div>
-                        <Card>Test On Going</Card><br />
+                        <Card>Test On Going
+                          <div>
+                            <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                          </div>  
+                        </Card><br />
                       </div>
                       <div>
-                        <Card>Test On Going</Card><br />
+                        <Card>Test On Going
+                          <div>
+                          <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                          </div>  
+                        </Card><br />
                       </div>
                     </Card>
                   </Col>
                   <Col span={6}>
                   <Card title="DONE" bordered={false}>
-                  <div>
-                    <Card>Test Done</Card><br />
-                  </div>
-                  <div>
-                    <Card>Test Done</Card><br />
-                  </div>
-                  <div>
-                    <Card>Test Done</Card><br />
-                  </div>
-                </Card>
+                      <div>
+                        <Card>Test Done
+                          <div>
+                          <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                          </div>  
+                        </Card><br />
+                      </div>
+                      <div>
+                        <Card>Test Done
+                          <div>
+                            <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                          </div>  
+                        </Card><br />
+                      </div>
+                      <div>
+                        <Card>Test Done
+                          <div>
+                            <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                          </div>  
+                        </Card><br />
+                      </div>
+                    </Card>
                   </Col>
                 </Row>
               </div>
