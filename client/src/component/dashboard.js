@@ -116,7 +116,17 @@ class Dashboard extends Component {
               }}>
                 <Row gutter={5}>
                   <Col span={6}>
-                    <Card title="Backlog" bordered={false}>Card content</Card>
+                    <Card title="Backlog" bordered={false}>
+                      <div>
+                        <Card>Test Tampilan</Card><br />
+                      </div>
+                      <div>
+                        <Card>Test Tampilan</Card><br />
+                      </div>
+                      <div>
+                        <Card>Test Tampilan</Card><br />
+                      </div>
+                    </Card>
                   </Col>
                   <Col span={6}>
                     <Card title="Todo" bordered={false}>Card content</Card>
@@ -125,7 +135,10 @@ class Dashboard extends Component {
                     <Card title="On Progress" bordered={false}>Card content</Card>
                   </Col>
                   <Col span={6}>
-                    <Card title="Done" bordered={false}>Card content</Card>
+                    <Card title="Done" bordered={false}>Card content
+                      <br />
+                      Card content
+                    </Card>
                   </Col>
                 </Row>
               </div>
