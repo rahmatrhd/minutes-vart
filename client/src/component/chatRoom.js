@@ -11,6 +11,7 @@ import {
 import {ChatFeed, Message} from 'react-chat-ui'
 import {BrowserRouter, Link} from 'react-router-dom'
 import firebase from './firebaseConfig'
+import axios from 'axios'
 
 import Bubble from './chattext'
 import './chatroom.css'
@@ -43,7 +44,8 @@ class ChatRoom extends Component {
       email: '',
       messages: [],
       photoURL: '',
-      userId: ''
+      userId: '',
+      chatFeedElem: null
     }
   }
 
@@ -54,7 +56,7 @@ class ChatRoom extends Component {
   fetchAllMessages() {
     let ref = firebase
       .database()
-      .ref('/chat')
+      .ref(`/rooms/${this.props.match.params.id}/chat`)
     ref.on('value', snapshot => {
       let temp = []
       let messages = Object.entries(snapshot.val())
@@ -71,12 +73,26 @@ class ChatRoom extends Component {
 
   sendChat(e) {
     e.preventDefault()
-    let ref = firebase
-      .database()
-      .ref('/chat')
-    ref
-      .push()
-      .set({id: this.state.userId, message: this.state.chatText, senderName: this.state.currentUser})
+    axios.post('https://us-central1-minutes-vart.cloudfunctions.net/incomingChat', {
+      roomId: this.props.match.params.id,
+      chat: {
+        user: {
+          id: this.state.userId,
+          name: this.state.currentUser
+        },
+        type: 'text',
+        data: {
+          text: this.state.chatText
+        }
+      }
+    }, {
+      headers: {
+        'Content-Type' : 'application/json'
+      }
+    })
+    .then(data => {
+      this.setState({chatText: ''})
+    })
     this.setState({chatText: ''})
   }
 
@@ -98,25 +114,22 @@ class ChatRoom extends Component {
   componentDidMount() {
     this.stateChangeListener()
     this.fetchAllMessages()
+    this.scrollToBottom();
   }
 
-  handleChat(e) {
-    console.log('====================================');
-    console.log(e);
-    console.log('====================================');
-    // var chat = {
-    //   scrollHeight: e.target.scrollHeight,
-    //   clientHeight: e.target.clientHeight,
-    //   scrollTop: e.target.scrollTop
-    // }
-    // this.scrollToBottom(chat.scrollHeight, chat.clientHeight, chat.scrollTop);
+  componentDidUpdate() {
+    this.scrollToBottom();
   }
 
-  scrollToBottom(a, b, c) {
-    const scrollHeight = a;
-    const height = b;
-    const maxScrollTop = scrollHeight - height;
-    c = maxScrollTop > 0 ? maxScrollTop : 0;
+  scrollToBottom() {
+    // console.log('====================================');
+    // console.log(elem.scrollHeight); console.log(elem.clientHeight);
+    // console.log('===================================='); const scrollHeight =
+    // elem.scrollHeight; const height = elem.clientHeight; const maxScrollTop =
+    // scrollHeight - height; elem.scrollTop = maxScrollTop > 0   ? maxScrollTop   :
+    // 0;
+    // const node = ReactDOM.findDOMNode(this.messagesEnd);
+    this.messagesEnd.scrollIntoView({behavior: "smooth"});
   }
 
   render() {
@@ -206,12 +219,13 @@ class ChatRoom extends Component {
             marginLeft: 15,
             marginRight: 15
           }}>
-            <ChatFeed messages={this.state.messages} // Boolean: list of message objects
+            <ChatFeed ref={(elem) => {
+              this.chatFeedElem = elem
+            }} messages={this.state.messages} // Boolean: list of message objects
               isTyping={false} // Boolean: is the recipient typing
               hasInputField={false} // Boolean: use our input, or use your own
               showSenderName // show the name of the user who sent the message
-              bubblesCentered={false}
-              onChange={(e) => this.handleChat(this)} //Boolean should the bubbles be centered in the feed?
+              bubblesCentered={false} //Boolean should the bubbles be centered in the feed?
               // JSON: Custom bubble styles
               bubbleStyles={{
               text: {
@@ -223,6 +237,14 @@ class ChatRoom extends Component {
                 maxWidth: 500
               }
             }}/>
+            <div
+              style={{
+              float: "left",
+              clear: "both"
+            }}
+              ref={(el) => {
+              this.messagesEnd = el;
+            }}></div>
           </div>
           <div className='chatinput'>
             <Form onSubmit={(e) => this.sendChat(e)}>
