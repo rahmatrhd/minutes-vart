@@ -58,8 +58,6 @@ class ChatRoom extends Component {
       .database()
       .ref(`/rooms/${this.props.match.params.id}/chat`)
     ref.on('value', snapshot => {
-      // console.log('snapshot>>> ', snapshot.val());
-
       if (snapshot.val() !== null) {
         let temp = []
         let messages = Object.entries(snapshot.val())
@@ -72,12 +70,11 @@ class ChatRoom extends Component {
         })
         this.setState({messages: temp})
       }
-
     })
   }
 
   sendChat(e) {
-        let ref = firebase
+    let ref = firebase
       .database()
       .ref(`/rooms/${this.props.match.params.id}/chat`)
     ref
