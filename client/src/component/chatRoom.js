@@ -145,15 +145,7 @@ class ChatRoom extends Component {
   }
 
   scrollToBottom() {
-    // console.log('====================================');
-    // console.log(elem.scrollHeight); console.log(elem.clientHeight);
-    // console.log('===================================='); const scrollHeight =
-    // elem.scrollHeight; const height = elem.clientHeight; const maxScrollTop =
-    // scrollHeight - height; elem.scrollTop = maxScrollTop > 0   ? maxScrollTop   :
-    // 0; const node = ReactDOM.findDOMNode(this.messagesEnd);
-    this
-      .messagesEnd
-      .scrollIntoView({behavior: "smooth"});
+    this.messagesEnd.scrollIntoView({behavior: "smooth"});
   }
 
   render() {
