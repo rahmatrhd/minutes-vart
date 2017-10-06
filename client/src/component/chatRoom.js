@@ -45,7 +45,7 @@ class ChatRoom extends Component {
       messages: [],
       photoURL: '',
       userId: '',
-      chatFeedElem: null
+      roomTask: []
     }
   }
 
@@ -70,6 +70,19 @@ class ChatRoom extends Component {
         })
         this.setState({messages: temp})
       }
+    })
+    let task = firebase
+      .database()
+      .ref(`/rooms/${this.props.match.params.id}/minnie/todo`)
+    task.on('value', snapshot => {
+      let tmp = []
+      let todo = Object.entries(snapshot.val())
+      todo.map(maps => {
+        maps[1].key = maps[0]
+        tmp.push(maps[1])
+      })
+      this.setState({roomTask: tmp})
+      console.log(this.state.roomTask);
     })
   }
 
@@ -96,10 +109,9 @@ class ChatRoom extends Component {
       }
     }, {
       headers: {
-        'Content-Type' : 'application/json'
+        'Content-Type': 'application/json'
       }
-    })
-    .then(data => {
+    }).then(data => {
       this.setState({chatText: ''})
     })
     this.setState({chatText: ''})
@@ -136,9 +148,10 @@ class ChatRoom extends Component {
     // console.log('===================================='); const scrollHeight =
     // elem.scrollHeight; const height = elem.clientHeight; const maxScrollTop =
     // scrollHeight - height; elem.scrollTop = maxScrollTop > 0   ? maxScrollTop   :
-    // 0;
-    // const node = ReactDOM.findDOMNode(this.messagesEnd);
-    this.messagesEnd.scrollIntoView({behavior: "smooth"});
+    // 0; const node = ReactDOM.findDOMNode(this.messagesEnd);
+    this
+      .messagesEnd
+      .scrollIntoView({behavior: "smooth"});
   }
 
   render() {
@@ -285,14 +298,14 @@ class ChatRoom extends Component {
             }}>MINNIE The Minutes Bot</h1>
             <br/>
             <Table
-              dataSource={data}
+              dataSource={this.state.roomTask}
               pagination={false}
               style={{
               background: '#9CB1BF',
               width: '23vw'
             }}>
               <Column title="Task" dataIndex="task" key="task"/>
-              <Column title="User" dataIndex="user" key="user"/>
+              <Column title="User" dataIndex="userName" key="userName"/>
             </Table>
           </div>
           <div className='end'>
