@@ -86,29 +86,56 @@ class Dashboard extends Component {
               <div style={{ padding: '20px' }}>
                 <Row gutter={5}>
                   <Col span={6}>
-                    <Card title="Backlog" bordered={false}>
+                    <Card title="BACKLOG" bordered={false}>
                       <div>
-                        <Card>Test Tampilan</Card><br />
+                        <Card>Test Backlog</Card><br />
                       </div>
                       <div>
-                        <Card>Test Tampilan</Card><br />
+                        <Card>Test Backlog</Card><br />
                       </div>
                       <div>
-                        <Card>Test Tampilan</Card><br />
+                        <Card>Test Backlog</Card><br />
                       </div>
                     </Card>
                   </Col>
                   <Col span={6}>
-                    <Card title="Todo" bordered={false}>Card content</Card>
-                  </Col>
-                  <Col span={6}>
-                    <Card title="On Progress" bordered={false}>Card content</Card>
-                  </Col>
-                  <Col span={6}>
-                    <Card title="Done" bordered={false}>Card content
-                      <br />
-                      Card content
+                  <Card title="TODO" bordered={false}>
+                      <div>
+                        <Card>Test Todo</Card><br />
+                      </div>
+                      <div>
+                        <Card>Test Todo</Card><br />
+                      </div>
+                      <div>
+                        <Card>Test Todo</Card><br />
+                      </div>
                     </Card>
+                  </Col>
+                  <Col span={6}>
+                  <Card title="ON GOING" bordered={false}>
+                      <div>
+                        <Card>Test On Going</Card><br />
+                      </div>
+                      <div>
+                        <Card>Test On Going</Card><br />
+                      </div>
+                      <div>
+                        <Card>Test On Going</Card><br />
+                      </div>
+                    </Card>
+                  </Col>
+                  <Col span={6}>
+                  <Card title="DONE" bordered={false}>
+                  <div>
+                    <Card>Test Done</Card><br />
+                  </div>
+                  <div>
+                    <Card>Test Done</Card><br />
+                  </div>
+                  <div>
+                    <Card>Test Done</Card><br />
+                  </div>
+                </Card>
                   </Col>
                 </Row>
               </div>
