@@ -15,8 +15,26 @@ class Dashboard extends Component {
     this.state = {
       username: '',
       email: '',
-      photoURL: ''
+      photoURL: '',
+      roomList: []
     }
+  }
+
+  getAllRooms() {
+    let ref = firebase.database().ref('/rooms')
+    ref.on('value', snapshot => {
+      // console.log(snapshot.val())
+      let temp = []
+      let list = Object.entries(snapshot.val())
+      console.log('list>>>', list);
+      list.map(li => {
+        temp.push({
+          roomId: li[0],
+          topic: li[1].topic.text || undefined
+        })
+      })
+      this.setState({ roomList: temp })
+    })
   }
 
   logout() {
@@ -44,6 +62,7 @@ class Dashboard extends Component {
 
   componentDidMount() {
     this.stateChangeListener()
+    this.getAllRooms()
   }
 
   render() {
@@ -78,15 +97,25 @@ class Dashboard extends Component {
               </div>
             </div>
             <div className='active'>
-              <Card
-                title="Room title"
-                extra={<Link to='/chatroom'>Join</Link>}
-                style={{
-                marginBottom: '10px',
-                 background: '#13314D'
-              }} bordered={false}>
-                <p style={{color: 'white'}}>Discussion topic</p>
-              </Card>
+              {
+                this.state.roomList.map(room => {
+                  return (
+                    <Card
+                      title={ room.topic }
+                      extra={<Link to={{
+                        pathname: `/chatroom/${room.roomId}`
+                      }} >
+                        Join
+                      </Link>}
+                      style={{
+                        marginBottom: '10px',
+                        background: '#13314D'
+                      }} bordered={false}>
+                      <p style={{ color: 'white' }}>Discussion topic</p>
+                    </Card>
+                  )
+                })
+              }
             </div>
             <div className='history'>
               <Collapse bordered={false} className='collapse'>
