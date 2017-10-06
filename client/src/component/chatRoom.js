@@ -72,6 +72,13 @@ class ChatRoom extends Component {
   }
 
   sendChat(e) {
+        let ref = firebase
+      .database()
+      .ref(`/rooms/${this.props.match.params.id}/chat`)
+    ref
+      .push()
+      .set({id: this.state.userId, message: this.state.chatText, senderName: this.state.currentUser})
+    this.setState({chatText: ''})
     e.preventDefault()
     axios.post('https://us-central1-minutes-vart.cloudfunctions.net/incomingChat', {
       roomId: this.props.match.params.id,
