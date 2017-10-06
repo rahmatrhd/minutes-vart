@@ -30,8 +30,16 @@ class Dashboard extends Component {
       email: '',
       photoURL: '',
       roomList: [],
+
+      todoList: {
+        backlog: [],
+        done: [],
+        onProgress: [],
+        todo: []
+      },
       topicTitle: '',
       summaryList: ''
+
     }
   }
 
@@ -70,6 +78,41 @@ class Dashboard extends Component {
         })
       })
       this.setState({roomList: temp})
+    })
+  }
+
+  getAllTodo() {
+    let ref = firebase.database().ref('/kanban')
+    ref.on('value', snapshot => {
+      if (snapshot.val() !== null) {
+        let list = Object.entries(snapshot.val())
+        let todoList = {
+          backlog: [],
+          done: [],
+          onProgress: [],
+          todo: []
+        }
+        list.map(li => {
+          if (li[1].status === 'done') {
+            let done = li[1]
+            done.taskId = li[0]
+            todoList.done.push(done)
+          } else if (li[1].status === 'onProgress') {
+            let progress = li[1]
+            progress.taskId = li[0]
+            todoList.onProgress.push(progress)
+          } else if (li[1] === 'todo') {
+            let todo = li[1]
+            todo.taskId = li[0]
+            todoList.todo.push(todo)
+          } else {
+            let backlog = li[1]
+            backlog.taskId = li[0]
+            todoList.backlog.push(backlog)
+          }
+        })
+        this.setState({ todoList: todoList })
+      }
     })
   }
 
@@ -120,6 +163,7 @@ class Dashboard extends Component {
 
   componentWillMount() {
     this.stateChangeListener()
+    this.getAllTodo()
     this.getAllRooms()
     this.getAllSummary()
   }
@@ -208,12 +252,12 @@ class Dashboard extends Component {
                 <Button icon="plus" size='large' htmlType='submit'>Add Discussion</Button>
               </Form>
               <br/>
-              <br/> {this
-                .state
-                .roomList
-                .map(room => {
+              <br/>
+              {
+                this.state.roomList.map((room, idx) => {
                   return (
                     <Card
+                      key={idx}
                       title={room.topic}
                       extra={< Link to = {{ pathname: `/chatroom/${room.roomId}` }} > Join < /Link>}
                       style={{
@@ -225,7 +269,7 @@ class Dashboard extends Component {
                     </Card>
                   )
                 })
-}
+              }
             </div>
             <div className='history'>
               <Collapse bordered={false} className='collapse'>
