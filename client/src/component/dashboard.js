@@ -1,14 +1,15 @@
 import React, {Component} from 'react';
 
 import {
-  Layout,
-  Collapse,
-  Card,
   Avatar,
   Button,
+  Card,
   Col,
-  Row,
-  Input
+  Collapse,
+  Form,
+  Input,
+  Layout,
+  Row
 } from 'antd'
 import {BrowserRouter, Link} from 'react-router-dom'
 import firebase from './firebaseConfig'
@@ -31,15 +32,24 @@ class Dashboard extends Component {
     }
   }
 
+  createRoom() {
+    axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/watsonNLU?text=${this.state.topicTitle}`)
+    let ref = firebase.database().ref(`/rooms/`)
+    let roomData = {
+      topic: {
+        text: this.state.topicTitle
+      }
+    }
+    ref.push().set(roomData)
+  }
+
   getAllRooms() {
     let ref = firebase
       .database()
       .ref('/rooms')
     ref.on('value', snapshot => {
-      // console.log(snapshot.val())
       let temp = []
       let list = Object.entries(snapshot.val())
-      console.log('list>>>', list);
       list.map(li => {
         temp.push({
           roomId: li[0],
@@ -48,6 +58,10 @@ class Dashboard extends Component {
       })
       this.setState({roomList: temp})
     })
+  }
+
+  topicTitleChange(e) {
+    this.setState({topicTitle: e.target.value})
   }
 
   logout() {
@@ -74,16 +88,6 @@ class Dashboard extends Component {
             .push('/')
         }
       })
-  }
-
-  createRoom() {
-    axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/watsonNLU?text=${this.state.topicTitle}`)
-    let ref = firebase
-      .database()
-      .ref(`/rooms/`)
-    ref
-      .push()
-      .set({id: this.state.userId, message: this.state.chatText, senderName: this.state.currentUser})
   }
 
   componentDidMount() {
@@ -145,29 +149,29 @@ class Dashboard extends Component {
               </div>
             </div>
             <div className='active'>
-              <Input placeholder="Room Name..." />
-              <Button icon="plus" size='large' onClick={() => this.createRoom()}>Add Discussion</Button>
+              <Form onSubmit={(e) => this.createRoom(e)}>
+                <Input
+                onChange={e => this.topicTitleChange(e)}
+                placeholder="Room Name..." />
+                <Button icon="plus" size='large' htmlType='submit'>Add Discussion</Button>
+              </Form>
               <br/>
-              <br/> {this
-                .state
-                .roomList
-                .map(room => {
+              <br/>
+              {
+                this.state.roomList.map(room => {
                   return (
                     <Card
                       title={room.topic}
-                      extra={< Link to = {{ pathname: `/chatroom/${room.roomId}` }} > Join < /Link>}
-                      style={{
-                      marginBottom: '10px',
-                      background: '#13314D'
-                    }}
+                      extra={< Link to={{ pathname: `/chatroom/${room.roomId}` }}> Join </Link>}
+                      style={{ marginBottom: '10px', background: '#13314D' }}
                       bordered={false}>
-                      <p style={{
-                        color: 'white'
-                      }}>Discussion topic</p>
+                      <p style={{ color: 'white' }}>
+                        Discussion topic
+                      </p>
                     </Card>
                   )
                 })
-}
+              }
             </div>
             <div className='history'>
               <Collapse bordered={false} className='collapse'>
