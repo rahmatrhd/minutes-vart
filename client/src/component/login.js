@@ -14,7 +14,8 @@ class Login extends Component {
     .then(result => {
       console.log('username>> ', result.user.displayName)
       console.log('email>> ', result.user.email)
-      console.log('photoURL>> ', result.user.photoURL);
+      console.log('photoURL>> ', result.user.photoURL)
+      // this.registeredChecker(result.user.uid)
       // var token = result.credential.accessToken  // token gmail seandainya mau disimpen atau dipakai
     })
     .catch(e => {
@@ -36,6 +37,16 @@ class Login extends Component {
       if (user) {
         console.log('Logged')
         console.log(user)
+        let ref = firebase.database().ref('/users')
+        ref.once('value', snapshot => {
+          let checker = snapshot.hasChild(user.uid)
+          if (!checker) {
+            console.log('Not Registered. Registering')
+            ref.child(`${user.uid}`).set({name: user.displayName})
+          } else {
+            console.log('Registered')
+          }
+        })
         this.props.history.push('/dashboard')
       } else {
         console.log('Not Logged')
@@ -43,13 +54,8 @@ class Login extends Component {
     })
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.stateChangeListener()
-  }
-
-  authChecker() {
-    let user = firebase.auth().currentUser
-    return console.log(firebase.auth().currentUser)
   }
 
   render() {
@@ -62,10 +68,6 @@ class Login extends Component {
         <Button type="primary"
         onClick={this.logout}>
           Logout
-        </Button>
-        <Button type="primary"
-        onClick={this.authChecker}>
-          Auth check
         </Button>
       </Layout>
     )
