@@ -101,7 +101,7 @@ class Dashboard extends Component {
             let progress = li[1]
             progress.taskId = li[0]
             todoList.onProgress.push(progress)
-          } else if (li[1] === 'todo') {
+          } else if (li[1].status === 'todo') {
             let todo = li[1]
             todo.taskId = li[0]
             todoList.todo.push(todo)
@@ -197,31 +197,67 @@ class Dashboard extends Component {
                 padding: '20px'
               }}>
                 <Row gutter={5}>
+
+
                   <Col span={6}>
                     <Card title="Backlog" bordered={false}>
-                      <div>
-                        <Card>Test Tampilan</Card><br/>
-                      </div>
-                      <div>
-                        <Card>Test Tampilan</Card><br/>
-                      </div>
-                      <div>
-                        <Card>Test Tampilan</Card><br/>
-                      </div>
+                      {
+                        this.state.todoList.backlog.map((back, idx) => {
+                          return (
+                            <div key={idx}>
+                              <Card>{back.task}</Card>
+                            </div>
+                          )
+                        })
+                      }
                     </Card>
                   </Col>
+
+
                   <Col span={6}>
-                    <Card title="Todo" bordered={false}>Card content</Card>
-                  </Col>
-                  <Col span={6}>
-                    <Card title="On Progress" bordered={false}>Card content</Card>
-                  </Col>
-                  <Col span={6}>
-                    <Card title="Done" bordered={false}>Card content
-                      <br/>
-                      Card content
+                    <Card title="Todo" bordered={false}>
+                      {
+                        this.state.todoList.todo.map((td, idx) => {
+                          return(
+                            <div key={idx}>
+                              <Card>{td.task}</Card>
+                            </div>
+                          )
+                        })
+                      }
                     </Card>
                   </Col>
+                  
+                  <Col span={6}>
+                    <Card title="On Progress" bordered={false}>
+                      {
+                        this.state.todoList.onProgress.map((prog, idx) => {
+                          return(
+                            <div key={idx}>
+                              <Card>{prog.task}</Card>
+                            </div>
+                          )
+                        })
+                      }
+                    </Card>
+                  </Col>
+
+
+                  <Col span={6}>
+                    <Card title="Done" bordered={false}>
+                      {
+                        this.state.todoList.done.map((dn, idx) => {
+                          return (
+                            <div key={idx}>
+                              <Card>{dn.task}</Card>
+                            </div>
+                          )
+                        })
+                      }
+                    </Card>
+                  </Col>
+
+
                 </Row>
               </div>
             </div>
@@ -259,7 +295,7 @@ class Dashboard extends Component {
                     <Card
                       key={idx}
                       title={room.topic}
-                      extra={< Link to = {{ pathname: `/chatroom/${room.roomId}` }} > Join < /Link>}
+                      extra={<Link to = {{ pathname: `/chatroom/${room.roomId}` }} > Join </Link>}
                       style={{
                       marginBottom: '10px',
                       background: '#13314D'
