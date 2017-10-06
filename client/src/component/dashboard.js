@@ -87,7 +87,7 @@ class Dashboard extends Component {
           <div className='discussion'>
             <div className='info'>
               <div className='userinfo'>
-                <Avatar size="large" src={this.state.photoURL}/><br/>
+                <Avatar size="large" src={this.state.photoURL} /><br/>
                 <b>
                   { this.state.username }
                 </b>
