@@ -95,6 +95,15 @@ class Dashboard extends Component {
     this.getAllRooms()
   }
 
+  paketJoin(link) {
+    let ref = firebase
+      .database()
+      .ref(`/rooms/${link}/participant`)
+    ref
+      .push()
+      .set({username: this.state.username})
+  }
+
   render() {
     return (
       <Layout>
