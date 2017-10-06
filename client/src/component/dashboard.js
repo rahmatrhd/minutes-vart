@@ -1,10 +1,18 @@
 import React, {Component} from 'react';
 
-import {Layout, Collapse, Card, Avatar, Button, Col, Row} from 'antd'
-import { BrowserRouter, Link } from 'react-router-dom'
-
-
+import {
+  Layout,
+  Collapse,
+  Card,
+  Avatar,
+  Button,
+  Col,
+  Row,
+  Input
+} from 'antd'
+import {BrowserRouter, Link} from 'react-router-dom'
 import firebase from './firebaseConfig'
+import axios from 'axios'
 
 import './dashboard.css'
 
@@ -18,12 +26,15 @@ class Dashboard extends Component {
       username: '',
       email: '',
       photoURL: '',
-      roomList: []
+      roomList: [],
+      topicTitle: ''
     }
   }
 
   getAllRooms() {
-    let ref = firebase.database().ref('/rooms')
+    let ref = firebase
+      .database()
+      .ref('/rooms')
     ref.on('value', snapshot => {
       // console.log(snapshot.val())
       let temp = []
@@ -35,31 +46,44 @@ class Dashboard extends Component {
           topic: li[1].topic.text || undefined
         })
       })
-      this.setState({ roomList: temp })
+      this.setState({roomList: temp})
     })
   }
 
   logout() {
     console.log('Logout')
-    firebase.auth().signOut()
-    .then(() => {
-      console.log('signed out')
-    })
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        console.log('signed out')
+      })
   }
 
   stateChangeListener() {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        console.log(user)
-        this.setState({
-          username: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL
-        })
-      } else {
-        this.props.history.push('/')
-      }
-    })
+    firebase
+      .auth()
+      .onAuthStateChanged(user => {
+        if (user) {
+          console.log(user)
+          this.setState({username: user.displayName, email: user.email, photoURL: user.photoURL})
+        } else {
+          this
+            .props
+            .history
+            .push('/')
+        }
+      })
+  }
+
+  createRoom() {
+    axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/watsonNLU?text=${this.state.topicTitle}`)
+    let ref = firebase
+      .database()
+      .ref(`/rooms/`)
+    ref
+      .push()
+      .set({id: this.state.userId, message: this.state.chatText, senderName: this.state.currentUser})
   }
 
   componentDidMount() {
@@ -83,7 +107,9 @@ class Dashboard extends Component {
               </div>
             </div>
             <div className='kanbancontent'>
-              <div style={{ padding: '20px' }}>
+              <div style={{
+                padding: '20px'
+              }}>
                 <Row gutter={5}>
                   <Col span={6}>
                     <Card title="Backlog" bordered={false}>Card content</Card>
@@ -104,35 +130,44 @@ class Dashboard extends Component {
           <div className='discussion'>
             <div className='info'>
               <div className='userinfo'>
-                <Avatar size="large" src={this.state.photoURL} /><br/>
+                <Avatar size="large" src={this.state.photoURL}/><br/>
                 <b>
-                  { this.state.username }
+                  {this.state.username}
                 </b>
               </div>
               <div className='logout'>
-                <Button type="primary" onClick={ this.logout } style={{background: '#13314D'}}>Logout</Button>
+                <Button
+                  type="primary"
+                  onClick={this.logout}
+                  style={{
+                  background: '#13314D'
+                }}>Logout</Button>
               </div>
             </div>
             <div className='active'>
-              {
-                this.state.roomList.map(room => {
+              <Input placeholder="Room Name..." />
+              <Button icon="plus" size='large' onClick={() => this.createRoom()}>Add Discussion</Button>
+              <br/>
+              <br/> {this
+                .state
+                .roomList
+                .map(room => {
                   return (
                     <Card
-                      title={ room.topic }
-                      extra={<Link to={{
-                        pathname: `/chatroom/${room.roomId}`
-                      }} >
-                        Join
-                      </Link>}
+                      title={room.topic}
+                      extra={< Link to = {{ pathname: `/chatroom/${room.roomId}` }} > Join < /Link>}
                       style={{
-                        marginBottom: '10px',
-                        background: '#13314D'
-                      }} bordered={false}>
-                      <p style={{ color: 'white' }}>Discussion topic</p>
+                      marginBottom: '10px',
+                      background: '#13314D'
+                    }}
+                      bordered={false}>
+                      <p style={{
+                        color: 'white'
+                      }}>Discussion topic</p>
                     </Card>
                   )
                 })
-              }
+}
             </div>
             <div className='history'>
               <Collapse bordered={false} className='collapse'>
