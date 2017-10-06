@@ -75,13 +75,15 @@ class ChatRoom extends Component {
       .database()
       .ref(`/rooms/${this.props.match.params.id}/minnie/todo`)
     task.on('value', snapshot => {
-      let tmp = []
-      let todo = Object.entries(snapshot.val())
-      todo.map(maps => {
-        maps[1].key = maps[0]
-        tmp.push(maps[1])
-      })
-      this.setState({roomTask: tmp})
+      if (snapshot.val() !== null) {
+        let tmp = []
+        let todo = Object.entries(snapshot.val())
+        todo.map(maps => {
+          maps[1].key = maps[0]
+          tmp.push(maps[1])
+        })
+        this.setState({roomTask: tmp})
+      }
       console.log(this.state.roomTask);
     })
   }
