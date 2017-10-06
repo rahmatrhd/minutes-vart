@@ -7,7 +7,7 @@ import Chat from './component/chat'
 import ChatRoom from './component/chatRoom'
 import Dashboard from './component/dashboard'
 import Login from './component/login'
-import ChatRoom from './component/chatRoom'
+// import ChatRoom from './component/chatRoom'
 import './App.css'
 
 class App extends Component {
