@@ -10,6 +10,7 @@ import {
 } from 'antd'
 import {ChatFeed, Message} from 'react-chat-ui'
 import {BrowserRouter, Link} from 'react-router-dom'
+import firebase from './firebaseConfig'
 
 import Bubble from './chattext'
 import './chatroom.css'
@@ -17,64 +18,105 @@ import './chatroom.css'
 const FormItem = Form.Item;
 const {Column, ColumnGroup} = Table;
 
-const data = [{
-  key: '1',
-  task: 'Wireframing',
-  user: 'Brown',
-}, {
-  key: '2',
-  task: 'Layouting',
-  user: 'Green',
-}, {
-  key: '3',
-  task: 'Create Server',
-  user: 'Black',
-}];
+const data = [
+  {
+    key: '1',
+    task: 'Wireframing',
+    user: 'Brown'
+  }, {
+    key: '2',
+    task: 'Layouting',
+    user: 'Green'
+  }, {
+    key: '3',
+    task: 'Create Server',
+    user: 'Black'
+  }
+];
+
 class ChatRoom extends Component {
   constructor() {
     super()
     this.state = {
-      messages: [
-        {
-          id: 0,
-          message: 'Id 0 untuk self bubble',
-          senderName: 'You'
-        }, {
-          id: 2,
-          message: 'id selain 0 untuk another user',
-          senderName: 'Tama'
-        }, {
-          id: 0,
-          message: 'id yang sama bersebelahan menjadi 1',
-          senderName: 'Mark'
-        }, {
-          id: 0,
-          message: 'seperti ini',
-          senderName: 'Mark'
-        }, {
-          id: 1,
-          message: 'Hi, My Name is Mark',
-          senderName: 'Mark'
-        }, {
-          id: 2,
-          message: 'shut up mark',
-          senderName: 'Tama'
-        }, {
-          id: 0,
-          message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum odio tellus," +
-              " venenatis in ligula vitae, finibus aliquam leo. Nullam varius neque a lacus con" +
-              "dimentum, sed scelerisque ipsum eleifend. Vestibulum imperdiet ex sit amet turpi" +
-              "s vestibulum, quis porta justo varius. Integer ac bibendum erat. Pellentesque ut" +
-              " nisi et nisi mattis finibus a et sapien. Etiam neque turpis, consequat eu dolor" +
-              " eu, tempor maximus felis. Ut elementum dui at congue semper. Nullam scelerisque" +
-              " commodo turpis, ac tincidunt massa porta pellentesque. Pellentesque sagittis do" +
-              "lor sodales iaculis vestibulum. In bibendum dignissim mauris. Duis vitae mauris " +
-              "vel sem facilisis suscipit a porttitor ex. Suspendisse convallis mauris turpis, " +
-              "vel viverra tortor tempor at.",
-          senderName: 'You'
-        }
-      ]
+      chatText: '',
+      currentUser: '',
+      email: '',
+      messages: [],
+      photoURL: '',
+      userId: ''
     }
+  }
+
+  chatChange(e) {
+    this.setState({chatText: e.target.value})
+  }
+
+  fetchAllMessages() {
+    let ref = firebase
+      .database()
+      .ref('/chat')
+    ref.on('value', snapshot => {
+      let temp = []
+      let messages = Object.entries(snapshot.val())
+      messages.map(msg => {
+        if (msg[1].id === this.state.userId) {
+          msg[1].id = 0
+        }
+        msg[1].key = msg[0]
+        temp.push(msg[1])
+      })
+      this.setState({messages: temp})
+    })
+  }
+
+  sendChat(e) {
+    e.preventDefault()
+    let ref = firebase
+      .database()
+      .ref('/chat')
+    ref
+      .push()
+      .set({id: this.state.userId, message: this.state.chatText, senderName: this.state.currentUser})
+    this.setState({chatText: ''})
+  }
+
+  stateChangeListener() {
+    firebase
+      .auth()
+      .onAuthStateChanged(user => {
+        if (user) {
+          this.setState({currentUser: user.displayName, email: user.email, photoURL: user.photoURL, userId: user.uid})
+        } else {
+          this
+            .props
+            .history
+            .push('/')
+        }
+      })
+  }
+
+  componentDidMount() {
+    this.stateChangeListener()
+    this.fetchAllMessages()
+  }
+
+  handleChat(e) {
+    console.log('====================================');
+    console.log(e);
+    console.log('====================================');
+    // var chat = {
+    //   scrollHeight: e.target.scrollHeight,
+    //   clientHeight: e.target.clientHeight,
+    //   scrollTop: e.target.scrollTop
+    // }
+    // this.scrollToBottom(chat.scrollHeight, chat.clientHeight, chat.scrollTop);
+  }
+
+  scrollToBottom(a, b, c) {
+    const scrollHeight = a;
+    const height = b;
+    const maxScrollTop = scrollHeight - height;
+    c = maxScrollTop > 0 ? maxScrollTop : 0;
   }
 
   render() {
@@ -84,13 +126,13 @@ class ChatRoom extends Component {
           <div className='innertask'>
             <div className='toptask'>
               <Link to='/dashboard'>
-              <Button
-                shape="circle"
-                icon="arrow-left"
-                size='large'
-                style={{
-                margin: 15
-              }}/>
+                <Button
+                  shape="circle"
+                  icon="arrow-left"
+                  size='large'
+                  style={{
+                  margin: 15
+                }}/>
               </Link>
             </div>
             <div className='middletask'>
@@ -168,7 +210,8 @@ class ChatRoom extends Component {
               isTyping={false} // Boolean: is the recipient typing
               hasInputField={false} // Boolean: use our input, or use your own
               showSenderName // show the name of the user who sent the message
-              bubblesCentered={false} //Boolean should the bubbles be centered in the feed?
+              bubblesCentered={false}
+              onChange={(e) => this.handleChat(this)} //Boolean should the bubbles be centered in the feed?
               // JSON: Custom bubble styles
               bubbleStyles={{
               text: {
@@ -182,19 +225,24 @@ class ChatRoom extends Component {
             }}/>
           </div>
           <div className='chatinput'>
-            <Input
-              size='large'
-              placeholder='chat box..'
-              style={{
-              width: '82%',
-              marginRight: '1%'
-            }}/>
-            <Button
-              ghost
-              style={{
-              width: '10%',
-              overflow: 'hidden'
-            }}>Send</Button>
+            <Form onSubmit={(e) => this.sendChat(e)}>
+              <Input
+                size='large'
+                placeholder='chat box..'
+                value={this.state.chatText}
+                onChange={(e) => this.chatChange(e)}
+                style={{
+                width: '82%',
+                marginRight: '1%'
+              }}/>
+              <Button
+                ghost
+                htmlType='submit'
+                style={{
+                width: '10%',
+                overflow: 'hidden'
+              }}>Send</Button>
+            </Form>
           </div>
         </div>
         <div className='minnie'>
@@ -205,7 +253,10 @@ class ChatRoom extends Component {
               marginTop: 15
             }}>MINNIE The Minutes Bot</h1>
             <br/>
-            <Table dataSource={data} pagination={false} style={{
+            <Table
+              dataSource={data}
+              pagination={false}
+              style={{
               background: '#9CB1BF',
               width: '23vw'
             }}>
