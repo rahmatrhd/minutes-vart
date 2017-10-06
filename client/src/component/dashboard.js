@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Layout, Collapse, Card, Avatar, Button} from 'antd'
+import {Layout, Collapse, Card, Avatar, Button, Col, Row} from 'antd'
 
 import firebase from './firebaseConfig'
 
@@ -61,7 +61,22 @@ class Dashboard extends Component {
               </div>
             </div>
             <div className='kanbancontent'>
-              DISINI ISI KANBAN
+              <div style={{ padding: '20px' }}>
+                <Row gutter={5}>
+                  <Col span={6}>
+                    <Card title="Backlog" bordered={false}>Card content</Card>
+                  </Col>
+                  <Col span={6}>
+                    <Card title="Todo" bordered={false}>Card content</Card>
+                  </Col>
+                  <Col span={6}>
+                    <Card title="On Progress" bordered={false}>Card content</Card>
+                  </Col>
+                  <Col span={6}>
+                    <Card title="Done" bordered={false}>Card content</Card>
+                  </Col>
+                </Row>
+              </div>
             </div>
           </div>
           <div className='discussion'>
