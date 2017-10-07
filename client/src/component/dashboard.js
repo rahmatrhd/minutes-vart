@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
 import {
   Avatar,
@@ -13,13 +13,13 @@ import {
   Tag,
   Spin
 } from 'antd'
-import {BrowserRouter, Link} from 'react-router-dom'
+import { BrowserRouter, Link } from 'react-router-dom'
 import firebase from './firebaseConfig'
 import axios from 'axios'
 
 import './dashboard.css'
 
-const {Content, Sider} = Layout
+const { Content, Sider } = Layout
 const Panel = Collapse.Panel
 
 class Dashboard extends Component {
@@ -36,6 +36,7 @@ class Dashboard extends Component {
         onProgress: [],
         todo: []
       },
+      userId: '',
       topicTitle: '',
       summaryList: ''
 
@@ -44,29 +45,29 @@ class Dashboard extends Component {
 
   createRoom(e) {
     e.preventDefault();
-    axios
-      .get(`https://us-central1-minutes-vart.cloudfunctions.net/watsonNLU?text=${this.state.topicTitle}`)
-      .then(({data}) => {
-        let ref = firebase
-          .database()
-          .ref(`/rooms/`)
+    axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/watsonNLU?text=${this.state.topicTitle}`)
+    .then(({ data }) => {
+      console.log(data.error)
+
+      if (data.error) {
+        alert('Room\'s name should be descriptive and written in English' )
+      } else {
+        let ref = firebase.database().ref(`/rooms/`)
         let roomData = {
           topic: {
             categories: data.categories,
             text: this.state.topicTitle
-          }
+          },
+          timestamp: Date.now()
         }
-        ref
-          .push()
-          .set(roomData)
-        this.setState({topicTitle: ''})
-      })
+        ref.push().set(roomData)
+        this.setState({ topicTitle: '' })
+      }
+    })
   }
 
   getAllRooms() {
-    let ref = firebase
-      .database()
-      .ref('/rooms')
+    let ref = firebase.database().ref('/rooms')
     ref.on('value', snapshot => {
       let temp = []
       let list = Object.entries(snapshot.val())
@@ -76,7 +77,7 @@ class Dashboard extends Component {
           topic: li[1].topic.text || undefined
         })
       })
-      this.setState({roomList: temp})
+      this.setState({ roomList: temp })
     })
   }
 
@@ -116,9 +117,7 @@ class Dashboard extends Component {
   }
 
   getAllSummary() {
-    let sum = firebase
-      .database()
-      .ref('/summary')
+    let sum = firebase.database().ref('/summary')
     sum.on('value', snapshot => {
       let summary = []
       let listSummary = Object.entries(snapshot.val())
@@ -126,19 +125,17 @@ class Dashboard extends Component {
         summ[1].key = summ[0]
         summary.push(summ[1])
       })
-      this.setState({summaryList: summary})
+      this.setState({ summaryList: summary })
     })
   }
 
   topicTitleChange(e) {
-    this.setState({topicTitle: e.target.value})
+    this.setState({ topicTitle: e.target.value })
   }
 
   logout() {
     console.log('Logout')
-    firebase
-      .auth()
-      .signOut()
+    firebase.auth().signOut()
       .then(() => {
         console.log('signed out')
       })
@@ -151,19 +148,19 @@ class Dashboard extends Component {
     task.status = 'backlog'
     firebase.database().ref(`/kanban/${task.taskId}`).set(task)
   }
-  
+
   toTodo(task) {
     console.log('toTodo')
     task.status = 'todo'
     firebase.database().ref(`/kanban/${task.taskId}`).set(task)
   }
-  
+
   toOnProgress(task) {
     console.log('toOnProgress')
     task.status = 'onProgress'
     firebase.database().ref(`/kanban/${task.taskId}`).set(task)
   }
-  
+
   toDone(task) {
     console.log('toDone')
     task.status = 'done'
@@ -192,7 +189,8 @@ class Dashboard extends Component {
         this.setState({
           username: user.displayName,
           email: user.email,
-          photoURL: user.photoURL
+          photoURL: user.photoURL,
+          userId: user.uid
         })
       } else {
         this.props.history.push('/')
@@ -208,12 +206,17 @@ class Dashboard extends Component {
   }
 
   paketJoin(link) {
-    let ref = firebase
-      .database()
-      .ref(`/rooms/${link}/participant`)
-    ref
-      .push()
-      .set({username: this.state.username})
+    console.log('kirim paket')
+    let ref = firebase.database().ref(`/rooms/${link}/participant`)
+    ref.push({
+      name: this.state.username,
+      id: this.state.userId
+    })
+    this.props.history.push(`/chatroom/${link}`)
+    // ref.push().set({
+    //   name: this.state.username,
+    //   id: this.state.userId
+    // })
   }
 
   render() {
@@ -236,9 +239,8 @@ class Dashboard extends Component {
                 padding: '20px'
               }}>
                 <Row gutter={5}>
-
                   <Col span={6}>
-                    <Card title="Backlog" bordered={false}>
+                    <Card title="Backlog" bordered={false} style={{backgroundColor: 'rgba(255,255,255, 0.6)'}}>
                       {
                         this.state.todoList.backlog.map((back, idx) => {
                           return (
@@ -246,10 +248,10 @@ class Dashboard extends Component {
                               <Card>{back.task}</Card>
                               <br />
                               <Button
-                              onClick={() => this.toTodo(back)}
-                              type="primary"
-                              shape="circle" 
-                              icon="rocket">
+                                onClick={() => this.toTodo(back)}
+                                type="primary"
+                                shape="circle"
+                                icon="right-circle">
                               </Button>
                             </div>
                           )
@@ -260,28 +262,26 @@ class Dashboard extends Component {
 
 
                   <Col span={6}>
-                    <Card title="Todo" bordered={false}>
+                    <Card title="Todo" bordered={false} style={{backgroundColor: 'rgba(255,255,255, 0.6)'}}>
                       {
                         this.state.todoList.todo.map((td, idx) => {
-                          return(
+                          return (
                             <div key={idx}>
-                              <Card>{td.task}</Card>
-                              <br /><Button type="primary" shape="circle" icon="rocket"></Button>
-                            </div>
-                          )
-                        })
-                      }
-                    </Card>
-                  </Col>
-                  
-                  <Col span={6}>
-                    <Card title="On Progress" bordered={false}>
-                      {
-                        this.state.todoList.onProgress.map((prog, idx) => {
-                          return(
-                            <div key={idx}>
-                              <Card>{prog.task}</Card>
-                              <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                              <Card>
+                                <p>{td.task}</p>
+                                <Button
+                                onClick={() => this.toBackLog(td)}
+                                style={{position: 'pull-left'}}
+                                type="primary" shape="circle"
+                                icon="left-circle">
+                                </Button>
+                                <Button
+                                onClick={() => this.toOnProgress(td)}
+                                style={{position: 'pull-right'}}
+                                type="primary" shape="circle"
+                                icon="right-circle">
+                                </Button>
+                              </Card>
                             </div>
                           )
                         })
@@ -290,13 +290,48 @@ class Dashboard extends Component {
                   </Col>
 
                   <Col span={6}>
-                    <Card title="Done" bordered={false}>
+                    <Card title="On Progress" bordered={false} style={{backgroundColor: 'rgba(255,255,255, 0.6)'}}>
+                      {
+                        this.state.todoList.onProgress.map((prog, idx) => {
+                          return (
+                            <div key={idx}>
+                              <Card>
+                                <p>{prog.task}</p>
+                                <Button
+                                onClick={() => this.toTodo(prog)}
+                                type="primary"
+                                shape="circle"
+                                icon="left-circle">
+                                </Button>
+                                <Button
+                                onClick={() => this.toDone(prog)}
+                                type="primary"
+                                shape="circle"
+                                icon="right-circle">
+                                </Button>
+                              </Card>
+                            </div>
+                          )
+                        })
+                      }
+                    </Card>
+                  </Col>
+
+                  <Col span={6}>
+                    <Card title="Done" bordered={false} style={{backgroundColor: 'rgba(255,255,255, 0.6)'}}>
                       {
                         this.state.todoList.done.map((dn, idx) => {
                           return (
                             <div key={idx}>
-                              <Card>{dn.task}</Card>
-                              <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                              <Card>
+                                <p>{dn.task}</p>
+                                <Button
+                                onClick={() => this.toOnProgress(dn)}
+                                type="primary"
+                                shape="circle"
+                                icon="left-circle">
+                                </Button>
+                              </Card>
                             </div>
                           )
                         })
@@ -311,7 +346,7 @@ class Dashboard extends Component {
           <div className='discussion'>
             <div className='info'>
               <div className='userinfo'>
-                <Avatar size="large" src={this.state.photoURL}/><br/>
+                <Avatar size="large" src={this.state.photoURL} /><br />
                 <b>
                   {this.state.username}
                 </b>
@@ -321,8 +356,8 @@ class Dashboard extends Component {
                   type="primary"
                   onClick={this.logout}
                   style={{
-                  background: '#13314D'
-                }}>Logout</Button>
+                    background: '#13314D'
+                  }}>Logout</Button>
               </div>
             </div>
             <div className='active'>
@@ -330,22 +365,22 @@ class Dashboard extends Component {
                 <Input
                   value={this.state.topicTitle}
                   onChange={e => this.topicTitleChange(e)}
-                  placeholder="Room Name..."/>
+                  placeholder="Room Name..." />
                 <Button icon="plus" size='large' htmlType='submit'>Add Discussion</Button>
               </Form>
-              <br/>
-              <br/>
+              <br />
+              <br />
               {
                 this.state.roomList.map((room, idx) => {
                   return (
                     <Card
                       key={idx}
                       title={room.topic}
-                      extra={<Link to = {{ pathname: `/chatroom/${room.roomId}` }} > Join </Link>}
+                      extra={<a onClick={(e) => this.paketJoin(room.roomId)}> Join </a>}
                       style={{
-                      marginBottom: '10px',
-                      background: '#13314D'
-                    }}
+                        marginBottom: '10px',
+                        background: '#13314D'
+                      }}
                       bordered={false}>
                       <Tag>Tag 1</Tag>
                     </Card>
@@ -356,20 +391,20 @@ class Dashboard extends Component {
             <div className='history'>
               <Collapse bordered={false} className='collapse'>
                 {this.state.summaryList ? this.state.summaryList.map(summary => {
-                    return (
-                      <Panel
-                        header={summary.topic}
-                        key="1"
-                        style={customPanelStyle}
-                        key={summary.key}>
-                        <Collapse>
-                          <Panel header='Participant' key='1'>
-                            <p>test</p>
-                          </Panel>
-                        </Collapse>
-                      </Panel>
-                    )
-                  }) : <Spin size="large" />}
+                  return (
+                    <Panel
+                      header={summary.topic}
+                      key="1"
+                      style={customPanelStyle}
+                      key={summary.key}>
+                      <Collapse>
+                        <Panel header='Participant' key='1'>
+                          <p>test</p>
+                        </Panel>
+                      </Collapse>
+                    </Panel>
+                  )
+                }) : <Spin size="large" />}
               </Collapse>
             </div>
           </div>
