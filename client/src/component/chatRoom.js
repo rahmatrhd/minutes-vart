@@ -43,6 +43,7 @@ class ChatRoom extends Component {
       currentUser: '',
       email: '',
       messages: [],
+      participants: [],
       photoURL: '',
       roomTask: [],
       userId: '',
@@ -89,7 +90,6 @@ class ChatRoom extends Component {
         })
         this.setState({ roomTask: tmp })
       }
-      console.log(this.state.roomTask);
     })
   }
 
@@ -105,7 +105,6 @@ class ChatRoom extends Component {
           todo: []
         }
         list.map(li => {
-          console.log('user>>>> ', li[1].user.userId)
           if (li[1].status === 'done' && li[1].user.userId === this.state.userId) {
             let done = li[1]
             done.taskId = li[0]
@@ -126,6 +125,18 @@ class ChatRoom extends Component {
         })
         this.setState({ usersTodoList: usersTodoList })
       }
+    })
+  }
+
+  getParticipantList() {
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/participant`)
+    ref.on('value', snapshot => {
+      let longList = Object.entries(snapshot.val())
+      let temp = []
+      longList.map(list => {
+        temp.push(list[1])
+      })
+      this.setState({participants: temp.sort()})
     })
   }
 
@@ -175,7 +186,8 @@ class ChatRoom extends Component {
     this.fetchAllMessages()
     this.fetchAllTask()
     this.fetchAllTodo()
-    this.scrollToBottom();
+    this.getParticipantList()
+    this.scrollToBottom()
   }
 
   componentDidUpdate() {
@@ -212,6 +224,7 @@ class ChatRoom extends Component {
                   this.state.usersTodoList.backlog.map((list, idx) => {
                     return (
                       <Timeline.Item
+                        key={idx}
                         color='green'>
                         {list.task}
                       </Timeline.Item>
@@ -222,6 +235,7 @@ class ChatRoom extends Component {
                   this.state.usersTodoList.todo.map((list, idx) => {
                     return (
                       <Timeline.Item
+                        key={idx}
                         color='green'>
                         {list.task}
                       </Timeline.Item>
@@ -232,6 +246,7 @@ class ChatRoom extends Component {
                   this.state.usersTodoList.onProgress.map((list, idx) => {
                     return (
                       <Timeline.Item
+                        key={idx}
                         color='red'>
                         {list.task}
                       </Timeline.Item>
@@ -242,6 +257,7 @@ class ChatRoom extends Component {
                   this.state.usersTodoList.done.map((list, idx) => {
                     return (
                       <Timeline.Item
+                        key={idx}
                         color='blue'>
                         {list.task}
                       </Timeline.Item>
@@ -252,47 +268,24 @@ class ChatRoom extends Component {
             </div>
           </div>
           <div className='member'>
-
-            <Card
-              style={{
-                margin: 15,
-                background: '#2D587B'
-              }}
-              noHovering
-              bordered={false}>
-              <Icon
-                type="check-circle"
-                style={{
-                  color: 'green',
-                  fontSize: 25,
-                  float: 'left'
-                }} />
-              <h2
-                style={{
-                  float: 'right',
-                  color: 'white'
-                }}>Username</h2>
-            </Card>
-            <Card
-              style={{
-                margin: 15,
-                background: '#2D587B'
-              }}
-              noHovering
-              bordered={false}>
-              <Icon
-                type="check-circle"
-                style={{
-                  color: 'green',
-                  fontSize: 25,
-                  float: 'left'
-                }} />
-              <h2
-                style={{
-                  float: 'right',
-                  color: 'white'
-                }}>Username</h2>
-            </Card>
+            {
+              this.state.participants.map((member, idx) => {
+                return (
+                  <Card key={idx}
+                  style={{ margin: 15, background: '#2D587B' }}
+                  noHovering
+                  bordered={false}>
+                    <Icon
+                      type="check-circle"
+                      style={{ color: 'green', fontSize: 25, float: 'left'
+                      }} />
+                    <h2 style={{ float: 'right', color: 'white' }}>
+                      {member.name}
+                    </h2>
+                  </Card>
+                )
+              })
+            }
           </div>
         </div>
         <div className='chatbox'>
