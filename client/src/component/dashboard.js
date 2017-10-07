@@ -183,8 +183,6 @@ class Dashboard extends Component {
             console.log('Not Registered. Register first.')
             // this.logout()
             this.props.history.push('/')
-          } else {
-            console.log('aman-aman aja');
           }
         })
 

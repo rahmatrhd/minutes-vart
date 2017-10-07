@@ -181,10 +181,14 @@ class ChatRoom extends Component {
   componentWillMount = async () => {
     await this.stateChangeListener()
     await this.fetchAllMessages()
-    await this.fetchAllTask()
     await this.fetchAllTodo()
     await this.getParticipantList()
+    await this.fetchAllTask()
     await this.scrollToBottom()
+  }
+  
+  scrollToBottom() {
+    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
   }
   
   componentDidMount() {
@@ -192,10 +196,6 @@ class ChatRoom extends Component {
 
   componentDidUpdate() {
     this.scrollToBottom();
-  }
-
-  scrollToBottom() {
-    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
   }
 
   render() {
