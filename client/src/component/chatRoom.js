@@ -45,7 +45,7 @@ class ChatRoom extends Component {
       messages: [],
       photoURL: '',
       userId: '',
-      chatFeedElem: null
+      roomTask: []
     }
   }
 
@@ -58,20 +58,44 @@ class ChatRoom extends Component {
       .database()
       .ref(`/rooms/${this.props.match.params.id}/chat`)
     ref.on('value', snapshot => {
-      let temp = []
-      let messages = Object.entries(snapshot.val())
-      messages.map(msg => {
-        if (msg[1].id === this.state.userId) {
-          msg[1].id = 0
-        }
-        msg[1].key = msg[0]
-        temp.push(msg[1])
-      })
-      this.setState({messages: temp})
+      if (snapshot.val() !== null) {
+        let temp = []
+        let messages = Object.entries(snapshot.val())
+        messages.map(msg => {
+          if (msg[1].id === this.state.userId) {
+            msg[1].id = 0
+          }
+          msg[1].key = msg[0]
+          temp.push(msg[1])
+        })
+        this.setState({messages: temp})
+      }
+    })
+    let task = firebase
+      .database()
+      .ref(`/rooms/${this.props.match.params.id}/minnie/todo`)
+    task.on('value', snapshot => {
+      if (snapshot.val() !== null) {
+        let tmp = []
+        let todo = Object.entries(snapshot.val())
+        todo.map(maps => {
+          maps[1].key = maps[0]
+          tmp.push(maps[1])
+        })
+        this.setState({roomTask: tmp})
+      }
+      console.log(this.state.roomTask);
     })
   }
 
   sendChat(e) {
+    let ref = firebase
+      .database()
+      .ref(`/rooms/${this.props.match.params.id}/chat`)
+    ref
+      .push()
+      .set({id: this.state.userId, message: this.state.chatText, senderName: this.state.currentUser})
+    this.setState({chatText: ''})
     e.preventDefault()
     axios.post('https://us-central1-minutes-vart.cloudfunctions.net/incomingChat', {
       roomId: this.props.match.params.id,
@@ -87,10 +111,9 @@ class ChatRoom extends Component {
       }
     }, {
       headers: {
-        'Content-Type' : 'application/json'
+        'Content-Type': 'application/json'
       }
-    })
-    .then(data => {
+    }).then(data => {
       this.setState({chatText: ''})
     })
     this.setState({chatText: ''})
@@ -122,13 +145,6 @@ class ChatRoom extends Component {
   }
 
   scrollToBottom() {
-    // console.log('====================================');
-    // console.log(elem.scrollHeight); console.log(elem.clientHeight);
-    // console.log('===================================='); const scrollHeight =
-    // elem.scrollHeight; const height = elem.clientHeight; const maxScrollTop =
-    // scrollHeight - height; elem.scrollTop = maxScrollTop > 0   ? maxScrollTop   :
-    // 0;
-    // const node = ReactDOM.findDOMNode(this.messagesEnd);
     this.messagesEnd.scrollIntoView({behavior: "smooth"});
   }
 
@@ -276,14 +292,14 @@ class ChatRoom extends Component {
             }}>MINNIE The Minutes Bot</h1>
             <br/>
             <Table
-              dataSource={data}
+              dataSource={this.state.roomTask}
               pagination={false}
               style={{
               background: '#9CB1BF',
               width: '23vw'
             }}>
               <Column title="Task" dataIndex="task" key="task"/>
-              <Column title="User" dataIndex="user" key="user"/>
+              <Column title="User" dataIndex="userName" key="userName"/>
             </Table>
           </div>
           <div className='end'>
