@@ -210,7 +210,6 @@ class Dashboard extends Component {
               }}>
                 <Row gutter={5}>
 
-
                   <Col span={6}>
                     <Card title="Backlog" bordered={false}>
                       {
@@ -218,6 +217,7 @@ class Dashboard extends Component {
                           return (
                             <div key={idx}>
                               <Card>{back.task}</Card>
+                              <br /><Button type="primary" shape="circle" icon="rocket"></Button>
                             </div>
                           )
                         })
@@ -233,6 +233,7 @@ class Dashboard extends Component {
                           return(
                             <div key={idx}>
                               <Card>{td.task}</Card>
+                              <br /><Button type="primary" shape="circle" icon="rocket"></Button>
                             </div>
                           )
                         })
@@ -247,13 +248,13 @@ class Dashboard extends Component {
                           return(
                             <div key={idx}>
                               <Card>{prog.task}</Card>
+                              <br /><Button type="primary" shape="circle" icon="rocket"></Button>
                             </div>
                           )
                         })
                       }
                     </Card>
                   </Col>
-
 
                   <Col span={6}>
                     <Card title="Done" bordered={false}>
@@ -262,13 +263,13 @@ class Dashboard extends Component {
                           return (
                             <div key={idx}>
                               <Card>{dn.task}</Card>
+                              <br /><Button type="primary" shape="circle" icon="rocket"></Button>
                             </div>
                           )
                         })
                       }
                     </Card>
                   </Col>
-
 
                 </Row>
               </div>
