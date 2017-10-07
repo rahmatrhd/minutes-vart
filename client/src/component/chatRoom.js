@@ -75,8 +75,11 @@ class ChatRoom extends Component {
         this.setState({ messages: temp })
       }
     })
-    let task = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/todo`)
-    task.on('value', snapshot => {
+  }
+
+  fetchAllTask() {
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/todo`)
+    ref.on('value', snapshot => {
       if (snapshot.val() !== null) {
         let tmp = []
         let todo = Object.entries(snapshot.val())
@@ -164,16 +167,13 @@ class ChatRoom extends Component {
     })
   }
 
-  todoFilter() {
-
-  }
-
   componentWillMount() {
     this.stateChangeListener()
   }
 
   componentDidMount() {
     this.fetchAllMessages()
+    this.fetchAllTask()
     this.fetchAllTodo()
     this.scrollToBottom();
   }
