@@ -374,7 +374,7 @@ class Dashboard extends Component {
                   value={this.state.topicTitle}
                   onChange={e => this.topicTitleChange(e)}
                   placeholder="Room Name..." />
-                <Button icon="plus" size='large' htmlType='submit'>Add Discussion</Button>
+                  <br /><br /><Button icon="plus" size='large' htmlType='submit'>Add Discussion</Button>
               </Form>
               <br />
               <br />
