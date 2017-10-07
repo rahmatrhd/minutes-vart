@@ -11,7 +11,11 @@ import {
   Layout,
   Row,
   Tag,
-  Spin
+  Spin,
+  Modal,
+  Select,
+  Checkbox,
+  Progress
 } from 'antd'
 import { BrowserRouter, Link } from 'react-router-dom'
 import firebase from './firebaseConfig'
@@ -38,9 +42,67 @@ class Dashboard extends Component {
       },
       userId: '',
       topicTitle: '',
-      summaryList: ''
-
+      summaryList: '',
+      
+      review: {
+        visibleModal: false,
+        item: {
+          topic: {
+            text: ''
+          },
+          todo: {},
+          notes: {
+            0: {
+              data: {}
+            }
+          },
+          report: {
+            userParticipationRate: {
+              0: {}
+            },
+            userContributionRate: {
+              0: {}
+            },
+            userFocusness: {
+              0: {}
+            }
+          }
+        }
+      },
+      users: {}
     }
+  }
+  
+  reviewModal(item) {
+    console.log(item)
+    this.setState({
+      review: {
+        visibleModal: true,
+        item
+      }
+    })
+  }
+  
+  modalHandleOk() {
+    console.log(this.state.review.item.todo)
+  }
+  
+  modalHandleCancel() {
+    this.setState({
+      review: {
+        ...this.state.review,
+        visibleModal: false
+      }
+    })
+  }
+  
+  getAllUsers() {
+    firebase.database().ref('users').once('value')
+    .then(snapshot => {
+      this.setState({
+        users: snapshot.val()
+      })
+    })
   }
 
   createRoom(e) {
@@ -117,7 +179,7 @@ class Dashboard extends Component {
   }
 
   getAllSummary() {
-    let sum = firebase.database().ref('/summary')
+    let sum = firebase.database().ref('/history')
     sum.on('value', snapshot => {
       if (snapshot.val() !== null) {
         let summary = []
@@ -205,6 +267,7 @@ class Dashboard extends Component {
     this.getAllTodo()
     this.getAllRooms()
     this.getAllSummary()
+    this.getAllUsers()
   }
 
   paketJoin(link) {
@@ -404,22 +467,149 @@ class Dashboard extends Component {
             </div>
             <div className='history'>
               <Collapse bordered={false} className='collapse'>
-                {this.state.summaryList ? this.state.summaryList.map(summary => {
+                {this.state.summaryList ? this.state.summaryList.map(item => {
                   return (
                     <Panel
-                      header={summary.topic}
+                      header={item.topic.text}
                       key="1"
                       style={customPanelStyle}
-                      key={summary.key}>
-                      <Collapse>
-                        <Panel header='Participant' key='1'>
-                          <p>test</p>
-                        </Panel>
-                      </Collapse>
+                      key={item.key}
+                    >
+                      
+                      <div>
+                        {new Date(item.timestamp).toLocaleString()}
+                      </div>
+                      <div>
+                        {Object.keys(item.participant).map(key => <Tag>{item.participant[key].name}</Tag>)}
+                      </div>
+                      <div>
+                        {!item.status ? <Button type="primary" onClick={() => this.reviewModal(item)}>Review</Button> : ''} 
+                      </div>
                     </Panel>
                   )
                 }) : <Spin size="large" />}
               </Collapse>
+              <Modal
+                title={this.state.review.item.topic.text}
+                visible={this.state.review.visibleModal}
+                onOk={() => this.modalHandleOk()}
+                onCancel={() => this.modalHandleCancel()}
+                okText="Submit"
+                cancelText="Cancel"
+              >
+                Tasks
+                {Object.keys(this.state.review.item.todo).map(key => {
+                  const todo = this.state.review.item.todo[key]
+                  return (
+                    <Col>
+                      <Row gutter={4}>
+                        <Col span={23}>
+                          <Input.Group compact>
+                            <Select 
+                              labelInValue
+                              style={{ width: '30%' }}
+                              defaultValue={{key: todo.userId}}
+                              onChange={(e) => {
+                                this.state.review.item.todo[key].userId = e.key
+                                this.state.review.item.todo[key].userName = e.label
+                                this.forceUpdate()
+                              }}
+                            >
+                              {Object.keys(this.state.users).map(id => (
+                                <Select.Option value={id} >{this.state.users[id].name}</Select.Option>
+                              ))}
+                            </Select>
+                            <Input style={{ width: '70%' }} defaultValue={todo.task} />
+                          </Input.Group>
+                        </Col>
+                        <Col span={1}>
+                          <Checkbox 
+                            checked={todo.status}
+                            onChange={(e) => {
+                              this.state.review.item.todo[key].status = e.target.checked
+                              this.forceUpdate()
+                            }}
+                          />
+                        </Col>
+                      </Row>
+                    </Col>
+                  )
+                })}
+                <br/>
+                
+                Noted Chat
+                <ul>
+                  {Object.keys(this.state.review.item.notes).map(key => {
+                    const note = this.state.review.item.notes[key]
+                    return (
+                      <li>{note.data.text}</li>
+                    )
+                  })}
+                </ul>
+                <br/>
+                
+                Duration: {this.state.review.item.report.duration}
+                <br/>
+                
+                <Row>
+                  <Col span={12}>
+                    Discussion Efficiency
+                    <Progress type="dashboard" percent={Math.floor(this.state.review.item.report.discussionEfficiency * 100)} />
+                  </Col>
+                  <Col span={12}>
+                    Discussion Productivity
+                    <Progress type="dashboard" percent={Math.floor(this.state.review.item.report.discussionProductivity * 100)} />
+                  </Col>
+                </Row>
+                <br/>
+                
+                User Participation Rate
+                {Object.keys(this.state.review.item.report.userParticipationRate).map(key => {
+                  const user = this.state.review.item.report.userParticipationRate[key]
+                  return (
+                    <Row>
+                      <Col span={4}>
+                        {user.name}
+                      </Col>
+                      <Col span={20}>
+                        <Progress percent={Math.floor(user.score * 100)} strokeWidth={5}/>
+                      </Col>
+                    </Row>
+                  )
+                })}
+                <br/>
+                
+                User Contribution Rate
+                {Object.keys(this.state.review.item.report.userContributionRate).map(key => {
+                  const user = this.state.review.item.report.userContributionRate[key]
+                  return (
+                    <Row>
+                      <Col span={4}>
+                        {user.name}
+                      </Col>
+                      <Col span={20}>
+                        <Progress percent={Math.floor(user.score * 100)} strokeWidth={5}/>
+                      </Col>
+                    </Row>
+                  )
+                })}
+                <br/>
+                
+                User Focusness
+                {Object.keys(this.state.review.item.report.userFocusness).map(key => {
+                  const user = this.state.review.item.report.userFocusness[key]
+                  return (
+                    <Row>
+                      <Col span={4}>
+                        {user.name}
+                      </Col>
+                      <Col span={20}>
+                        <Progress percent={Math.floor(user.score * 100)} strokeWidth={5}/>
+                      </Col>
+                    </Row>
+                  )
+                })}
+              </Modal>
             </div>
           </div>
         </Layout>
