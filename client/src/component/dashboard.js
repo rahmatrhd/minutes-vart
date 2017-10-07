@@ -167,7 +167,7 @@ class Dashboard extends Component {
             let todo = li[1]
             todo.taskId = li[0]
             todoList.todo.push(todo)
-          } else {
+          } else if (li[1].status === 'backlog') {
             let backlog = li[1]
             backlog.taskId = li[0]
             todoList.backlog.push(backlog)
@@ -181,14 +181,15 @@ class Dashboard extends Component {
   getAllSummary() {
     let sum = firebase.database().ref('/history')
     sum.on('value', snapshot => {
-      let summary = []
-      let listSummary = Object.entries(snapshot.val())
-      listSummary.map(summ => {
-        summ[1].key = summ[0]
-        summary.push(summ[1])
-      })
-      console.log(summary);
-      this.setState({ summaryList: summary })
+      if (snapshot.val() !== null) {
+        let summary = []
+        let listSummary = Object.entries(snapshot.val())
+        listSummary.map(summ => {
+          summ[1].key = summ[0]
+          summary.push(summ[1])
+        })
+        this.setState({ summaryList: summary })
+      }
     })
   }
 
@@ -310,7 +311,8 @@ class Dashboard extends Component {
                           return (
                             <div key={idx}>
                               <Card>
-                                <p style={{fontSize: '18px'}}>{back.task}</p><br />
+                                <p style={{fontSize: '18px'}}>{back.task}</p>
+                                <p>Assign to: {back.user.name}</p>
                                   <div className="singlebutton">
                                     <Button
                                       onClick={() => this.toTodo(back)}
@@ -336,7 +338,8 @@ class Dashboard extends Component {
                           return (
                             <div key={idx}>
                               <Card>
-                                <p style={{fontSize: '18px'}}>{td.task}</p><br />
+                                <p style={{fontSize: '18px'}}>{td.task}</p>
+                                <p>Assign to: {td.user.name}</p><br />
                                 <div className="wrapbutton">
                                 <Button
                                 onClick={() => this.toBackLog(td)}
@@ -366,7 +369,8 @@ class Dashboard extends Component {
                           return (
                             <div key={idx}>
                               <Card>
-                                <p style={{fontSize: '18px'}}>{prog.task}</p><br />
+                                <p style={{fontSize: '18px'}}>{prog.task}</p>
+                                <p>Assign to: {prog.user.name}</p><br />
                                 <div className="wrapbutton">
                                 <Button
                                 onClick={() => this.toTodo(prog)}
@@ -396,7 +400,8 @@ class Dashboard extends Component {
                           return (
                             <div key={idx}>
                               <Card>
-                                <p style={{fontSize: '18px'}}>{dn.task}</p><br />
+                                <p style={{fontSize: '18px'}}>{dn.task}</p>
+                                <p>Assign to: {dn.user.name}</p><br />
                                 <Button
                                 onClick={() => this.toOnProgress(dn)}
                                 type="primary"

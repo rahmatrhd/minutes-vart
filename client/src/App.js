@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {BrowserRouter as Router, Redirect, Route} from 'react-router-dom'
+import {BrowserRouter as Router, Route} from 'react-router-dom'
 // import store from './store'
 import {Provider} from 'react-redux'
 
@@ -19,7 +19,6 @@ class App extends Component {
             <Route exact path='/' component={Login} />
             <Route exact path='/chatroom/:id' component={ChatRoom} />
             <Route exact path='/dashboard' component={Dashboard} />
-            <Redirect to='/dashboard' />
           </div>
         </Router>
       </Provider>
