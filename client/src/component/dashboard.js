@@ -207,8 +207,8 @@ class Dashboard extends Component {
 
   paketJoin(link) {
     console.log('kirim paket')
-    let ref = firebase.database().ref(`/rooms/${link}/participant`)
-    ref.push({
+    let ref = firebase.database().ref(`/rooms/${link}/participant/${this.state.userId}`)
+    ref.set({
       name: this.state.username,
       id: this.state.userId
     })
