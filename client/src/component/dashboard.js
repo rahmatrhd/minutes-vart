@@ -269,8 +269,18 @@ class Dashboard extends Component {
                             <div key={idx}>
                               <Card>
                                 <p>{td.task}</p>
-                                <Button style={{position: 'pull-left'}} type="primary" shape="circle" icon="left-circle"></Button>
-                                <Button style={{position: 'pull-right'}} type="primary" shape="circle" icon="right-circle"></Button>
+                                <Button
+                                onClick={() => this.toBackLog(td)}
+                                style={{position: 'pull-left'}}
+                                type="primary" shape="circle"
+                                icon="left-circle">
+                                </Button>
+                                <Button
+                                onClick={() => this.toOnProgress(td)}
+                                style={{position: 'pull-right'}}
+                                type="primary" shape="circle"
+                                icon="right-circle">
+                                </Button>
                               </Card>
                             </div>
                           )
@@ -287,8 +297,18 @@ class Dashboard extends Component {
                             <div key={idx}>
                               <Card>
                                 <p>{prog.task}</p>
-                                <Button type="primary" shape="circle" icon="left-circle"></Button>
-                                <Button type="primary" shape="circle" icon="right-circle"></Button>
+                                <Button
+                                onClick={() => this.toTodo(prog)}
+                                type="primary"
+                                shape="circle"
+                                icon="left-circle">
+                                </Button>
+                                <Button
+                                onClick={() => this.toDone(prog)}
+                                type="primary"
+                                shape="circle"
+                                icon="right-circle">
+                                </Button>
                               </Card>
                             </div>
                           )
@@ -305,7 +325,12 @@ class Dashboard extends Component {
                             <div key={idx}>
                               <Card>
                                 <p>{dn.task}</p>
-                                <Button type="primary" shape="circle" icon="left-circle"></Button>
+                                <Button
+                                onClick={() => this.toOnProgress(dn)}
+                                type="primary"
+                                shape="circle"
+                                icon="left-circle">
+                                </Button>
                               </Card>
                             </div>
                           )
