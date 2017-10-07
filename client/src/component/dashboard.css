@@ -89,3 +89,15 @@ img {
   grid-column: 3;
   justify-self: center;
 }
+
+.wrapbutton {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.singlebutton {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
