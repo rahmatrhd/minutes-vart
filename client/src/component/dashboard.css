@@ -39,6 +39,12 @@ img {
   height: 75px;
 }
 
+#minutes {
+  margin: 25px;
+  width: auto;
+  height: 100px;
+}
+
 .collapse {
   margin: 20px 20px;
   background: #2D587B;
