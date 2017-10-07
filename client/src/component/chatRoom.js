@@ -90,7 +90,6 @@ class ChatRoom extends Component {
         })
         this.setState({ roomTask: tmp })
       }
-      console.log(this.state.roomTask);
     })
   }
 
@@ -225,6 +224,7 @@ class ChatRoom extends Component {
                   this.state.usersTodoList.backlog.map((list, idx) => {
                     return (
                       <Timeline.Item
+                        key={idx}
                         color='green'>
                         {list.task}
                       </Timeline.Item>
@@ -235,6 +235,7 @@ class ChatRoom extends Component {
                   this.state.usersTodoList.todo.map((list, idx) => {
                     return (
                       <Timeline.Item
+                        key={idx}
                         color='green'>
                         {list.task}
                       </Timeline.Item>
@@ -245,6 +246,7 @@ class ChatRoom extends Component {
                   this.state.usersTodoList.onProgress.map((list, idx) => {
                     return (
                       <Timeline.Item
+                        key={idx}
                         color='red'>
                         {list.task}
                       </Timeline.Item>
@@ -255,6 +257,7 @@ class ChatRoom extends Component {
                   this.state.usersTodoList.done.map((list, idx) => {
                     return (
                       <Timeline.Item
+                        key={idx}
                         color='blue'>
                         {list.task}
                       </Timeline.Item>

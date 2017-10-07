@@ -119,13 +119,15 @@ class Dashboard extends Component {
   getAllSummary() {
     let sum = firebase.database().ref('/summary')
     sum.on('value', snapshot => {
-      let summary = []
-      let listSummary = Object.entries(snapshot.val())
-      listSummary.map(summ => {
-        summ[1].key = summ[0]
-        summary.push(summ[1])
-      })
-      this.setState({ summaryList: summary })
+      if (snapshot.val() !== null) {
+        let summary = []
+        let listSummary = Object.entries(snapshot.val())
+        listSummary.map(summ => {
+          summ[1].key = summ[0]
+          summary.push(summ[1])
+        })
+        this.setState({ summaryList: summary })
+      }
     })
   }
 
