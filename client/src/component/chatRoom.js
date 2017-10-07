@@ -54,9 +54,7 @@ class ChatRoom extends Component {
   }
 
   fetchAllMessages() {
-    let ref = firebase
-      .database()
-      .ref(`/rooms/${this.props.match.params.id}/chat`)
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/chat`)
     ref.on('value', snapshot => {
       if (snapshot.val() !== null) {
         let temp = []
@@ -71,9 +69,7 @@ class ChatRoom extends Component {
         this.setState({messages: temp})
       }
     })
-    let task = firebase
-      .database()
-      .ref(`/rooms/${this.props.match.params.id}/minnie/todo`)
+    let task = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/todo`)
     task.on('value', snapshot => {
       if (snapshot.val() !== null) {
         let tmp = []
@@ -89,12 +85,8 @@ class ChatRoom extends Component {
   }
 
   sendChat(e) {
-    let ref = firebase
-      .database()
-      .ref(`/rooms/${this.props.match.params.id}/chat`)
-    ref
-      .push()
-      .set({id: this.state.userId, message: this.state.chatText, senderName: this.state.currentUser})
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/chat`)
+    ref.push().set({id: this.state.userId, message: this.state.chatText, senderName: this.state.currentUser})
     this.setState({chatText: ''})
     e.preventDefault()
     axios.post('https://us-central1-minutes-vart.cloudfunctions.net/incomingChat', {
@@ -113,25 +105,21 @@ class ChatRoom extends Component {
       headers: {
         'Content-Type': 'application/json'
       }
-    }).then(data => {
+    })
+    .then(data => {
       this.setState({chatText: ''})
     })
     this.setState({chatText: ''})
   }
 
   stateChangeListener() {
-    firebase
-      .auth()
-      .onAuthStateChanged(user => {
-        if (user) {
-          this.setState({currentUser: user.displayName, email: user.email, photoURL: user.photoURL, userId: user.uid})
-        } else {
-          this
-            .props
-            .history
-            .push('/')
-        }
-      })
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.setState({currentUser: user.displayName, email: user.email, photoURL: user.photoURL, userId: user.uid})
+      } else {
+        this.props.history.push('/')
+      }
+    })
   }
 
   componentDidMount() {
