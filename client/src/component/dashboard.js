@@ -145,6 +145,34 @@ class Dashboard extends Component {
       })
   }
 
+  // --------------------------- kanbans---------------------------
+
+  toBackLog(task) {
+    console.log('toBackLog')
+    task.status = 'backlog'
+    firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+  }
+  
+  toTodo(task) {
+    console.log('toTodo')
+    task.status = 'todo'
+    firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+  }
+  
+  toOnProgress(task) {
+    console.log('toOnProgress')
+    task.status = 'onProgress'
+    firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+  }
+  
+  toDone(task) {
+    console.log('toDone')
+    task.status = 'done'
+    firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+  }
+
+  // --------------------------- kanbans---------------------------
+
   stateChangeListener() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
@@ -217,7 +245,13 @@ class Dashboard extends Component {
                           return (
                             <div key={idx}>
                               <Card>{back.task}</Card>
-                              <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                              <br />
+                              <Button
+                              onClick={() => this.toTodo(back)}
+                              type="primary"
+                              shape="circle" 
+                              icon="rocket">
+                              </Button>
                             </div>
                           )
                         })
