@@ -146,19 +146,31 @@ class Dashboard extends Component {
   }
 
   stateChangeListener() {
-    firebase
-      .auth()
-      .onAuthStateChanged(user => {
-        if (user) {
-          console.log(user)
-          this.setState({username: user.displayName, email: user.email, photoURL: user.photoURL})
-        } else {
-          this
-            .props
-            .history
-            .push('/')
-        }
-      })
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        console.log(user)
+
+        let ref = firebase.database().ref('/users')
+        ref.once('value', snap => {
+          let regist = snap.hasChild(user.uid)
+          if (!regist) {
+            console.log('Not Registered. Register first.')
+            // this.logout()
+            this.props.history.push('/')
+          } else {
+            console.log('aman-aman aja');
+          }
+        })
+
+        this.setState({
+          username: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL
+        })
+      } else {
+        this.props.history.push('/')
+      }
+    })
   }
 
   componentWillMount() {
