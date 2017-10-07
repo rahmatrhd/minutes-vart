@@ -239,9 +239,8 @@ class Dashboard extends Component {
                 padding: '20px'
               }}>
                 <Row gutter={5}>
-
                   <Col span={6}>
-                    <Card title="Backlog" bordered={false}>
+                    <Card title="Backlog" bordered={false} style={{backgroundColor: 'rgba(255,255,255, 0.6)'}}>
                       {
                         this.state.todoList.backlog.map((back, idx) => {
                           return (
@@ -252,7 +251,7 @@ class Dashboard extends Component {
                                 onClick={() => this.toTodo(back)}
                                 type="primary"
                                 shape="circle"
-                                icon="rocket">
+                                icon="right-circle">
                               </Button>
                             </div>
                           )
@@ -263,13 +262,16 @@ class Dashboard extends Component {
 
 
                   <Col span={6}>
-                    <Card title="Todo" bordered={false}>
+                    <Card title="Todo" bordered={false} style={{backgroundColor: 'rgba(255,255,255, 0.6)'}}>
                       {
                         this.state.todoList.todo.map((td, idx) => {
                           return (
                             <div key={idx}>
-                              <Card>{td.task}</Card>
-                              <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                              <Card>
+                                <p>{td.task}</p>
+                                <Button style={{position: 'pull-left'}} type="primary" shape="circle" icon="left-circle"></Button>
+                                <Button style={{position: 'pull-right'}} type="primary" shape="circle" icon="right-circle"></Button>
+                              </Card>
                             </div>
                           )
                         })
@@ -278,13 +280,16 @@ class Dashboard extends Component {
                   </Col>
 
                   <Col span={6}>
-                    <Card title="On Progress" bordered={false}>
+                    <Card title="On Progress" bordered={false} style={{backgroundColor: 'rgba(255,255,255, 0.6)'}}>
                       {
                         this.state.todoList.onProgress.map((prog, idx) => {
                           return (
                             <div key={idx}>
-                              <Card>{prog.task}</Card>
-                              <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                              <Card>
+                                <p>{prog.task}</p>
+                                <Button type="primary" shape="circle" icon="left-circle"></Button>
+                                <Button type="primary" shape="circle" icon="right-circle"></Button>
+                              </Card>
                             </div>
                           )
                         })
@@ -293,13 +298,15 @@ class Dashboard extends Component {
                   </Col>
 
                   <Col span={6}>
-                    <Card title="Done" bordered={false}>
+                    <Card title="Done" bordered={false} style={{backgroundColor: 'rgba(255,255,255, 0.6)'}}>
                       {
                         this.state.todoList.done.map((dn, idx) => {
                           return (
                             <div key={idx}>
-                              <Card>{dn.task}</Card>
-                              <br /><Button type="primary" shape="circle" icon="rocket"></Button>
+                              <Card>
+                                <p>{dn.task}</p>
+                                <Button type="primary" shape="circle" icon="left-circle"></Button>
+                              </Card>
                             </div>
                           )
                         })
