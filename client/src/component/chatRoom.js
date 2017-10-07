@@ -178,16 +178,16 @@ class ChatRoom extends Component {
     })
   }
 
-  componentWillMount() {
-    this.stateChangeListener()
+  componentWillMount = async () => {
+    await this.stateChangeListener()
+    await this.fetchAllMessages()
+    await this.fetchAllTask()
+    await this.fetchAllTodo()
+    await this.getParticipantList()
+    await this.scrollToBottom()
   }
-
+  
   componentDidMount() {
-    this.fetchAllMessages()
-    this.fetchAllTask()
-    this.fetchAllTodo()
-    this.getParticipantList()
-    this.scrollToBottom()
   }
 
   componentDidUpdate() {
