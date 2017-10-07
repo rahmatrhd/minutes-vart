@@ -105,7 +105,7 @@ class Dashboard extends Component {
             let todo = li[1]
             todo.taskId = li[0]
             todoList.todo.push(todo)
-          } else {
+          } else if (li[1].status === 'backlog') {
             let backlog = li[1]
             backlog.taskId = li[0]
             todoList.backlog.push(backlog)

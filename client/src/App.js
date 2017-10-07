@@ -19,7 +19,6 @@ class App extends Component {
             <Route exact path='/' component={Login} />
             <Route exact path='/chatroom/:id' component={ChatRoom} />
             <Route exact path='/dashboard' component={Dashboard} />
-            <Redirect to='/dashboard' />
           </div>
         </Router>
       </Provider>
