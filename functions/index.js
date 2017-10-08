@@ -6,6 +6,7 @@ admin.initializeApp(functions.config().firebase)
 const incomingChat = require('./incomingChat')
 const watsonNLU = require('./watsonNLU')
 const closeDiscussion = require('./closeDiscussion')
+const submitReview = require('./submitReview')
 
 exports.incomingChat = functions.https.onRequest((req, res) => {
   cors()(req, res, () => {
@@ -23,4 +24,10 @@ exports.closeDiscussion = functions.https.onRequest((req, res) => {
   cors()(req, res, () => {
     closeDiscussion(req, res)
   })
+})
+
+exports.submitReview = functions.https.onRequest((req, res) => {
+	cors()(req, res, () => {
+		submitReview(req, res)
+	})
 })
