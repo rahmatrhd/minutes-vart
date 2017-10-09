@@ -482,7 +482,7 @@ class Dashboard extends Component {
                       <div>
                         {Object.keys(item.participant).map(key => <Tag>{item.participant[key].name}</Tag>)}
                       </div>
-                      <div>
+                      <div><br />
                         {!item.status ? <Button type="primary" onClick={() => this.reviewModal(item)}>Review</Button> : ''} 
                       </div>
                     </Panel>
