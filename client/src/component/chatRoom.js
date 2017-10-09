@@ -61,6 +61,11 @@ class ChatRoom extends Component {
     this.setState({ chatText: e.target.value })
   }
 
+  deleteMinnieTask(taskId) {
+    console.log('Delete minnie task');
+    firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/todo/${taskId}`).remove()
+  }
+
   fetchAllMessages() {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/chat`)
     ref.on('value', snapshot => {
@@ -144,7 +149,8 @@ class ChatRoom extends Component {
   roomStatusChecker() {
     firebase.database().ref(`/rooms/${this.props.match.params.id}/status`).on('value', snap => {
       this.setState({ roomStatus: snap.val() })
-      if (!snap.val()) {
+      // if (!snap.val()) {
+      if (!this.state.roomStatus) {
         this.props.history.push('/dashboard')
       }
     })
@@ -380,6 +386,21 @@ class ChatRoom extends Component {
               }}>
               <Column title="Task" dataIndex="task" key="task" />
               <Column title="User" dataIndex="userName" key="userName" />
+              <Column
+                title=""
+                key="action"
+                render={(text, rec) => (
+                  <span>
+                    <Button 
+                      type="danger"
+                      size="small"
+                      onClick={() => this.deleteMinnieTask(rec.key)}
+                    >
+                      <span><Icon type="delete" /></span>
+                    </Button>
+                  </span>
+                )}
+              />
             </Table>
           </div>
           <div className='end'>

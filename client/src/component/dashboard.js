@@ -285,10 +285,6 @@ class Dashboard extends Component {
     }
   }
 
-  toRemove(task) {
-    
-  }
-
   // --------------------------- kanbans---------------------------
 
   stateChangeListener() {
@@ -374,7 +370,7 @@ class Dashboard extends Component {
                                 <p>Assign to: {back.user.name}</p><br />
                                   <div className="singlebutton">
                                     <Button
-                                      onClick={() => this.toRemove(back)}
+                                      onClick={() => this.deleteTask(back)}
                                       type="primary"
                                       shape="circle"
                                       icon="delete">
@@ -412,7 +408,7 @@ class Dashboard extends Component {
                                 icon="left-circle">
                                 </Button>
                                 <Button
-                                  onClick={() => this.toRemove(td)}
+                                  onClick={() => this.deleteTask(td)}
                                   type="primary"
                                   shape="circle"
                                   icon="delete">
@@ -449,7 +445,7 @@ class Dashboard extends Component {
                                   icon="left-circle">
                                 </Button>
                                 <Button
-                                  onClick={() => this.toRemove(prog)}
+                                  onClick={() => this.deleteTask(prog)}
                                   type="primary"
                                   shape="circle"
                                   icon="delete">
@@ -487,7 +483,7 @@ class Dashboard extends Component {
                                     icon="left-circle">
                                   </Button>
                                   <Button
-                                    onClick={() => this.toRemove(dn)}
+                                    onClick={() => this.deleteTask(dn)}
                                     type="primary"
                                     shape="circle"
                                     icon="delete">
