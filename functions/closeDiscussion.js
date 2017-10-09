@@ -5,6 +5,7 @@ const Duration = require('./Duration')
 module.exports = (req, res) => {
   const roomId = req.query.room_id
   
+  db.ref(`rooms/${roomId}/status`).set(false)
   db.ref(`rooms/${roomId}`).once('value')
   .then(snapshot => {
     const data = Object.assign({}, snapshot.val())
