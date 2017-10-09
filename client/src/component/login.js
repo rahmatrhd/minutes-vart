@@ -29,6 +29,10 @@ class Login extends Component {
     })
   }
 
+  registerNewUser(id, name) {
+    firebase.database().ref('/users').child(id).set({ name: name })
+  }
+
   stateChangeListener() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
@@ -39,12 +43,13 @@ class Login extends Component {
           let checker = snapshot.hasChild(user.uid)
           if (!checker) {
             console.log('Not Registered. Registering')
-            ref.child(`${user.uid}`).set({name: user.displayName})
+            this.registerNewUser(user.uid, user.displayName)
+            this.props.history.push('/dashboard')
           } else {
             console.log('Registered')
+            this.props.history.push('/dashboard')
           }
         })
-        this.props.history.push('/dashboard')
       } else {
         console.log('Not Logged')
       }

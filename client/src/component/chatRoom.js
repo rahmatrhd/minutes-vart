@@ -46,6 +46,7 @@ class ChatRoom extends Component {
       participants: [],
       photoURL: '',
       roomTask: [],
+      roomStatus: true,
       userId: '',
       usersTodoList: {
         backlog: [],
@@ -142,7 +143,10 @@ class ChatRoom extends Component {
 
   roomStatusChecker() {
     firebase.database().ref(`/rooms/${this.props.match.params.id}/status`).on('value', snap => {
-      if (!snap.val()) this.props.history.push('/dashboard')
+      this.setState({ roomStatus: snap.val() })
+      if (!snap.val()) {
+        this.props.history.push('/dashboard')
+      }
     })
   }
 
@@ -186,15 +190,19 @@ class ChatRoom extends Component {
 
   componentWillMount = async () => {
     await this.stateChangeListener()
+    await this.roomStatusChecker()
     await this.fetchAllMessages()
-    await this.fetchAllTask()
     await this.fetchAllTodo()
     await this.getParticipantList()
+    await this.fetchAllTask()
     await this.scrollToBottom()
   }
   
+  scrollToBottom() {
+    if (this.state.roomStatus) this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+  }
+  
   componentDidMount() {
-    this.roomStatusChecker()
   }
 
   componentDidUpdate() {
