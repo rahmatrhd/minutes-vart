@@ -301,6 +301,9 @@ class Dashboard extends Component {
               </div>
               <div className='name'>
                 <h1>Project Name</h1>
+                <hr /><br />
+                <Button icon="edit" type="primary" size='large'>NEW TASK
+                </Button>
               </div>
             </div>
             <div className='kanbancontent'>
