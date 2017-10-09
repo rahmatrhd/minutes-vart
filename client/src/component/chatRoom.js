@@ -238,8 +238,9 @@ class ChatRoom extends Component {
                   icon="arrow-left"
                   size='large'
                   style={{
-                    margin: 15
+                    margin: 15, float: 'left'
                   }} />
+                  <h1 style={{float: 'right', marginRight: 10, marginTop: 10, color: 'white', overflowX: 'hidden'}}>TITLE</h1>
               </Link>
             </div>
             <div className='middletask'>
