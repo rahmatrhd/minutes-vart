@@ -197,6 +197,11 @@ class ChatRoom extends Component {
   scrollToBottom() {
     this.messagesEnd.scrollIntoView({ behavior: "smooth" });
   }
+  
+  endDiscussion() {
+    const roomId = this.props.match.params.id
+    axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/closeDiscussion?room_id=${roomId}`)
+  }
 
   render() {
     return (
@@ -364,6 +369,7 @@ class ChatRoom extends Component {
           </div>
           <div className='end'>
             <Button
+              onClick={() => this.endDiscussion()}
               type="danger"
               size='large'
               style={{
