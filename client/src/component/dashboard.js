@@ -231,6 +231,10 @@ class Dashboard extends Component {
     firebase.database().ref(`/kanban/${task.taskId}`).set(task)
   }
 
+  toRemove(task) {
+    
+  }
+
   // --------------------------- kanbans---------------------------
 
   stateChangeListener() {
@@ -312,8 +316,14 @@ class Dashboard extends Component {
                             <div key={idx}>
                               <Card>
                                 <p style={{fontSize: '18px'}}>{back.task}</p>
-                                <p>Assign to: {back.user.name}</p>
+                                <p>Assign to: {back.user.name}</p><br />
                                   <div className="singlebutton">
+                                    <Button
+                                      onClick={() => this.toRemove(back)}
+                                      type="primary"
+                                      shape="circle"
+                                      icon="delete">
+                                    </Button>
                                     <Button
                                       onClick={() => this.toTodo(back)}
                                       type="primary"
@@ -347,6 +357,12 @@ class Dashboard extends Component {
                                 icon="left-circle">
                                 </Button>
                                 <Button
+                                  onClick={() => this.toRemove(td)}
+                                  type="primary"
+                                  shape="circle"
+                                  icon="delete">
+                                </Button>
+                                <Button
                                 onClick={() => this.toOnProgress(td)}
                                 type="primary" shape="circle"
                                 icon="right-circle">
@@ -372,16 +388,22 @@ class Dashboard extends Component {
                                 <p>Assign to: {prog.user.name}</p><br />
                                 <div className="wrapbutton">
                                 <Button
-                                onClick={() => this.toTodo(prog)}
-                                type="primary"
-                                shape="circle"
-                                icon="left-circle">
+                                  onClick={() => this.toTodo(prog)}
+                                  type="primary"
+                                  shape="circle"
+                                  icon="left-circle">
                                 </Button>
                                 <Button
-                                onClick={() => this.toDone(prog)}
-                                type="primary"
-                                shape="circle"
-                                icon="right-circle">
+                                  onClick={() => this.toRemove(prog)}
+                                  type="primary"
+                                  shape="circle"
+                                  icon="delete">
+                                </Button>
+                                <Button
+                                  onClick={() => this.toDone(prog)}
+                                  type="primary"
+                                  shape="circle"
+                                  icon="right-circle">
                                 </Button>
                                 </div>
                               </Card>
@@ -402,12 +424,20 @@ class Dashboard extends Component {
                               <Card>
                                 <p style={{fontSize: '18px'}}>{dn.task}</p>
                                 <p>Assign to: {dn.user.name}</p><br />
-                                <Button
-                                onClick={() => this.toOnProgress(dn)}
-                                type="primary"
-                                shape="circle"
-                                icon="left-circle">
-                                </Button>
+                                <div className="singlebutton">
+                                  <Button
+                                    onClick={() => this.toOnProgress(dn)}
+                                    type="primary"
+                                    shape="circle"
+                                    icon="left-circle">
+                                  </Button>
+                                  <Button
+                                    onClick={() => this.toRemove(dn)}
+                                    type="primary"
+                                    shape="circle"
+                                    icon="delete">
+                                  </Button>
+                                </div>
                               </Card>
                               <br />
                             </div>
