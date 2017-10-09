@@ -20,6 +20,7 @@ module.exports = (req, res) => {
     // duration
     const duration = new Duration(Date.now() - timestamp)
     const durationString = `${duration.getHours}:${duration.getMinutes}`
+    console.log('duration', duration, durationString)
     
     // user participation rate
     let hashUserRelevantChat = {} // hash table
@@ -32,6 +33,7 @@ module.exports = (req, res) => {
       name: user.name,
       score: hashUserRelevantChat[user.id] / relevantChatArr.length
     }))
+    console.log('hashUserRelevantChat', hashUserRelevantChat, userParicipationRate)
     
     //user contribution rate
     let hashUserNotes = {}
@@ -44,6 +46,7 @@ module.exports = (req, res) => {
       name: user.name,
       score: hashUserNotes[user.id] / notesArr.length
     }))
+    console.log('hashUserNotes', hashUserNotes, userContributionRate)
     
     //user focusness
     let hashUserChat = {}
@@ -56,28 +59,43 @@ module.exports = (req, res) => {
       name: user.name,
       score: hashUserRelevantChat[user.id] / hashUserChat[user.id]
     }))
+    console.log('hashUserChat', hashUserChat, userFocusness)
     
     // discussion efficiency
     const discussionEfficiency = relevantChatArr.length / chatArr.length
     
     // discussion productivity rate (per hour)
     const discussionProductivity = discussionEfficiency / duration.getTotalHours
-    db.ref(`summary`).push({
-      status: true,
-      topic,
-      participant,
-      minnie: data.minnie,
-      todo,
+    console.log('discussion', discussionEfficiency, discussionProductivity)
+      
+    db.ref('history').push({
+      status: false,
+      topic: data.topic,
+      participant: data.participant,
+      timestamp: Date.now(),
+      notes: data.minnie.notes,
+      todo: data.minnie.todo.map(singleTodo => {
+        singleTodo.status = true
+        return singleTodo
+      }),
       report: {
         duration: durationString,
-        userParicipationRate,
-        userContributionRate,
-        userFocusness,
-        discussionEfficiency,
-        discussionProductivity
+        userParicipationRate: arrToObj(userParicipationRate),
+        userContributionRate: arrToObj(userContributionRate),
+        userFocusness: arrToObj(userFocusness),
+        discussionEfficiency: discussionEfficiency,
+        discussionProductivity: discussionProductivity
       }
     })
     db.ref(`rooms/${roomId}`).set(null)
   })
   .catch(err => res.send(err))
+}
+
+const arrToObj = arr => {
+  let result = {}
+  arr.forEach((item, index) => {
+    result[index] = item
+  })
+  return result
 }

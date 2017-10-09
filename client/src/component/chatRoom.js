@@ -140,6 +140,12 @@ class ChatRoom extends Component {
     })
   }
 
+  roomStatusChecker() {
+    firebase.database().ref(`/rooms/${this.props.match.params.id}/status`).on('value', snap => {
+      if (!snap.val()) this.props.history.push('/dashboard')
+    })
+  }
+
   sendChat(e) {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/chat`)
     ref.push().set({ id: this.state.userId, message: this.state.chatText, senderName: this.state.currentUser })
@@ -192,6 +198,7 @@ class ChatRoom extends Component {
   }
   
   componentDidMount() {
+    this.roomStatusChecker()
   }
 
   componentDidUpdate() {
