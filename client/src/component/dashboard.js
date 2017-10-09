@@ -128,6 +128,7 @@ class Dashboard extends Component {
       } else {
         let ref = firebase.database().ref(`/rooms/`)
         let roomData = {
+          status: true,
           topic: {
             categories: data.categories,
             text: this.state.topicTitle
