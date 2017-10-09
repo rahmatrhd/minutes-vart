@@ -1,6 +1,8 @@
 const functions = require('firebase-functions')
 const axios = require('axios')
+
 const assignTodo = require('./assignTodo')
+const cancelTodo = require('./cancelTodo')
 
 const TOKEN = functions.config().api_ai.dev_token
 
@@ -11,13 +13,7 @@ module.exports = payload => {
     query,
     sessionId,
     timezone: new Date(),
-    lang: 'en',
-    originalRequest: {
-      source: 'minutes',
-      data: {
-        roomId
-      }
-    }
+    lang: 'en'
   }, {
     headers: {
       Authorization: `Bearer ${TOKEN}`
@@ -26,6 +22,7 @@ module.exports = payload => {
   .then(({data}) => {
     const actionHandlers = {
       'assign_todo': () => assignTodo(roomId, data),
+      'Todo.Todo-cancel': () => cancelTodo(roomId),
       'default': () => {
         return {
           result: null
