@@ -154,8 +154,9 @@ class ChatRoom extends Component {
       if (!this.state.roomStatus) {
         this.props.history.push('/dashboard')
       }
-    })
-  }
+    }
+  })
+}
 
   sendChat(e) {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/chat`)
