@@ -66,7 +66,7 @@ class ChatRoom extends Component {
     ref.on('value', snapshot => {
       if (snapshot.val() !== null) {
         let temp = []
-        let messages = Object.entries(snapshot.val())
+        let messages = Object.entries(snapshot.val() || {})
         messages.map(msg => {
           if (msg[1].id === this.state.userId) {
             msg[1].id = 0
@@ -84,7 +84,7 @@ class ChatRoom extends Component {
     ref.on('value', snapshot => {
       if (snapshot.val() !== null) {
         let tmp = []
-        let todo = Object.entries(snapshot.val())
+        let todo = Object.entries(snapshot.val() || {})
         todo.map(maps => {
           maps[1].key = maps[0]
           tmp.push(maps[1])
@@ -98,7 +98,7 @@ class ChatRoom extends Component {
     let ref = firebase.database().ref('/kanban')
     ref.on('value', snapshot => {
       if (snapshot.val() !== null) {
-        let list = Object.entries(snapshot.val())
+        let list = Object.entries(snapshot.val() || {})
         let usersTodoList = {
           backlog: [],
           done: [],
@@ -132,7 +132,7 @@ class ChatRoom extends Component {
   getParticipantList() {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/participant`)
     ref.on('value', snapshot => {
-      let longList = Object.entries(snapshot.val())
+      let longList = Object.entries(snapshot.val() || {})
       let temp = []
       longList.map(list => {
         temp.push(list[1])
@@ -143,7 +143,7 @@ class ChatRoom extends Component {
 
   roomStatusChecker() {
     firebase.database().ref(`/rooms/${this.props.match.params.id}/status`).on('value', snap => {
-      this.setState({ roomStatus: snap.val() })
+      this.setState({ roomStatus: snap.val() || {}})
       if (!snap.val()) {
         this.props.history.push('/dashboard')
       }
