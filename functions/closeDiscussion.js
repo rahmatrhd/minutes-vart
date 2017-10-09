@@ -93,6 +93,9 @@ module.exports = (req, res) => {
         
       db.ref('history').push({
         status: false,
+        topic: {
+          text: data.topic.text
+        },
         participant: data.participant,
         timestamp: Date.now(),
         notes: data.minnie.notes,
@@ -106,7 +109,9 @@ module.exports = (req, res) => {
           discussionProductivity: discussionProductivity
         }
       })
-      db.ref(`rooms/${roomId}`).set(null)
+      .then(() => {
+        db.ref(`rooms/${roomId}`).set(null)
+      })
     })
     .catch(err => res.send(err))
   })
