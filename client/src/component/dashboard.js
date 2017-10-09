@@ -69,10 +69,29 @@ class Dashboard extends Component {
           }
         }
       },
-      users: {}
+      users: {},
+      visible: false
     }
   }
   
+  addTaskModal(item) {
+    this.setState({
+      visible: true
+    })
+  }
+
+  addHandleOk() {
+    this.setState({
+      visible: false
+    })
+  }
+
+  addHandleCancel() {
+    this.setState({
+      visible: false
+    })
+  }
+
   reviewModal(item) {
     console.log(item)
     this.setState({
@@ -302,8 +321,25 @@ class Dashboard extends Component {
               <div className='name'>
                 <h1>Project Name</h1>
                 <hr /><br />
-                <Button icon="edit" type="primary" size='large'>NEW TASK
+                <Button 
+                  onClick={() => this.addTaskModal()}
+                  icon="edit" 
+                  type="primary" 
+                  size='large'>
+                  NEW TASK
                 </Button>
+                <Modal
+                  title="Add Task Modal"
+                  visible={this.state.visible}
+                  onOk={() => this.addHandleOk()}
+                  onCancel={() => this.addHandleCancel()}
+                  cancelText="Cancel"
+                  okText="Ok"
+                >
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                  <p>Some contents...</p>
+                </Modal>
               </div>
             </div>
             <div className='kanbancontent'>
