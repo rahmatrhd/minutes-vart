@@ -90,7 +90,7 @@ class Dashboard extends Component {
     this.setState({
       visible: false
     })
-    this.addNewTask(e)
+    this.addNewTask()
   }
 
   addHandleCancel() {
@@ -247,18 +247,16 @@ class Dashboard extends Component {
   // --------------------------- kanbans---------------------------
 
   addNewTask() {
-    let data = {
+    console.log('name', this.state.username)
+    const key = firebase.database().ref(`/kanban`).push().key
+    firebase.database().ref(`/kanban/${key}`).set({
       status: 'backlog',
       task: this.state.newTask,
+      taskId: key,
       user: {
         name: this.state.username,
         userId: this.state.userId
       }
-    }
-    firebase.database().ref('/kanban').push(data)
-    firebase.database().ref('/kanban').limitToLast(1).on('child_added', added => {
-      data.taskId = added.key
-      firebase.database().ref(`/kanban/${added.key}`).set(data)
     })
     this.setState({newTask: ''})
   }
