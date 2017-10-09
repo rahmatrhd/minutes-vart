@@ -171,7 +171,7 @@ class Dashboard extends Component {
     let ref = firebase.database().ref('/rooms')
     ref.on('value', snapshot => {
       let temp = []
-      let list = Object.entries(snapshot.val())
+      let list = Object.entries(snapshot.val() || {})
       list.map(li => {
         temp.push({
           roomId: li[0],
@@ -186,7 +186,7 @@ class Dashboard extends Component {
     let ref = firebase.database().ref('/kanban')
     ref.on('value', snapshot => {
       if (snapshot.val() !== null) {
-        let list = Object.entries(snapshot.val())
+        let list = Object.entries(snapshot.val() || {})
         let todoList = {
           backlog: [],
           done: [],
@@ -222,7 +222,7 @@ class Dashboard extends Component {
     sum.on('value', snapshot => {
       if (snapshot.val() !== null) {
         let summary = []
-        let listSummary = Object.entries(snapshot.val())
+        let listSummary = Object.entries(snapshot.val() || {})
         listSummary.map(summ => {
           summ[1].key = summ[0]
           summary.push(summ[1])
