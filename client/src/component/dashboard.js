@@ -173,6 +173,7 @@ class Dashboard extends Component {
       let temp = []
       let list = Object.entries(snapshot.val())
       list.map(li => {
+        console.log('>>>>>', li[1].participant)
         temp.push({
           roomId: li[0],
           topic: li[1].topic.text.toUpperCase() || undefined
@@ -399,6 +400,7 @@ class Dashboard extends Component {
                     <Input
                       onChange={(e) => this.addNewTaskChange(e)}
                       prefix={<Icon type="calendar" style={{ fontSize: 13 }} />} type="text" placeholder="New Task ..."
+                      value={this.state.newTask}
                     />
                   </Form>
                 </Modal>
