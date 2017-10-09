@@ -343,18 +343,17 @@ class Dashboard extends Component {
                                 <div className="wrapbutton">
                                 <Button
                                 onClick={() => this.toBackLog(td)}
-                                style={{position: 'pull-left'}}
                                 type="primary" shape="circle"
                                 icon="left-circle">
                                 </Button>
                                 <Button
                                 onClick={() => this.toOnProgress(td)}
-                                style={{position: 'pull-right'}}
                                 type="primary" shape="circle"
                                 icon="right-circle">
                                 </Button>
                                 </div>
                               </Card>
+                              <br />
                             </div>
                           )
                         })
@@ -386,6 +385,7 @@ class Dashboard extends Component {
                                 </Button>
                                 </div>
                               </Card>
+                              <br />
                             </div>
                           )
                         })
@@ -409,6 +409,7 @@ class Dashboard extends Component {
                                 icon="left-circle">
                                 </Button>
                               </Card>
+                              <br />
                             </div>
                           )
                         })
