@@ -11,7 +11,7 @@ class Login extends Component {
     var provider = new firebase.auth.GoogleAuthProvider()
     provider.addScope('https://www.googleapis.com/auth/userinfo.email')
     provider.addScope('https://www.googleapis.com/auth/userinfo.profile')
-    firebase.auth().signInWithPopup(provider).then(result => {
+    firebase.auth().signInWithRedirect(provider).then(result => {
       console.log('username>> ', result.user.displayName)
       console.log('email>> ', result.user.email)
       console.log('photoURL>> ', result.user.photoURL)
@@ -87,7 +87,7 @@ class Login extends Component {
           <div style={{
             textAlign: 'center'
           }}>
-            <button class="loginBtn loginBtn--google" onClick={this.loginGmail}>
+            <button className="loginBtn loginBtn--google" onClick={this.loginGmail}>
               Login With Google
             </button>
           </div>

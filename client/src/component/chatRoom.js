@@ -61,6 +61,11 @@ class ChatRoom extends Component {
     this.setState({ chatText: e.target.value })
   }
 
+  deleteMinnieTask(taskId) {
+    console.log('Delete minnie task');
+    firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/todo/${taskId}`).remove()
+  }
+
   fetchAllMessages() {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/chat`)
     ref.on('value', snapshot => {
@@ -145,6 +150,8 @@ class ChatRoom extends Component {
     firebase.database().ref(`/rooms/${this.props.match.params.id}/status`).on('value', snap => {
       this.setState({ roomStatus: snap.val() || {}})
       if (!snap.val()) {
+      this.setState({ roomStatus: snap.val() || {}})
+      if (!this.state.roomStatus) {
         this.props.history.push('/dashboard')
       }
     })
@@ -216,6 +223,8 @@ class ChatRoom extends Component {
   endDiscussion() {
     const roomId = this.props.match.params.id
     axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/closeDiscussion?room_id=${roomId}`)
+    // firebase.database().ref(`/rooms/${this.props.match.params.id}`).remove()
+    // this.props.history.push('/dashboard')
   }
 
   render() {
@@ -230,8 +239,9 @@ class ChatRoom extends Component {
                   icon="arrow-left"
                   size='large'
                   style={{
-                    margin: 15
+                    margin: 15, float: 'left'
                   }} />
+                  <h1 style={{float: 'right', marginRight: 10, marginTop: 10, color: 'white', overflowX: 'hidden'}}>TITLE</h1>
               </Link>
             </div>
             <div className='middletask'>
@@ -245,7 +255,7 @@ class ChatRoom extends Component {
                     return (
                       <Timeline.Item
                         key={idx}
-                        color='green'>
+                        color='red'>
                         {list.task}
                       </Timeline.Item>
                     )
@@ -256,7 +266,7 @@ class ChatRoom extends Component {
                     return (
                       <Timeline.Item
                         key={idx}
-                        color='green'>
+                        color='orange'>
                         {list.task}
                       </Timeline.Item>
                     )
@@ -267,7 +277,7 @@ class ChatRoom extends Component {
                     return (
                       <Timeline.Item
                         key={idx}
-                        color='red'>
+                        color='blue'>
                         {list.task}
                       </Timeline.Item>
                     )
@@ -278,7 +288,7 @@ class ChatRoom extends Component {
                     return (
                       <Timeline.Item
                         key={idx}
-                        color='blue'>
+                        color='green'>
                         {list.task}
                       </Timeline.Item>
                     )
@@ -380,6 +390,21 @@ class ChatRoom extends Component {
               }}>
               <Column title="Task" dataIndex="task" key="task" />
               <Column title="User" dataIndex="userName" key="userName" />
+              <Column
+                title=""
+                key="action"
+                render={(text, rec) => (
+                  <span>
+                    <Button 
+                      type="danger"
+                      size="small"
+                      onClick={() => this.deleteMinnieTask(rec.key)}
+                    >
+                      <span><Icon type="delete" /></span>
+                    </Button>
+                  </span>
+                )}
+              />
             </Table>
           </div>
           <div className='end'>
