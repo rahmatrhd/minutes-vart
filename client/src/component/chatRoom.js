@@ -251,7 +251,7 @@ class ChatRoom extends Component {
                     return (
                       <Timeline.Item
                         key={idx}
-                        color='red'>
+                        color='green'>
                         {list.task}
                       </Timeline.Item>
                     )
@@ -262,7 +262,7 @@ class ChatRoom extends Component {
                     return (
                       <Timeline.Item
                         key={idx}
-                        color='orange'>
+                        color='green'>
                         {list.task}
                       </Timeline.Item>
                     )
@@ -273,7 +273,7 @@ class ChatRoom extends Component {
                     return (
                       <Timeline.Item
                         key={idx}
-                        color='blue'>
+                        color='red'>
                         {list.task}
                       </Timeline.Item>
                     )
@@ -284,7 +284,7 @@ class ChatRoom extends Component {
                     return (
                       <Timeline.Item
                         key={idx}
-                        color='green'>
+                        color='blue'>
                         {list.task}
                       </Timeline.Item>
                     )
