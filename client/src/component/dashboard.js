@@ -273,6 +273,10 @@ class Dashboard extends Component {
     }
   }
 
+  toRemove(task) {
+    
+  }
+
   // --------------------------- kanbans---------------------------
 
   stateChangeListener() {
@@ -339,6 +343,9 @@ class Dashboard extends Component {
               </div>
               <div className='name'>
                 <h1>Project Name</h1>
+                <hr /><br />
+                <Button icon="edit" type="primary" size='large'>NEW TASK
+                </Button>
               </div>
             </div>
             <div className='kanbancontent'>
@@ -354,8 +361,14 @@ class Dashboard extends Component {
                             <div key={idx}>
                               <Card>
                                 <p style={{fontSize: '18px'}}>{back.task}</p>
-                                <p>Assign to: {back.user.name}</p>
+                                <p>Assign to: {back.user.name}</p><br />
                                   <div className="singlebutton">
+                                    <Button
+                                      onClick={() => this.toRemove(back)}
+                                      type="primary"
+                                      shape="circle"
+                                      icon="delete">
+                                    </Button>
                                     <Button
                                       onClick={() => this.toTodo(back)}
                                       type="primary"
@@ -385,18 +398,23 @@ class Dashboard extends Component {
                                 <div className="wrapbutton">
                                 <Button
                                 onClick={() => this.toBackLog(td)}
-                                style={{position: 'pull-left'}}
                                 type="primary" shape="circle"
                                 icon="left-circle">
                                 </Button>
                                 <Button
+                                  onClick={() => this.toRemove(td)}
+                                  type="primary"
+                                  shape="circle"
+                                  icon="delete">
+                                </Button>
+                                <Button
                                 onClick={() => this.toOnProgress(td)}
-                                style={{position: 'pull-right'}}
                                 type="primary" shape="circle"
                                 icon="right-circle">
                                 </Button>
                                 </div>
                               </Card>
+                              <br />
                             </div>
                           )
                         })
@@ -415,19 +433,26 @@ class Dashboard extends Component {
                                 <p>Assign to: {prog.user.name}</p><br />
                                 <div className="wrapbutton">
                                 <Button
-                                onClick={() => this.toTodo(prog)}
-                                type="primary"
-                                shape="circle"
-                                icon="left-circle">
+                                  onClick={() => this.toTodo(prog)}
+                                  type="primary"
+                                  shape="circle"
+                                  icon="left-circle">
                                 </Button>
                                 <Button
-                                onClick={() => this.toDone(prog)}
-                                type="primary"
-                                shape="circle"
-                                icon="right-circle">
+                                  onClick={() => this.toRemove(prog)}
+                                  type="primary"
+                                  shape="circle"
+                                  icon="delete">
+                                </Button>
+                                <Button
+                                  onClick={() => this.toDone(prog)}
+                                  type="primary"
+                                  shape="circle"
+                                  icon="right-circle">
                                 </Button>
                                 </div>
                               </Card>
+                              <br />
                             </div>
                           )
                         })
@@ -444,13 +469,22 @@ class Dashboard extends Component {
                               <Card>
                                 <p style={{fontSize: '18px'}}>{dn.task}</p>
                                 <p>Assign to: {dn.user.name}</p><br />
-                                <Button
-                                onClick={() => this.toOnProgress(dn)}
-                                type="primary"
-                                shape="circle"
-                                icon="left-circle">
-                                </Button>
+                                <div className="singlebutton">
+                                  <Button
+                                    onClick={() => this.toOnProgress(dn)}
+                                    type="primary"
+                                    shape="circle"
+                                    icon="left-circle">
+                                  </Button>
+                                  <Button
+                                    onClick={() => this.toRemove(dn)}
+                                    type="primary"
+                                    shape="circle"
+                                    icon="delete">
+                                  </Button>
+                                </div>
                               </Card>
+                              <br />
                             </div>
                           )
                         })
@@ -524,7 +558,7 @@ class Dashboard extends Component {
                       <div>
                         {Object.keys(item.participant).map(key => <Tag>{item.participant[key].name}</Tag>)}
                       </div>
-                      <div>
+                      <div><br />
                         {!item.status ? <Button type="primary" onClick={() => this.reviewModal(item)}>Review</Button> : ''} 
                       </div>
                     </Panel>
