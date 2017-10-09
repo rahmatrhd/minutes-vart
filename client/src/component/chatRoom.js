@@ -222,6 +222,8 @@ class ChatRoom extends Component {
   endDiscussion() {
     const roomId = this.props.match.params.id
     axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/closeDiscussion?room_id=${roomId}`)
+    // firebase.database().ref(`/rooms/${this.props.match.params.id}`).remove()
+    // this.props.history.push('/dashboard')
   }
 
   render() {
