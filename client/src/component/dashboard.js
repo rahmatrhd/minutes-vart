@@ -354,18 +354,18 @@ class Dashboard extends Component {
     this.getAllUsers()
   }
 
-  paketJoin(link) {
+  paketJoin(roomId, topic) {
     console.log('kirim paket')
-    let ref = firebase.database().ref(`/rooms/${link}/participant/${this.state.userId}`)
+    let ref = firebase.database().ref(`/rooms/${roomId}/participant/${this.state.userId}`)
     ref.set({
       name: this.state.username,
       id: this.state.userId
     })
-    this.props.history.push(`/chatroom/${link}`)
-    // ref.push().set({
-    //   name: this.state.username,
-    //   id: this.state.userId
-    // })
+    // this.props.history.push(`/chatroom/${roomId}`)
+    this.props.history.push({
+      pathname: `/chatroom/${roomId}`,
+      state: {topic: topic}
+    })
   }
 
   judulHistory(title) {
@@ -597,7 +597,7 @@ class Dashboard extends Component {
                     <Card
                       key={idx}
                       title={room.topic}
-                      extra={<a onClick={(e) => this.paketJoin(room.roomId)}> Join </a>}
+                      extra={<a onClick={(e) => this.paketJoin(room.roomId, room.topic)}> Join </a>}
                       style={{
                         marginBottom: '10px',
                         marginRight: '10px',

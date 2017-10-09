@@ -140,15 +140,17 @@ class ChatRoom extends Component {
       let longList = Object.entries(snapshot.val() || {})
       let temp = []
       longList.map(list => {
-        temp.push(list[1])
-      })
+        temp.push(list[1])      })
       this.setState({participants: temp.sort()})
     })
   }
 
   roomStatusChecker() {
     firebase.database().ref(`/rooms/${this.props.match.params.id}/status`).on('value', snap => {
-      this.setState({ roomStatus: snap.val() || {}})
+      this.setState({
+        roomStatus: snap.val() || {},
+        topic: this.props.location.state.topic
+      })
       if (!snap.val()) {
         this.setState({ roomStatus: snap.val() || {}})
         if (!this.state.roomStatus) {
@@ -242,7 +244,7 @@ class ChatRoom extends Component {
                   style={{
                     margin: 15, float: 'left'
                   }} />
-                  <h1 style={{float: 'right', marginRight: 10, marginTop: 10, color: 'white', overflowX: 'hidden'}}>TITLE</h1>
+                  <h1 style={{float: 'right', marginRight: 10, marginTop: 10, color: 'white', overflowX: 'hidden'}}>{ this.state.topic }</h1>
               </Link>
             </div>
             <div className='middletask'>
