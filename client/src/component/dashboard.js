@@ -85,6 +85,18 @@ class Dashboard extends Component {
   
   modalHandleOk() {
     console.log(this.state.review.item.todo)
+    axios.post(`https://us-central1-minutes-vart.cloudfunctions.net/submitReview`, {
+      historyId: this.state.review.item.key,
+      todo: this.state.review.item.todo
+    })
+    .then(() => {
+      this.setState({
+        review: {
+          ...this.state.review,
+          visibleModal: false
+        }
+      })
+    })
   }
   
   modalHandleCancel() {
