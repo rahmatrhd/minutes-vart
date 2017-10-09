@@ -207,28 +207,70 @@ class Dashboard extends Component {
 
   // --------------------------- kanbans---------------------------
 
+  addNewTask() {
+    let data = {
+      status: 'backlog',
+      task: 'newTask',
+      user: {
+        name: this.state.username,
+        userId: this.state.userId
+      }
+    }
+    firebase.database().ref('/kanban').push(data)
+    firebase.database().ref('/kanban').limitToLast(1).on('child_added', added => {
+      console.log('added', added.key)
+      data.taskId = added.key
+      firebase.database().ref(`/kanban/${added.key}`).set(data)
+    })
+  }
+
+  deleteTask(task) {
+    console.log('deleteTask')
+    if (task.user.userId === this.state.userId) {
+      firebase.database().ref(`/kanban/${task.taskId}`).remove()
+    } else {
+      alert('You are not authorized to edit this task')
+    }
+  }
+
   toBackLog(task) {
     console.log('toBackLog')
-    task.status = 'backlog'
-    firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    if (task.user.userId === this.state.userId) {
+      task.status = 'backlog'
+      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    } else {
+      alert ('You are not authorized to edit this task')
+    }
   }
 
   toTodo(task) {
     console.log('toTodo')
-    task.status = 'todo'
-    firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    if (task.user.userId === this.state.userId) {
+      task.status = 'todo'
+      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    } else {
+      alert ('You are not authorized to edit this task')
+    }
   }
 
   toOnProgress(task) {
     console.log('toOnProgress')
-    task.status = 'onProgress'
-    firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    if (task.user.userId === this.state.userId) {
+      task.status = 'onProgress'
+      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    } else {
+      alert('You are not authorized to edit this task')
+    }
   }
 
   toDone(task) {
     console.log('toDone')
-    task.status = 'done'
-    firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    if (task.user.userId === this.state.userId) {
+      task.status = 'done'
+      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    } else {
+      alert('You are not authorized to edit this task')
+    }
   }
 
   // --------------------------- kanbans---------------------------
