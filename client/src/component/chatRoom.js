@@ -150,9 +150,10 @@ class ChatRoom extends Component {
     firebase.database().ref(`/rooms/${this.props.match.params.id}/status`).on('value', snap => {
       this.setState({ roomStatus: snap.val() || {}})
       if (!snap.val()) {
-      this.setState({ roomStatus: snap.val() || {}})
-      if (!this.state.roomStatus) {
-        this.props.history.push('/dashboard')
+        this.setState({ roomStatus: snap.val() || {}})
+        if (!this.state.roomStatus) {
+          this.props.history.push('/dashboard')
+        }
       }
     })
   }
