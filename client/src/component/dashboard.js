@@ -7,6 +7,7 @@ import {
   Col,
   Collapse,
   Form,
+  Icon,
   Input,
   Layout,
   Row,
@@ -30,20 +31,9 @@ class Dashboard extends Component {
   constructor() {
     super()
     this.state = {
-      username: '',
       email: '',
+      newTask: '',
       photoURL: '',
-      roomList: [],
-      todoList: {
-        backlog: [],
-        done: [],
-        onProgress: [],
-        todo: []
-      },
-      userId: '',
-      topicTitle: '',
-      summaryList: '',
-      
       review: {
         visibleModal: false,
         item: {
@@ -69,21 +59,38 @@ class Dashboard extends Component {
           }
         }
       },
+      roomList: [],
+      summaryList: '',
+      todoList: {
+        backlog: [],
+        done: [],
+        onProgress: [],
+        todo: []
+      },
+      topicTitle: '',
+      userId: '',
+      username: '',
       users: {},
       visible: false
     }
   }
   
+  addNewTaskChange(e) {
+    this.setState({newTask: e.target.value})
+  }
+
   addTaskModal(item) {
     this.setState({
       visible: true
     })
   }
 
-  addHandleOk() {
+  addHandleOk(e) {
+    e.preventDefault()
     this.setState({
       visible: false
     })
+    this.addNewTask(e)
   }
 
   addHandleCancel() {
@@ -242,7 +249,7 @@ class Dashboard extends Component {
   addNewTask() {
     let data = {
       status: 'backlog',
-      task: 'newTask',
+      task: this.state.newTask,
       user: {
         name: this.state.username,
         userId: this.state.userId
@@ -250,10 +257,10 @@ class Dashboard extends Component {
     }
     firebase.database().ref('/kanban').push(data)
     firebase.database().ref('/kanban').limitToLast(1).on('child_added', added => {
-      console.log('added', added.key)
       data.taskId = added.key
       firebase.database().ref(`/kanban/${added.key}`).set(data)
     })
+    this.setState({newTask: ''})
   }
 
   deleteTask(task) {
@@ -377,18 +384,25 @@ class Dashboard extends Component {
                   size='large'>
                   NEW TASK
                 </Button>
+
+
                 <Modal
-                  title="Add Task Modal"
+                  title="Add New Task"
                   visible={this.state.visible}
-                  onOk={() => this.addHandleOk()}
+                  onOk={(e) => this.addHandleOk(e)}
                   onCancel={() => this.addHandleCancel()}
                   cancelText="Cancel"
                   okText="Ok"
                 >
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
-                  <p>Some contents...</p>
+                  <Form onSubmit={(e) => this.addHandleOk(e)} >
+                    <Input
+                      onChange={(e) => this.addNewTaskChange(e)}
+                      prefix={<Icon type="calendar" style={{ fontSize: 13 }} />} type="text" placeholder="New Task ..."
+                    />
+                  </Form>
                 </Modal>
+
+
               </div>
             </div>
             <div className='kanbancontent'>
