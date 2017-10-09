@@ -28,12 +28,12 @@ module.exports = (req, res) => {
       hashUserRelevantChat[chat.user.id] = hashUserRelevantChat[chat.user.id] ? hashUserRelevantChat[chat.user.id] + 1 : 1
     })
     
-    const userParicipationRate = participantArr.map(user => ({
+    const userParticipationRate = participantArr.map(user => ({
       id: user.id,
       name: user.name,
       score: hashUserRelevantChat[user.id] / relevantChatArr.length
     }))
-    console.log('hashUserRelevantChat', hashUserRelevantChat, userParicipationRate)
+    console.log('hashUserRelevantChat', hashUserRelevantChat, userParticipationRate)
     
     //user contribution rate
     let hashUserNotes = {}
@@ -80,7 +80,7 @@ module.exports = (req, res) => {
       }),
       report: {
         duration: durationString,
-        userParicipationRate: arrToObj(userParicipationRate),
+        userParticipationRate: arrToObj(userParticipationRate),
         userContributionRate: arrToObj(userContributionRate),
         userFocusness: arrToObj(userFocusness),
         discussionEfficiency: discussionEfficiency,
