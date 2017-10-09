@@ -46,6 +46,7 @@ class ChatRoom extends Component {
       participants: [],
       photoURL: '',
       roomTask: [],
+      roomStatus: true,
       userId: '',
       usersTodoList: {
         backlog: [],
@@ -140,6 +141,15 @@ class ChatRoom extends Component {
     })
   }
 
+  roomStatusChecker() {
+    firebase.database().ref(`/rooms/${this.props.match.params.id}/status`).on('value', snap => {
+      this.setState({ roomStatus: snap.val() })
+      if (!snap.val()) {
+        this.props.history.push('/dashboard')
+      }
+    })
+  }
+
   sendChat(e) {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/chat`)
     ref.push().set({ id: this.state.userId, message: this.state.chatText, senderName: this.state.currentUser })
@@ -180,11 +190,16 @@ class ChatRoom extends Component {
 
   componentWillMount = async () => {
     await this.stateChangeListener()
+    await this.roomStatusChecker()
     await this.fetchAllMessages()
-    await this.fetchAllTask()
     await this.fetchAllTodo()
     await this.getParticipantList()
+    await this.fetchAllTask()
     await this.scrollToBottom()
+  }
+  
+  scrollToBottom() {
+    if (this.state.roomStatus) this.messagesEnd.scrollIntoView({ behavior: "smooth" });
   }
   
   componentDidMount() {
@@ -196,6 +211,11 @@ class ChatRoom extends Component {
 
   scrollToBottom() {
     this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+  }
+  
+  endDiscussion() {
+    const roomId = this.props.match.params.id
+    axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/closeDiscussion?room_id=${roomId}`)
   }
 
   render() {
@@ -364,6 +384,7 @@ class ChatRoom extends Component {
           </div>
           <div className='end'>
             <Button
+              onClick={() => this.endDiscussion()}
               type="danger"
               size='large'
               style={{
