@@ -3,7 +3,6 @@ const axios = require('axios')
 
 const assignTodo = require('./assignTodo')
 const assignTodoConfirm = require('./assignTodoConfirm')
-const cancelTodo = require('./cancelTodo')
 
 const TOKEN = functions.config().api_ai.dev_token
 
