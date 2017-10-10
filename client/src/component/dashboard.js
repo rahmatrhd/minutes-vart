@@ -388,7 +388,7 @@ class Dashboard extends Component {
                   src='logo.png'/>
               </div>
               <div className='name'>
-                <h1>Project Name</h1>
+                <h1>M I N U T E S - A P P</h1>
                 <hr /><br />
                 <Button 
                   onClick={() => this.addTaskModal()}
