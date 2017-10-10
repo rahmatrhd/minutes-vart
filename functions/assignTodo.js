@@ -6,8 +6,8 @@ module.exports = (data) => {
   const { result: { parameters: { task, person } }, sessionId } = data
   
   if (task && person)
-    db.ref('users').once('value')
-    .then(snapshot => {    
+    return db.ref('users').once('value')
+    .then(snapshot => {
       const keys = Object.keys(snapshot.val())
       const userNames = keys.map(key => snapshot.val()[key].name)
 
@@ -16,11 +16,16 @@ module.exports = (data) => {
 
       if (bestMatch > 0.6) {
         const index = similarityScore.indexOf(bestMatch)
-        db.ref(`rooms/${sessionId}/minnie/todo`).push({
+        return db.ref(`rooms/${sessionId}/minnie/todo`).push({
           task,
           userId: keys[index],
           userName: userNames[index],
           timestamp: Date.now()
+        })
+      } else {
+        return Promise.resolve({
+          userUndefined: true,
+          name: person
         })
       }
     })

@@ -35,7 +35,6 @@ module.exports = payload => {
     const actionHandlers = {
       'assign_todo': () => assignTodo(data),
       'assign_todo.person_confirm_yes': () => assignTodoConfirm(data, userId),
-      'Todo.Todo-cancel': () => cancelTodo(roomId),
       'default': () => {
         return {
           result: null

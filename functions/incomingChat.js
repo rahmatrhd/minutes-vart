@@ -16,6 +16,8 @@ module.exports = (req, res) => {
       sendChatToAI(req.body)
     ])
   })
-  .then(() => res.send({}))
+  .then(results => {
+    res.send(results[1])
+  })
   .catch(err => res.send(err))
 }
