@@ -8,7 +8,7 @@
 Simple Meeting Assistant summarized your team's chat logs in minutes. The app monitors the group's chats, creates tasks automatically based on the chat log, reminds and gives notification if the discussion is out of topic.
 
 
-## Authors
+## Authors 👷 
 
   1. [Ahmad Fajar](https://www.linkedin.com/in/ahmad-fajar-74464414b/)
 
@@ -19,14 +19,14 @@ Simple Meeting Assistant summarized your team's chat logs in minutes. The app mo
   4. [Rizki Pratama](https://www.linkedin.com/in/rizki-pratama-180460149/)
 
 
-## Technology
+## Technology 🚀 
 
 
 
-## Installation
+## Installation 🔧 
 
 
-## License
+## License 🔗 
 Copyright © 2017 [Rahmat](https://github.com/rama841) - [Ahfa](https://github.com/ahmad-fajar) - [Vega](https://github.com/PDVega) - [Tama](https://github.com/tamastro)
 Licensed under the MIT license.
 
