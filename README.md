@@ -27,6 +27,8 @@ Simple Meeting Assistant summarized your team's chat logs in minutes. The app mo
 
 ![Firebase logo](http://cdn03.androidauthority.net/wp-content/uploads/2017/04/Firebase-Logo-840x272.png){.classname}
 
+![Firebase logo](http://uploads.im/Y8MSN.png)
+
 <style type="text/css">
     .classname{
         width: 200px;
