@@ -169,7 +169,7 @@ class ChatRoom extends Component {
   sendChat(e) {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/chat`)
     ref.push().set({ id: this.state.userId, message: this.state.chatText, senderName: this.state.currentUser })
-    this.setState({ chatText: '' })
+    // this.setState({ chatText: '' })
     e.preventDefault()
     axios.post('https://us-central1-minutes-vart.cloudfunctions.net/incomingChat', {
       roomId: this.props.match.params.id,
@@ -188,8 +188,10 @@ class ChatRoom extends Component {
           'Content-Type': 'application/json'
         }
       })
-      .then(data => {
-        this.setState({ chatText: '' })
+      .then(({data}) => {
+        if (data.hasOwnProperty('userUndefined')) {
+          nameNotification(data.name)
+        }
       })
     this.setState({ chatText: '' })
     this.checkUnrelevant()
@@ -432,6 +434,14 @@ const openNotification = () => {
     message: 'Out Off Topic',
     description: 'The Discussion had been drifted from the original purpose of this meeting, please discuss things that related to the topic',
     icon: <Icon type="smile-circle" style={{ color: '#108ee9' }} />
+  });
+};
+
+const nameNotification = (name) => {
+  notification.open({
+    message: `No user name ${name}`,
+    description: `You've assigned a task to an unknown user, please invite said user to Minutes App`,
+    icon: <Icon type="frown-circle" style={{ color: '#108ee9' }} />
   });
 };
 
