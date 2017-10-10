@@ -1,12 +1,13 @@
-# Minutes App
-project management (AI)
+# Minutes App [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
+> Your time is worth every second.
 
-[Minutes App][]
-===================
+[![Build Status](https://api.travis-ci.org/travis-ci/travis-web.svg?branch=daily-cron)](https://nodejs.org/en/)
+[![MIT License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/MIT)
+[![Create App](https://img.shields.io/github/issues/detail/last-update/badges/shields/979.svg)]()
 
-[![Build Status](http://img.shields.io/travis/Python-Markdown/markdown.svg)](https://travis-ci.org/Python-Markdown/markdown)
-[![Coverage Status](https://codecov.io/gh/Python-Markdown/markdown/branch/master/graph/badge.svg)](https://codecov.io/gh/Python-Markdown/markdown)
-[![Latest Version](http://img.shields.io/pypi/v/Markdown.svg)](http://pypi.python.org/pypi/Markdown)
-[![Python Versions](http://img.shields.io/pypi/pyversions/Markdown.svg)](http://pypi.python.org/pypi/Markdown)
-[![BSD License](http://img.shields.io/badge/license-BSD-yellow.svg)](http://opensource.org/licenses/BSD-3-Clause)
-[![Code of Conduct](https://img.shields.io/badge/code%20of%20conduct-contributor%20covenant-green.svg?style=flat-square)][Code of Conduct]
+Simple Meeting Assistant summarized your team's chat logs in minutes. The app monitors the group's chats, creates tasks automatically based on the chat log, reminds and gives notification if the discussion is out of topic.
+
+
+
+
+[![NPM Download Stats](https://nodei.co/npm/decache.png?downloads=true)](https://www.npmjs.com/package/decache)
