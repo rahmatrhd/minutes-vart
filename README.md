@@ -27,7 +27,7 @@ Simple Meeting Assistant summarized your team's chat logs in minutes. The app mo
 
 ![React logo](http://sj.uploads.im/t/u5MDT.png)
 
-![Google Function](http://sk.uploads.im/t/VIXiB.png) ## Google Function
+![Google Function](http://sk.uploads.im/t/VIXiB.png)
 
 ![Firebase logo](http://sj.uploads.im/t/Y8MSN.png)
 
