@@ -40,8 +40,3 @@ Copyright © 2017 [Rahmat](https://github.com/rama841) - [Ahfa](https://github.c
 Licensed under the MIT license.
 
 [![CC0](https://licensebuttons.net/p/zero/1.0/88x31.png)](https://creativecommons.org/publicdomain/zero/1.0/)
-<style>
-h1 {
-  color: red;
- }
-</style>
