@@ -93,7 +93,7 @@ class ChatRoom extends Component {
     ref.on('value', snapshot => {
       this.setState({unrelevant: snapshot.val()})
     })
-      console.log(this.state.unrelevant);
+      console.log('Num of irrelevant chat', this.state.unrelevant);
   }
 checkUnrelevant() {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
@@ -224,7 +224,7 @@ checkUnrelevant() {
   }
   
   scrollToBottom() {
-    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+    if (this.state.roomStatus) this.messagesEnd.scrollIntoView({ behavior: "smooth" })
   }
 
   endDiscussion() {
