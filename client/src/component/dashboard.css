@@ -1,11 +1,13 @@
 .App {
   display: grid;
   grid-template-columns: 2fr 1fr;
+  background-image: url('https://appfluence.com/productivity/wp-content/uploads/2016/07/team-huddle.jpg');
+  background-size: cover;
 }
 
 .kanban {
   grid-column: 1;
-  background-color: #9CB1BF;
+  background-color: rgba(156, 177, 191, 0.2);
   overflow: auto;
   height: 100vh;
   display: grid;
@@ -99,5 +101,5 @@ img {
 .singlebutton {
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
+  justify-content: space-around;
 }

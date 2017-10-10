@@ -8,13 +8,14 @@ import {
   Col,
   Collapse,
   Form,
+  Icon,
   Input,
   Layout,
   Modal,
+  Popconfirm,
   Progress,
   Row,
   Select,
-  Spin,
   Tag
 } from 'antd'
 // import { BrowserRouter, Link } from 'react-router-dom'
@@ -26,24 +27,15 @@ import './dashboard.css'
 // const { Content, Sider } = Layout
 const Panel = Collapse.Panel
 
+const { TextArea } = Input
+
 class Dashboard extends Component {
   constructor() {
     super()
     this.state = {
-      username: '',
       email: '',
+      newTask: '',
       photoURL: '',
-      roomList: [],
-      todoList: {
-        backlog: [],
-        done: [],
-        onProgress: [],
-        todo: []
-      },
-      userId: '',
-      topicTitle: '',
-      summaryList: '',
-      
       review: {
         visibleModal: false,
         item: {
@@ -69,10 +61,46 @@ class Dashboard extends Component {
           }
         }
       },
-      users: {}
+      roomList: [],
+      summaryList: '',
+      todoList: {
+        backlog: [],
+        done: [],
+        onProgress: [],
+        todo: []
+      },
+      topicTitle: '',
+      userId: '',
+      username: '',
+      users: {},
+      visible: false
     }
   }
   
+  addNewTaskChange(e) {
+    this.setState({newTask: e.target.value})
+  }
+
+  addTaskModal(item) {
+    this.setState({
+      visible: true
+    })
+  }
+
+  addHandleOk(e) {
+    e.preventDefault()
+    this.setState({
+      visible: false
+    })
+    this.addNewTask()
+  }
+
+  addHandleCancel() {
+    this.setState({
+      visible: false
+    })
+  }
+
   reviewModal(item) {
     console.log(item)
     this.setState({
@@ -85,6 +113,18 @@ class Dashboard extends Component {
   
   modalHandleOk() {
     console.log(this.state.review.item.todo)
+    axios.post(`https://us-central1-minutes-vart.cloudfunctions.net/submitReview`, {
+      historyId: this.state.review.item.key,
+      todo: this.state.review.item.todo
+    })
+    .then(() => {
+      this.setState({
+        review: {
+          ...this.state.review,
+          visibleModal: false
+        }
+      })
+    })
   }
   
   modalHandleCancel() {
@@ -110,12 +150,12 @@ class Dashboard extends Component {
     axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/watsonNLU?text=${this.state.topicTitle}`)
     .then(({ data }) => {
       console.log(data.error)
-
       if (data.error) {
         alert('Room\'s name should be descriptive and written in English' )
       } else {
         let ref = firebase.database().ref(`/rooms/`)
         let roomData = {
+          status: true,
           topic: {
             categories: data.categories,
             text: this.state.topicTitle
@@ -132,11 +172,18 @@ class Dashboard extends Component {
     let ref = firebase.database().ref('/rooms')
     ref.on('value', snapshot => {
       let temp = []
-      let list = Object.entries(snapshot.val())
+      let list = Object.entries(snapshot.val()) || {}
       list.forEach(li => {
+        let participant = li[1].participant ? Object.entries(li[1].participant) : []
+        console.log(participant)
+        let participants = []
+        participant.forEach(ind => {
+          participants.push(ind[1].name)
+        })
         temp.push({
+          participants: participants,
           roomId: li[0],
-          topic: li[1].topic.text || undefined
+          topic: li[1].topic.text.toUpperCase() || undefined
         })
       })
       this.setState({ roomList: temp })
@@ -207,28 +254,68 @@ class Dashboard extends Component {
 
   // --------------------------- kanbans---------------------------
 
+  addNewTask() {
+    console.log('name', this.state.username)
+    const key = firebase.database().ref(`/kanban`).push().key
+    firebase.database().ref(`/kanban/${key}`).set({
+      status: 'backlog',
+      task: this.state.newTask,
+      taskId: key,
+      user: {
+        name: this.state.username,
+        userId: this.state.userId
+      }
+    })
+    this.setState({newTask: ''})
+  }
+
+  deleteTask(task) {
+    console.log('deleteTask')
+    if (task.user.userId !== this.state.userId) {
+      alert('You are not authorized to edit this task')
+    } else {
+      firebase.database().ref(`/kanban/${task.taskId}`).remove()
+    }
+  }
+
   toBackLog(task) {
     console.log('toBackLog')
-    task.status = 'backlog'
-    firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    if (task.user.userId === this.state.userId) {
+      task.status = 'backlog'
+      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    } else {
+      alert ('You are not authorized to edit this task')
+    }
   }
 
   toTodo(task) {
     console.log('toTodo')
-    task.status = 'todo'
-    firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    if (task.user.userId === this.state.userId) {
+      task.status = 'todo'
+      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    } else {
+      alert ('You are not authorized to edit this task')
+    }
   }
 
   toOnProgress(task) {
     console.log('toOnProgress')
-    task.status = 'onProgress'
-    firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    if (task.user.userId === this.state.userId) {
+      task.status = 'onProgress'
+      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    } else {
+      alert('You are not authorized to edit this task')
+    }
   }
 
   toDone(task) {
     console.log('toDone')
-    task.status = 'done'
-    firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    if (task.user.userId === this.state.userId) {
+      task.status = 'done'
+      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    } else {
+      alert('You are not authorized to edit this task')
+    }
   }
 
   // --------------------------- kanbans---------------------------
@@ -269,18 +356,22 @@ class Dashboard extends Component {
     this.getAllUsers()
   }
 
-  paketJoin(link) {
+  paketJoin(roomId, topic) {
     console.log('kirim paket')
-    let ref = firebase.database().ref(`/rooms/${link}/participant/${this.state.userId}`)
+    let ref = firebase.database().ref(`/rooms/${roomId}/participant/${this.state.userId}`)
     ref.set({
       name: this.state.username,
       id: this.state.userId
     })
-    this.props.history.push(`/chatroom/${link}`)
-    // ref.push().set({
-    //   name: this.state.username,
-    //   id: this.state.userId
-    // })
+    // this.props.history.push(`/chatroom/${roomId}`)
+    this.props.history.push({
+      pathname: `/chatroom/${roomId}`,
+      state: {topic: topic}
+    })
+  }
+
+  judulHistory(title) {
+    return `Topic : ${title.toUpperCase()}`
   }
 
   render() {
@@ -295,7 +386,32 @@ class Dashboard extends Component {
                   src='logo.png'/>
               </div>
               <div className='name'>
-                <h1>Project Name</h1>
+                <h1>M I N U T E S - A P P</h1>
+                <hr /><br />
+                <Button
+                  hidden
+                  onClick={() => this.addTaskModal()}
+                  icon="plus" 
+                  size='large'>
+                  NEW TASK
+                </Button>
+
+                <Modal
+                  title="ADD NEW TASK"
+                  visible={this.state.visible}
+                  onOk={(e) => this.addHandleOk(e)}
+                  onCancel={() => this.addHandleCancel()}
+                  cancelText="Cancel"
+                  okText="Add Task"
+                >
+                  <Form onSubmit={(e) => this.addHandleOk(e)} >
+                    <TextArea rows={4}
+                      onChange={(e) => this.addNewTaskChange(e)}
+                      prefix={<Icon type="calendar" style={{ fontSize: 13 }} />} type="text" placeholder="New Task ..."
+                      value={this.state.newTask}
+                    />
+                  </Form>
+                </Modal>
               </div>
             </div>
             <div className='kanbancontent'>
@@ -304,22 +420,34 @@ class Dashboard extends Component {
               }}>
                 <Row gutter={5}>
                   <Col span={6}>
-                    <Card title="BACKLOG" bordered={false} style={{backgroundColor: 'rgba(255,255,255, 0.6)'}}>
+                    <Card title="BACK LOG" bordered={false} style={{backgroundColor: 'rgba(255,0,0, 0.5)'}}>
                       {
                         this.state.todoList.backlog.map((back, idx) => {
                           return (
                             <div key={idx}>
-                              <Card>
+                              <Card style={{}}>
                                 <p style={{fontSize: '18px'}}>{back.task}</p>
-                                <p>Assign to: {back.user.name}</p>
-                                  <div className="singlebutton">
-                                    <Button
-                                      onClick={() => this.toTodo(back)}
-                                      type="primary"
-                                      shape="circle"
-                                      icon="right-circle">
-                                    </Button>
-                                  </div>
+                                <p>Assign to: {back.user.name}</p><br />
+                                {
+                                  this.state.userId === back.user.userId ? (
+                                    <div className="singlebutton">
+                                      <Popconfirm placement="bottomRight" okType="danger" title='Are you sure delete this task?' onConfirm={() => this.deleteTask(back)} okText="Yes" cancelText="No">
+                                        <Button
+                                          type="danger"
+                                          shape="circle"
+                                          icon="delete">
+                                        </Button>
+                                      </Popconfirm>
+                                      <Button
+                                        onClick={() => this.toTodo(back)}
+                                        type="dashed"
+                                        shape="circle"
+                                        icon="right-circle">
+                                      </Button>
+                                    </div>
+                                  ) :
+                                  null
+                                }
                               </Card>
                               <br />
                             </div>
@@ -329,7 +457,7 @@ class Dashboard extends Component {
                     </Card>
                   </Col>
                   <Col span={6}>
-                    <Card title="TODO" bordered={false} style={{backgroundColor: 'rgba(255,255,255, 0.6)'}}>
+                    <Card title="TO-DO" bordered={false} style={{backgroundColor: 'rgba(255,165,0, 0.5)'}}>
                       {
                         this.state.todoList.todo.map((td, idx) => {
                           return (
@@ -337,21 +465,32 @@ class Dashboard extends Component {
                               <Card>
                                 <p style={{fontSize: '18px'}}>{td.task}</p>
                                 <p>Assign to: {td.user.name}</p><br />
-                                <div className="wrapbutton">
-                                <Button
-                                onClick={() => this.toBackLog(td)}
-                                style={{position: 'pull-left'}}
-                                type="primary" shape="circle"
-                                icon="left-circle">
-                                </Button>
-                                <Button
-                                onClick={() => this.toOnProgress(td)}
-                                style={{position: 'pull-right'}}
-                                type="primary" shape="circle"
-                                icon="right-circle">
-                                </Button>
-                                </div>
+                                {
+                                  this.state.userId === td.user.userId ? (
+                                    <div className="wrapbutton">
+                                      <Button
+                                        onClick={() => this.toBackLog(td)}
+                                        type="dashed" shape="circle"
+                                        icon="left-circle">
+                                      </Button>
+                                      <Popconfirm placement="bottomRight" okType="danger" title='Are you sure delete this task?' onConfirm={() => this.deleteTask(td)} okText="Yes" cancelText="No">
+                                        <Button
+                                          type="danger"
+                                          shape="circle"
+                                          icon="delete">
+                                        </Button>
+                                      </Popconfirm>
+                                      <Button
+                                        onClick={() => this.toOnProgress(td)}
+                                        type="dashed" shape="circle"
+                                        icon="right-circle">
+                                      </Button>
+                                    </div>
+                                  ) :
+                                  null
+                                }
                               </Card>
+                              <br />
                             </div>
                           )
                         })
@@ -359,7 +498,7 @@ class Dashboard extends Component {
                     </Card>
                   </Col>
                   <Col span={6}>
-                    <Card title="ON PROGRESS" bordered={false} style={{backgroundColor: 'rgba(255,255,255, 0.6)'}}>
+                    <Card title="ON PROGRESS" bordered={false} style={{backgroundColor: 'rgba(0,0,255, 0.5)'}}>
                       {
                         this.state.todoList.onProgress.map((prog, idx) => {
                           return (
@@ -367,21 +506,34 @@ class Dashboard extends Component {
                               <Card>
                                 <p style={{fontSize: '18px'}}>{prog.task}</p>
                                 <p>Assign to: {prog.user.name}</p><br />
-                                <div className="wrapbutton">
-                                <Button
-                                onClick={() => this.toTodo(prog)}
-                                type="primary"
-                                shape="circle"
-                                icon="left-circle">
-                                </Button>
-                                <Button
-                                onClick={() => this.toDone(prog)}
-                                type="primary"
-                                shape="circle"
-                                icon="right-circle">
-                                </Button>
-                                </div>
+                                {
+                                  this.state.userId === prog.user.userId ? (
+                                    <div className="wrapbutton">
+                                      <Button
+                                        onClick={() => this.toTodo(prog)}
+                                        type="dashed"
+                                        shape="circle"
+                                        icon="left-circle">
+                                      </Button>
+                                      <Popconfirm placement="bottomRight" okType="danger" title="Are you sure delete this task?" onConfirm={() => this.deleteTask(prog)} okText="Yes" cancelText="No">
+                                        <Button
+                                          type="danger"
+                                          shape="circle"
+                                          icon="delete">
+                                        </Button>
+                                      </Popconfirm>
+                                      <Button
+                                        onClick={() => this.toDone(prog)}
+                                        type="dashed"
+                                        shape="circle"
+                                        icon="right-circle">
+                                      </Button>
+                                    </div>
+                                  ) :
+                                  null
+                                }
                               </Card>
+                              <br />
                             </div>
                           )
                         })
@@ -389,7 +541,7 @@ class Dashboard extends Component {
                     </Card>
                   </Col>
                   <Col span={6}>
-                    <Card title="DONE" bordered={false} style={{backgroundColor: 'rgba(255,255,255, 0.6)'}}>
+                    <Card title="DONE" bordered={false} style={{backgroundColor: 'rgba(0,128,0, 0.5)'}}>
                       {
                         this.state.todoList.done.map((dn, idx) => {
                           return (
@@ -397,13 +549,28 @@ class Dashboard extends Component {
                               <Card>
                                 <p style={{fontSize: '18px'}}>{dn.task}</p>
                                 <p>Assign to: {dn.user.name}</p><br />
-                                <Button
-                                onClick={() => this.toOnProgress(dn)}
-                                type="primary"
-                                shape="circle"
-                                icon="left-circle">
-                                </Button>
+                                {
+                                  this.state.userId === dn.user.userId ? (
+                                    <div className="singlebutton">
+                                      <Button
+                                        onClick={() => this.toOnProgress(dn)}
+                                        type="dashed"
+                                        shape="circle"
+                                        icon="left-circle">
+                                      </Button>
+                                      <Popconfirm placement="bottomRight" okType="danger" title="Are you sure delete this task?" onConfirm={() => this.deleteTask(dn)} okText="Yes" cancelText="No">
+                                        <Button
+                                          type="danger"
+                                          shape="circle"
+                                          icon="delete">
+                                        </Button>
+                                      </Popconfirm>
+                                    </div>
+                                  ) :
+                                  null
+                                }
                               </Card>
+                              <br />
                             </div>
                           )
                         })
@@ -432,12 +599,14 @@ class Dashboard extends Component {
               </div>
             </div>
             <div className='active'>
+              <h1 style={{color: 'white'}}>Discussion List</h1>
               <Form onSubmit={(e) => this.createRoom(e)}>
                 <Input
+                  size='large'
                   value={this.state.topicTitle}
                   onChange={e => this.topicTitleChange(e)}
-                  placeholder="Room Name..." />
-                  <br /><br /><Button icon="plus" size='large' htmlType='submit'>Add Discussion</Button>
+                  placeholder="Add Room Name..." style={{width: '70%', marginRight: 10}}/> 
+                  <Button icon="plus" size='large' htmlType='submit'>Add Discussion</Button>
               </Form>
               <br />
               <br />
@@ -447,24 +616,33 @@ class Dashboard extends Component {
                     <Card
                       key={idx}
                       title={room.topic}
-                      extra={<a onClick={(e) => this.paketJoin(room.roomId)}> Join </a>}
+                      extra={<a onClick={(e) => this.paketJoin(room.roomId, room.topic)}> Join </a>}
                       style={{
                         marginBottom: '10px',
-                        background: '#13314D'
-                      }}
-                      bordered={false}>
-                      <Tag>Tag 1</Tag>
+                        marginRight: '10px',
+                        background: '#2D587B'
+                      }}>
+                      {
+                        room.participants.map((orang, i) => {
+                          return (
+                            <Tag key={i}>
+                              {orang}
+                            </Tag>
+                          )
+                        })
+                      }
                     </Card>
                   )
                 })
               }
             </div>
             <div className='history'>
+              <h1 style={{color: 'white', marginLeft: 20}}>Discussion History List</h1>
               <Collapse bordered={false} className='collapse'>
                 {this.state.summaryList ? this.state.summaryList.map(item => {
                   return (
                     <Panel
-                      header={item.topic.text}
+                      header={this.judulHistory(item.topic.text)}
                       style={customPanelStyle}
                       key={item.key}
                     >
@@ -479,7 +657,7 @@ class Dashboard extends Component {
                           })
                         }
                       </div>
-                      <div>
+                      <div><br />
                         {!item.status ? <Button type="primary" onClick={() => this.reviewModal(item)}>Review</Button> : ''} 
                       </div>
                     </Panel>
@@ -515,8 +693,8 @@ class Dashboard extends Component {
                                   this.forceUpdate()
                                 }}
                               >
-                                {Object.keys(this.state.users).map(id => (
-                                  <Select.Option value={id} >{this.state.users[id].name}</Select.Option>
+                                {Object.keys(this.state.users).map((id, i) => (
+                                  <Select.Option value={id} key={i}>{this.state.users[id].name}</Select.Option>
                                 ))}
                               </Select>
                               <Input style={{ width: '70%' }} defaultValue={todo.task} />

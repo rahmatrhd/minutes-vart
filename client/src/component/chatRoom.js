@@ -6,7 +6,8 @@ import {
   Timeline,
   Card,
   Icon,
-  Table
+  Table,
+  notification
 } from 'antd'
 import { ChatFeed } from 'react-chat-ui'
 // import { ChatFeed, Message } from 'react-chat-ui'
@@ -33,13 +34,15 @@ class ChatRoom extends Component {
       participants: [],
       photoURL: '',
       roomTask: [],
+      roomStatus: true,
       userId: '',
       usersTodoList: {
         backlog: [],
         done: [],
         onProgress: [],
         todo: []
-      }
+      },
+      unrelevant: 0
     }
   }
 
@@ -47,12 +50,17 @@ class ChatRoom extends Component {
     this.setState({ chatText: e.target.value })
   }
 
+  deleteMinnieTask(taskId) {
+    console.log('Delete minnie task');
+    firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/todo/${taskId}`).remove()
+  }
+
   fetchAllMessages() {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/chat`)
     ref.on('value', snapshot => {
       if (snapshot.val() !== null) {
         let temp = []
-        let messages = Object.entries(snapshot.val())
+        let messages = Object.entries(snapshot.val() || {})
         messages.forEach(msg => {
           if (msg[1].id === this.state.userId) {
             msg[1].id = 0
@@ -70,7 +78,7 @@ class ChatRoom extends Component {
     ref.on('value', snapshot => {
       if (snapshot.val() !== null) {
         let tmp = []
-        let todo = Object.entries(snapshot.val())
+        let todo = Object.entries(snapshot.val() || {})
         todo.forEach(maps => {
           maps[1].key = maps[0]
           tmp.push(maps[1])
@@ -80,11 +88,27 @@ class ChatRoom extends Component {
     })
   }
 
+  listenUnrelevant() {
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
+    ref.on('value', snapshot => {
+      this.setState({unrelevant: snapshot.val()})
+    })
+      console.log(this.state.unrelevant);
+  }
+
+  checkUnrelevant() {
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
+    if (this.state.unrelevant >= 10) {
+      openNotification()
+      ref.set(0)
+    }
+  }
+
   fetchAllTodo() {
     let ref = firebase.database().ref('/kanban')
     ref.on('value', snapshot => {
       if (snapshot.val() !== null) {
-        let list = Object.entries(snapshot.val())
+        let list = Object.entries(snapshot.val() || {})
         let usersTodoList = {
           backlog: [],
           done: [],
@@ -118,12 +142,27 @@ class ChatRoom extends Component {
   getParticipantList() {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/participant`)
     ref.on('value', snapshot => {
-      let longList = Object.entries(snapshot.val())
+      let longList = Object.entries(snapshot.val() || {})
       let temp = []
       longList.forEach(list => {
         temp.push(list[1])
       })
       this.setState({participants: temp.sort()})
+    })
+  }
+
+  roomStatusChecker() {
+    firebase.database().ref(`/rooms/${this.props.match.params.id}/status`).on('value', snap => {
+      this.setState({
+        roomStatus: snap.val() || {},
+        topic: this.props.location.state.topic
+      })
+      if (!snap.val()) {
+        this.setState({ roomStatus: snap.val() || {}})
+        if (!this.state.roomStatus) {
+          this.props.history.push('/dashboard')
+        }
+      }
     })
   }
 
@@ -153,6 +192,7 @@ class ChatRoom extends Component {
         this.setState({ chatText: '' })
       })
     this.setState({ chatText: '' })
+    this.checkUnrelevant()
   }
 
   stateChangeListener() {
@@ -167,22 +207,24 @@ class ChatRoom extends Component {
 
   componentWillMount = async () => {
     await this.stateChangeListener()
+    await this.roomStatusChecker()
     await this.fetchAllMessages()
-    await this.fetchAllTask()
     await this.fetchAllTodo()
     await this.getParticipantList()
+    await this.fetchAllTask()
     await this.scrollToBottom()
+    await this.listenUnrelevant()
   }
   
-  componentDidMount() {
-  }
-
-  componentDidUpdate() {
-    this.scrollToBottom();
-  }
-
   scrollToBottom() {
-    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+    if (this.state.roomStatus) this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+  }
+
+  endDiscussion() {
+    const roomId = this.props.match.params.id
+    axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/closeDiscussion?room_id=${roomId}`)
+    // firebase.database().ref(`/rooms/${this.props.match.params.id}`).remove()
+    // this.props.history.push('/dashboard')
   }
 
   render() {
@@ -197,8 +239,9 @@ class ChatRoom extends Component {
                   icon="arrow-left"
                   size='large'
                   style={{
-                    margin: 15
+                    margin: 15, float: 'left'
                   }} />
+                  <h1 style={{float: 'right', marginRight: 10, marginTop: 10, color: 'white', overflowX: 'hidden'}}>{ this.state.topic }</h1>
               </Link>
             </div>
             <div className='middletask'>
@@ -212,7 +255,7 @@ class ChatRoom extends Component {
                     return (
                       <Timeline.Item
                         key={idx}
-                        color='green'>
+                        color='red'>
                         {list.task}
                       </Timeline.Item>
                     )
@@ -223,7 +266,7 @@ class ChatRoom extends Component {
                     return (
                       <Timeline.Item
                         key={idx}
-                        color='green'>
+                        color='orange'>
                         {list.task}
                       </Timeline.Item>
                     )
@@ -234,7 +277,7 @@ class ChatRoom extends Component {
                     return (
                       <Timeline.Item
                         key={idx}
-                        color='red'>
+                        color='blue'>
                         {list.task}
                       </Timeline.Item>
                     )
@@ -245,7 +288,7 @@ class ChatRoom extends Component {
                     return (
                       <Timeline.Item
                         key={idx}
-                        color='blue'>
+                        color='green'>
                         {list.task}
                       </Timeline.Item>
                     )
@@ -347,10 +390,26 @@ class ChatRoom extends Component {
               }}>
               <Column title="Task" dataIndex="task" key="task" />
               <Column title="User" dataIndex="userName" key="userName" />
+              <Column
+                title=""
+                key="action"
+                render={(text, rec) => (
+                  <span>
+                    <Button 
+                      type="danger"
+                      size="small"
+                      onClick={() => this.deleteMinnieTask(rec.key)}
+                    >
+                      <span><Icon type="delete" /></span>
+                    </Button>
+                  </span>
+                )}
+              />
             </Table>
           </div>
           <div className='end'>
             <Button
+              onClick={() => this.endDiscussion()}
               type="danger"
               size='large'
               style={{
@@ -363,5 +422,13 @@ class ChatRoom extends Component {
     )
   }
 }
+
+const openNotification = () => {
+  notification.open({
+    message: 'Out Off Topic',
+    description: 'The Discussion had been drifted from the original purpose of this meeting, please discuss things that related to the topic',
+    icon: <Icon type="smile-circle" style={{ color: '#108ee9' }} />
+  });
+};
 
 export default ChatRoom

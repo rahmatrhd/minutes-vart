@@ -11,7 +11,7 @@ class Login extends Component {
     var provider = new firebase.auth.GoogleAuthProvider()
     provider.addScope('https://www.googleapis.com/auth/userinfo.email')
     provider.addScope('https://www.googleapis.com/auth/userinfo.profile')
-    firebase.auth().signInWithPopup(provider).then(result => {
+    firebase.auth().signInWithRedirect(provider).then(result => {
       console.log('username>> ', result.user.displayName)
       console.log('email>> ', result.user.email)
       console.log('photoURL>> ', result.user.photoURL)
@@ -29,6 +29,10 @@ class Login extends Component {
     })
   }
 
+  registerNewUser(id, name) {
+    firebase.database().ref('/users').child(id).set({ name: name })
+  }
+
   stateChangeListener() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
@@ -39,12 +43,13 @@ class Login extends Component {
           let checker = snapshot.hasChild(user.uid)
           if (!checker) {
             console.log('Not Registered. Registering')
-            ref.child(`${user.uid}`).set({name: user.displayName})
+            this.registerNewUser(user.uid, user.displayName)
+            this.props.history.push('/dashboard')
           } else {
             console.log('Registered')
+            this.props.history.push('/dashboard')
           }
         })
-        this.props.history.push('/dashboard')
       } else {
         console.log('Not Logged')
       }
@@ -61,6 +66,11 @@ class Login extends Component {
         position: 'relative',
         height: '100vh'
       }}>
+      <div className='blur' style={{
+        position: 'relative',
+        height: '100vh',
+        backgroundColor: 'rgba(255,255,255,0.5)',
+      }}></div>
         <div
           id='dalemnya-div'
           style={{
@@ -68,7 +78,8 @@ class Login extends Component {
           top: '50%',
           left: '50%',
           marginRight: '-50%',
-          transform: "translate(-50%, -50%)"
+          transform: "translate(-50%, -50%)",
+          zIndex: 10,
         }}>
           <img
             id="minutes"
@@ -82,7 +93,7 @@ class Login extends Component {
           <div style={{
             textAlign: 'center'
           }}>
-            <button class="loginBtn loginBtn--google" onClick={this.loginGmail}>
+            <button className="loginBtn loginBtn--google" onClick={this.loginGmail}>
               Login With Google
             </button>
           </div>
