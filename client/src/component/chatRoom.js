@@ -8,32 +8,19 @@ import {
   Icon,
   Table
 } from 'antd'
-import { ChatFeed, Message } from 'react-chat-ui'
-import { BrowserRouter, Link } from 'react-router-dom'
+import { ChatFeed } from 'react-chat-ui'
+// import { ChatFeed, Message } from 'react-chat-ui'
+import { Link } from 'react-router-dom'
 import firebase from './firebaseConfig'
 import axios from 'axios'
 
-import Bubble from './chattext'
+// import Bubble from './chattext'
 import './chatroom.css'
 
-const FormItem = Form.Item;
-const { Column, ColumnGroup } = Table;
+// const FormItem = Form.Item;
+// const { Column, ColumnGroup } = Table;
+const { Column } = Table;
 
-const data = [
-  {
-    key: '1',
-    task: 'Wireframing',
-    user: 'Brown'
-  }, {
-    key: '2',
-    task: 'Layouting',
-    user: 'Green'
-  }, {
-    key: '3',
-    task: 'Create Server',
-    user: 'Black'
-  }
-];
 
 class ChatRoom extends Component {
   constructor() {
@@ -66,7 +53,7 @@ class ChatRoom extends Component {
       if (snapshot.val() !== null) {
         let temp = []
         let messages = Object.entries(snapshot.val())
-        messages.map(msg => {
+        messages.forEach(msg => {
           if (msg[1].id === this.state.userId) {
             msg[1].id = 0
           }
@@ -84,7 +71,7 @@ class ChatRoom extends Component {
       if (snapshot.val() !== null) {
         let tmp = []
         let todo = Object.entries(snapshot.val())
-        todo.map(maps => {
+        todo.forEach(maps => {
           maps[1].key = maps[0]
           tmp.push(maps[1])
         })
@@ -104,7 +91,7 @@ class ChatRoom extends Component {
           onProgress: [],
           todo: []
         }
-        list.map(li => {
+        list.forEach(li => {
           if (li[1].status === 'done' && li[1].user.userId === this.state.userId) {
             let done = li[1]
             done.taskId = li[0]
@@ -133,7 +120,7 @@ class ChatRoom extends Component {
     ref.on('value', snapshot => {
       let longList = Object.entries(snapshot.val())
       let temp = []
-      longList.map(list => {
+      longList.forEach(list => {
         temp.push(list[1])
       })
       this.setState({participants: temp.sort()})
