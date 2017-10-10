@@ -25,7 +25,7 @@ Simple Meeting Assistant summarized your team's chat logs in minutes. The app mo
 
 ## Technology 🚀 
 
-![Firebase logo](imgs/firebase.png) Firebase
+# ![Firebase logo](imgs/firebase.png) Firebase
 
 ## Installation 🔧 
 
