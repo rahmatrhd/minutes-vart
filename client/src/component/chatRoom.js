@@ -95,13 +95,14 @@ class ChatRoom extends Component {
     })
       console.log(this.state.unrelevant);
   }
-
-  checkUnrelevant() {
+checkUnrelevant() {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
-    if (this.state.unrelevant >= 10) {
-      openNotification()
-      ref.set(0)
-    }
+    ref.on('value', snapshot => {
+      if (snapshot.val() >= 6) {
+        openNotification()
+        ref.set(0)
+      }
+    })
   }
 
   fetchAllTodo() {
@@ -194,7 +195,6 @@ class ChatRoom extends Component {
         }
       })
     this.setState({ chatText: '' })
-    this.checkUnrelevant()
   }
 
   stateChangeListener() {
@@ -216,6 +216,7 @@ class ChatRoom extends Component {
     await this.fetchAllTask()
     await this.scrollToBottom()
     await this.listenUnrelevant()
+    await this.checkUnrelevant()
   }
 
   componentDidUpdate() {
