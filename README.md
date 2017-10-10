@@ -2,8 +2,13 @@
 > Your time is worth every second.
 
 [![Build Status](https://api.travis-ci.org/travis-ci/travis-web.svg?branch=daily-cron)](https://nodejs.org/en/)
+[![Build Status](https://img.shields.io/david/expressjs/express.svg)]()
 [![MIT License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/MIT)
+[![Coverage](https://img.shields.io/codecov/c/github/codecov/example-python/master.svg)]()
 [![Create App](https://img.shields.io/github/issues/detail/last-update/badges/shields/979.svg)]()
+[![first-timers-only Friendly](https://img.shields.io/badge/first--timers--only-friendly-blue.svg)](http://www.firsttimersonly.com/)
+[![Coverity](https://img.shields.io/coverity/ondemand/streams/STREAM.svg)]()
+[![Coverity](https://img.shields.io/chrome-web-store/stars/nimelepbpejjlbmoobocpfnjhihnpked.svg)]()
 
 Simple Meeting Assistant summarized your team's chat logs in minutes. The app monitors the group's chats, creates tasks automatically based on the chat log, reminds and gives notification if the discussion is out of topic.
 
