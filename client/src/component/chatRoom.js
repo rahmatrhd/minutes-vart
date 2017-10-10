@@ -151,12 +151,14 @@ class ChatRoom extends Component {
         roomStatus: snap.val() || {},
         topic: this.props.location.state.topic
       })
+
       if (!snap.val()) {
         this.setState({ roomStatus: snap.val() || {}})
         if (!this.state.roomStatus) {
           this.props.history.push('/dashboard')
         }
       }
+
     })
   }
 

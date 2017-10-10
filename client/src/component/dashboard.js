@@ -386,14 +386,13 @@ class Dashboard extends Component {
               <div className='name'>
                 <h1>Project Name</h1>
                 <hr /><br />
-                <Button 
+                <Button
+                  hidden
                   onClick={() => this.addTaskModal()}
                   icon="plus" 
                   size='large'>
                   NEW TASK
                 </Button>
-
-
                 <Modal
                   title="Add New Task"
                   visible={this.state.visible}
@@ -410,8 +409,6 @@ class Dashboard extends Component {
                     />
                   </Form>
                 </Modal>
-
-
               </div>
             </div>
             <div className='kanbancontent'>
@@ -456,29 +453,36 @@ class Dashboard extends Component {
                     <Card title="TO-DO" bordered={false} style={{backgroundColor: 'rgba(255,165,0, 0.5)'}}>
                       {
                         this.state.todoList.todo.map((td, idx) => {
+                          console.log('td', td.user.userId)
+                          console.log(this.state.userId === td.user.userId)
                           return (
                             <div key={idx}>
                               <Card>
                                 <p style={{fontSize: '18px'}}>{td.task}</p>
                                 <p>Assign to: {td.user.name}</p><br />
-                                <div className="wrapbutton">
-                                <Button
-                                onClick={() => this.toBackLog(td)}
-                                type="dashed" shape="circle"
-                                icon="left-circle">
-                                </Button>
-                                <Button
-                                  onClick={() => this.deleteTask(td)}
-                                  type="danger"
-                                  shape="circle"
-                                  icon="delete">
-                                </Button>
-                                <Button
-                                onClick={() => this.toOnProgress(td)}
-                                type="dashed" shape="circle"
-                                icon="right-circle">
-                                </Button>
-                                </div>
+                                {
+                                  this.state.userId === td.user.userId ? (
+                                    <div className="wrapbutton">
+                                      <Button
+                                        onClick={() => this.toBackLog(td)}
+                                        type="dashed" shape="circle"
+                                        icon="left-circle">
+                                      </Button>
+                                      <Button
+                                        onClick={() => this.deleteTask(td)}
+                                        type="danger"
+                                        shape="circle"
+                                        icon="delete">
+                                      </Button>
+                                      <Button
+                                        onClick={() => this.toOnProgress(td)}
+                                        type="dashed" shape="circle"
+                                        icon="right-circle">
+                                      </Button>
+                                    </div>
+                                  ) :
+                                  null
+                                }
                               </Card>
                               <br />
                             </div>
