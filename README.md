@@ -25,9 +25,7 @@ Simple Meeting Assistant summarized your team's chat logs in minutes. The app mo
 
 ## Technology 🚀 
 
-[![React logo](https://i.imgur.com/qxVNhH3.png)](https://reactjs.org/)  [![Google Function](https://i.imgur.com/YLEde1J.png)](https://cloud.google.com/functions/) [![Firebase logo](https://i.imgur.com/NKIYYUE.png)](https://firebase.google.com/)
-
-![API AI](http://sk.uploads.im/t/Joerf.png)
+[![React logo](https://i.imgur.com/qxVNhH3.png)](https://reactjs.org/)  [![Google Function](https://i.imgur.com/YLEde1J.png)](https://cloud.google.com/functions/) [![Firebase logo](https://i.imgur.com/NKIYYUE.png)](https://firebase.google.com/) [![API AI](https://i.imgur.com/6BU8ziZ.png)](https://api.ai/)
 
 
 ## Installation 🔧 
