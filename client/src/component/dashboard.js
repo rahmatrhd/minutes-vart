@@ -479,12 +479,13 @@ class Dashboard extends Component {
                                         type="dashed" shape="circle"
                                         icon="left-circle">
                                       </Button>
-                                      <Button
-                                        onClick={() => this.deleteTask(td)}
-                                        type="danger"
-                                        shape="circle"
-                                        icon="delete">
-                                      </Button>
+                                      <Popconfirm placement="bottomRight" okType="danger" title='Are you sure delete this task?' onConfirm={() => this.deleteTask(td)} okText="Yes" cancelText="No">
+                                        <Button
+                                          type="danger"
+                                          shape="circle"
+                                          icon="delete">
+                                        </Button>
+                                      </Popconfirm>
                                       <Button
                                         onClick={() => this.toOnProgress(td)}
                                         type="dashed" shape="circle"
@@ -512,27 +513,32 @@ class Dashboard extends Component {
                               <Card>
                                 <p style={{fontSize: '18px'}}>{prog.task}</p>
                                 <p>Assign to: {prog.user.name}</p><br />
-                                <div className="wrapbutton">
-                                <Button
-                                  onClick={() => this.toTodo(prog)}
-                                  type="dashed"
-                                  shape="circle"
-                                  icon="left-circle">
-                                </Button>
-                                <Popconfirm placement="bottomRight" okType="danger" title="Are you sure delete this task?" onConfirm={() => this.deleteTask(prog)} okText="Yes" cancelText="No">
-                                  <Button
-                                    type="danger"
-                                    shape="circle"
-                                    icon="delete">
-                                  </Button>
-                                </Popconfirm>
-                                <Button
-                                  onClick={() => this.toDone(prog)}
-                                  type="dashed"
-                                  shape="circle"
-                                  icon="right-circle">
-                                </Button>
-                                </div>
+                                {
+                                  this.state.userId === prog.user.userId ? (
+                                    <div className="wrapbutton">
+                                      <Button
+                                        onClick={() => this.toTodo(prog)}
+                                        type="dashed"
+                                        shape="circle"
+                                        icon="left-circle">
+                                      </Button>
+                                      <Popconfirm placement="bottomRight" okType="danger" title="Are you sure delete this task?" onConfirm={() => this.deleteTask(prog)} okText="Yes" cancelText="No">
+                                        <Button
+                                          type="danger"
+                                          shape="circle"
+                                          icon="delete">
+                                        </Button>
+                                      </Popconfirm>
+                                      <Button
+                                        onClick={() => this.toDone(prog)}
+                                        type="dashed"
+                                        shape="circle"
+                                        icon="right-circle">
+                                      </Button>
+                                    </div>
+                                  ) :
+                                  null
+                                }
                               </Card>
                               <br />
                             </div>
@@ -551,21 +557,26 @@ class Dashboard extends Component {
                               <Card>
                                 <p style={{fontSize: '18px'}}>{dn.task}</p>
                                 <p>Assign to: {dn.user.name}</p><br />
-                                <div className="singlebutton">
-                                  <Button
-                                    onClick={() => this.toOnProgress(dn)}
-                                    type="dashed"
-                                    shape="circle"
-                                    icon="left-circle">
-                                  </Button>
-                                  <Popconfirm placement="bottomRight" okType="danger" title="Are you sure delete this task?" onConfirm={() => this.deleteTask(dn)} okText="Yes" cancelText="No">
-                                    <Button
-                                      type="danger"
-                                      shape="circle"
-                                      icon="delete">
-                                    </Button>
-                                  </Popconfirm>
-                                </div>
+                                {
+                                  this.state.userId === dn.user.userId ? (
+                                    <div className="singlebutton">
+                                      <Button
+                                        onClick={() => this.toOnProgress(dn)}
+                                        type="dashed"
+                                        shape="circle"
+                                        icon="left-circle">
+                                      </Button>
+                                      <Popconfirm placement="bottomRight" okType="danger" title="Are you sure delete this task?" onConfirm={() => this.deleteTask(dn)} okText="Yes" cancelText="No">
+                                        <Button
+                                          type="danger"
+                                          shape="circle"
+                                          icon="delete">
+                                        </Button>
+                                      </Popconfirm>
+                                    </div>
+                                  ) :
+                                  null
+                                }
                               </Card>
                               <br />
                             </div>
