@@ -102,7 +102,7 @@ class Dashboard extends Component {
   }
 
   reviewModal(item) {
-    console.log(item)
+    // console.log(item)
     this.setState({
       review: {
         visibleModal: true,
@@ -112,7 +112,7 @@ class Dashboard extends Component {
   }
   
   modalHandleOk() {
-    console.log(this.state.review.item.todo)
+    // console.log(this.state.review.item.todo)
     axios.post(`https://us-central1-minutes-vart.cloudfunctions.net/submitReview`, {
       historyId: this.state.review.item.key,
       todo: this.state.review.item.todo
@@ -149,7 +149,7 @@ class Dashboard extends Component {
     e.preventDefault();
     axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/watsonNLU?text=${this.state.topicTitle}`)
     .then(({ data }) => {
-      console.log(data.error)
+      // console.log(data.error)
       if (data.error) {
         alert('Room\'s name should be descriptive and written in English' )
       } else {
@@ -175,7 +175,6 @@ class Dashboard extends Component {
       let list = Object.entries(snapshot.val()) || {}
       list.forEach(li => {
         let participant = li[1].participant ? Object.entries(li[1].participant) : []
-        console.log(participant)
         let participants = []
         participant.forEach(ind => {
           participants.push(ind[1].name)
@@ -255,7 +254,7 @@ class Dashboard extends Component {
   // --------------------------- kanbans---------------------------
 
   addNewTask() {
-    console.log('name', this.state.username)
+    console.log('addNewTask')
     const key = firebase.database().ref(`/kanban`).push().key
     firebase.database().ref(`/kanban/${key}`).set({
       status: 'backlog',
@@ -350,6 +349,9 @@ class Dashboard extends Component {
 
   componentWillMount() {
     this.stateChangeListener()
+  }
+  
+  componentDidMount(){
     this.getAllTodo()
     this.getAllRooms()
     this.getAllSummary()
@@ -357,7 +359,7 @@ class Dashboard extends Component {
   }
 
   paketJoin(roomId, topic) {
-    console.log('kirim paket')
+    console.log('Join room: ', topic)
     let ref = firebase.database().ref(`/rooms/${roomId}/participant/${this.state.userId}`)
     ref.set({
       name: this.state.username,
