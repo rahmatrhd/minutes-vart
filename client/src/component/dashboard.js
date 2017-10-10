@@ -4,29 +4,27 @@ import {
   Avatar,
   Button,
   Card,
+  Checkbox,
   Col,
   Collapse,
   Form,
   Icon,
   Input,
   Layout,
-  Row,
-  Tag,
-  Spin,
   Modal,
-  Select,
-  Checkbox,
-  Progress,
   Popconfirm,
-  message
+  Progress,
+  Row,
+  Select,
+  Tag
 } from 'antd'
-import { BrowserRouter, Link } from 'react-router-dom'
+// import { BrowserRouter, Link } from 'react-router-dom'
 import firebase from './firebaseConfig'
 import axios from 'axios'
 
 import './dashboard.css'
 
-const { Content, Sider } = Layout
+// const { Content, Sider } = Layout
 const Panel = Collapse.Panel
 
 const { TextArea } = Input
@@ -175,12 +173,11 @@ class Dashboard extends Component {
     ref.on('value', snapshot => {
       let temp = []
       let list = Object.entries(snapshot.val()) || {}
-      list.map(li => {
-        let participant = li[1].participant ? Object.entries(li[1].participant) : [['', {name: 'Kagak ada orangnya'}]]
-        // let participant = li[1].participant ? Object.entries(li[1].participant) : []
+      list.forEach(li => {
+        let participant = li[1].participant ? Object.entries(li[1].participant) : []
         console.log(participant)
         let participants = []
-        participant.map(ind => {
+        participant.forEach(ind => {
           participants.push(ind[1].name)
         })
         temp.push({
@@ -204,7 +201,7 @@ class Dashboard extends Component {
           onProgress: [],
           todo: []
         }
-        list.map(li => {
+        list.forEach(li => {
           if (li[1].status === 'done') {
             let done = li[1]
             done.taskId = li[0]
@@ -234,7 +231,7 @@ class Dashboard extends Component {
       if (snapshot.val() !== null) {
         let summary = []
         let listSummary = Object.entries(snapshot.val())
-        listSummary.map(summ => {
+        listSummary.forEach(summ => {
           summ[1].key = summ[0]
           summary.push(summ[1])
         })
@@ -326,8 +323,7 @@ class Dashboard extends Component {
   stateChangeListener() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        console.log(user)
-
+        console.log('Authenticated User: ', user)
         let ref = firebase.database().ref('/users')
         ref.once('value', snap => {
           let regist = snap.hasChild(user.uid)
@@ -335,6 +331,8 @@ class Dashboard extends Component {
             console.log('Not Registered. Register first.')
             // this.logout()
             this.props.history.push('/')
+          } else {
+            console.log('Registered');
           }
         })
 
@@ -458,14 +456,10 @@ class Dashboard extends Component {
                       }
                     </Card>
                   </Col>
-
-
                   <Col span={6}>
                     <Card title="TO-DO" bordered={false} style={{backgroundColor: 'rgba(255,165,0, 0.5)', boxShadow: '0px 0px 10px orange'}}>
                       {
                         this.state.todoList.todo.map((td, idx) => {
-                          console.log('td', td.user.userId)
-                          console.log(this.state.userId === td.user.userId)
                           return (
                             <div key={idx}>
                               <Card>
@@ -503,7 +497,6 @@ class Dashboard extends Component {
                       }
                     </Card>
                   </Col>
-
                   <Col span={6}>
                     <Card title="ON PROGRESS" bordered={false} style={{backgroundColor: 'rgba(0,0,255, 0.5)', boxShadow: '0px 0px 10px blue'}}>
                       {
@@ -547,7 +540,6 @@ class Dashboard extends Component {
                       }
                     </Card>
                   </Col>
-
                   <Col span={6}>
                     <Card title="DONE" bordered={false} style={{backgroundColor: 'rgba(0,128,0, 0.5)', boxShadow: '0px 0px 10px green'}}>
                       {
@@ -585,7 +577,6 @@ class Dashboard extends Component {
                       }
                     </Card>
                   </Col>
-
                 </Row>
               </div>
             </div>
@@ -652,23 +643,26 @@ class Dashboard extends Component {
                   return (
                     <Panel
                       header={this.judulHistory(item.topic.text)}
-                      key="1"
                       style={customPanelStyle}
                       key={item.key}
                     >
-                      
                       <div>
                         {new Date(item.timestamp).toLocaleString()}
                       </div>
                       <div>
-                        {Object.keys(item.participant).map(key => <Tag>{item.participant[key].name}</Tag>)}
+                        {
+                          Object.keys(item.participant).forEach((key, i) => {
+                            /* eslint-disable no-unused-expressions */
+                            <Tag key={i}>{item.participant[key].name}</Tag>
+                          })
+                        }
                       </div>
                       <div><br />
                         {!item.status ? <Button type="primary" onClick={() => this.reviewModal(item)}>Review</Button> : ''} 
                       </div>
                     </Panel>
                   )
-                }) : <Spin size="large" />}
+                }) : null}
               </Collapse>
               <Modal
                 title={this.state.review.item.topic.text}
@@ -679,59 +673,63 @@ class Dashboard extends Component {
                 cancelText="Cancel"
               >
                 Tasks
-                {Object.keys(this.state.review.item.todo).map(key => {
+                {
+                  Object.keys(this.state.review.item.todo).map(key => {
                   const todo = this.state.review.item.todo[key]
-                  return (
-                    <Col>
-                      <Row gutter={4}>
-                        <Col span={23}>
-                          <Input.Group compact>
-                            <Select 
-                              labelInValue
-                              style={{ width: '30%' }}
-                              defaultValue={{key: todo.userId}}
+                    return (
+                      <Col>
+                        <Row gutter={4}>
+                          <Col span={23}>
+                            <Input.Group compact>
+                              <Select 
+                                labelInValue
+                                style={{ width: '30%' }}
+                                defaultValue={{key: todo.userId}}
+                                onChange={(e) => {
+                                  // eslint-disable-next-line
+                                  this.state.review.item.todo[key].userId = e.key
+                                  // eslint-disable-next-line
+                                  this.state.review.item.todo[key].userName = e.label
+                                  this.forceUpdate()
+                                }}
+                              >
+                                {Object.keys(this.state.users).map((id, i) => (
+                                  <Select.Option value={id} key={i}>{this.state.users[id].name}</Select.Option>
+                                ))}
+                              </Select>
+                              <Input style={{ width: '70%' }} defaultValue={todo.task} />
+                            </Input.Group>
+                          </Col>
+                          <Col span={1}>
+                            <Checkbox 
+                              checked={todo.status}
                               onChange={(e) => {
-                                this.state.review.item.todo[key].userId = e.key
-                                this.state.review.item.todo[key].userName = e.label
+                                // eslint-disable-next-line
+                                this.state.review.item.todo[key].status = e.target.checked
                                 this.forceUpdate()
                               }}
-                            >
-                              {Object.keys(this.state.users).map(id => (
-                                <Select.Option value={id} >{this.state.users[id].name}</Select.Option>
-                              ))}
-                            </Select>
-                            <Input style={{ width: '70%' }} defaultValue={todo.task} />
-                          </Input.Group>
-                        </Col>
-                        <Col span={1}>
-                          <Checkbox 
-                            checked={todo.status}
-                            onChange={(e) => {
-                              this.state.review.item.todo[key].status = e.target.checked
-                              this.forceUpdate()
-                            }}
-                          />
-                        </Col>
-                      </Row>
-                    </Col>
-                  )
-                })}
+                            />
+                          </Col>
+                        </Row>
+                      </Col>
+                    )
+                  })
+                }
                 <br/>
-                
+
                 Noted Chat
                 <ul>
-                  {Object.keys(this.state.review.item.notes).map(key => {
+                  {
+                    Object.keys(this.state.review.item.notes).map((key, idx) => {
                     const note = this.state.review.item.notes[key]
                     return (
-                      <li>{note.data.text}</li>
-                    )
+                      <li key={idx}>{note.data.text}</li>
+                  )
                   })}
                 </ul>
                 <br/>
-                
                 Duration: {this.state.review.item.report.duration}
                 <br/>
-                
                 <Row>
                   <Col span={12}>
                     Discussion Efficiency
@@ -743,12 +741,11 @@ class Dashboard extends Component {
                   </Col>
                 </Row>
                 <br/>
-                
                 User Participation Rate
-                {Object.keys(this.state.review.item.report.userParticipationRate).map(key => {
+                {Object.keys(this.state.review.item.report.userParticipationRate).map((key, idx) => {
                   const user = this.state.review.item.report.userParticipationRate[key]
                   return (
-                    <Row>
+                    <Row key={idx}>
                       <Col span={4}>
                         {user.name}
                       </Col>
@@ -759,12 +756,11 @@ class Dashboard extends Component {
                   )
                 })}
                 <br/>
-                
                 User Contribution Rate
-                {Object.keys(this.state.review.item.report.userContributionRate).map(key => {
+                {Object.keys(this.state.review.item.report.userContributionRate).map((key, idx) => {
                   const user = this.state.review.item.report.userContributionRate[key]
                   return (
-                    <Row>
+                    <Row key={idx}>
                       <Col span={4}>
                         {user.name}
                       </Col>
@@ -775,12 +771,11 @@ class Dashboard extends Component {
                   )
                 })}
                 <br/>
-                
                 User Focusness
-                {Object.keys(this.state.review.item.report.userFocusness).map(key => {
+                {Object.keys(this.state.review.item.report.userFocusness).map((key, idx) => {
                   const user = this.state.review.item.report.userFocusness[key]
                   return (
-                    <Row>
+                    <Row key={idx}>
                       <Col span={4}>
                         {user.name}
                       </Col>
