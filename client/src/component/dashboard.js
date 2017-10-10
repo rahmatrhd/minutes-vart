@@ -422,7 +422,7 @@ class Dashboard extends Component {
               }}>
                 <Row gutter={5}>
                   <Col span={6}>
-                    <Card title="BACK LOG" bordered={false} style={{backgroundColor: 'rgba(255,0,0, 0.5)'}}>
+                    <Card title="BACK LOG" bordered={false} style={{backgroundColor: 'rgba(255,0,0, 0.5)', boxShadow: '0px 0px 10px red'}}>
                       {
                         this.state.todoList.backlog.map((back, idx) => {
                           return (
@@ -455,7 +455,7 @@ class Dashboard extends Component {
 
 
                   <Col span={6}>
-                    <Card title="TO-DO" bordered={false} style={{backgroundColor: 'rgba(255,165,0, 0.5)'}}>
+                    <Card title="TO-DO" bordered={false} style={{backgroundColor: 'rgba(255,165,0, 0.5)', boxShadow: '0px 0px 10px orange'}}>
                       {
                         this.state.todoList.todo.map((td, idx) => {
                           return (
@@ -491,7 +491,7 @@ class Dashboard extends Component {
                   </Col>
 
                   <Col span={6}>
-                    <Card title="ON PROGRESS" bordered={false} style={{backgroundColor: 'rgba(0,0,255, 0.5)'}}>
+                    <Card title="ON PROGRESS" bordered={false} style={{backgroundColor: 'rgba(0,0,255, 0.5)', boxShadow: '0px 0px 10px blue'}}>
                       {
                         this.state.todoList.onProgress.map((prog, idx) => {
                           return (
@@ -529,7 +529,7 @@ class Dashboard extends Component {
                   </Col>
 
                   <Col span={6}>
-                    <Card title="DONE" bordered={false} style={{backgroundColor: 'rgba(0,128,0, 0.5)'}}>
+                    <Card title="DONE" bordered={false} style={{backgroundColor: 'rgba(0,128,0, 0.5)', boxShadow: '0px 0px 10px green'}}>
                       {
                         this.state.todoList.done.map((dn, idx) => {
                           return (
