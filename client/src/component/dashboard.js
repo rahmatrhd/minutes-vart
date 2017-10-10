@@ -672,8 +672,9 @@ class Dashboard extends Component {
                 okText="Submit"
                 cancelText="Cancel"
               >
-                Tasks
+                <b>Tasks</b>
                 {
+                  this.state.review.item.todo ?
                   Object.keys(this.state.review.item.todo).map(key => {
                   const todo = this.state.review.item.todo[key]
                     return (
@@ -713,30 +714,39 @@ class Dashboard extends Component {
                         </Row>
                       </Col>
                     )
-                  })
+                  }) : null
                 }
                 <br/>
 
-                Noted Chat
-                <ul>
-                  {
-                    Object.keys(this.state.review.item.notes).map((key, idx) => {
-                    const note = this.state.review.item.notes[key]
-                    return (
-                      <li key={idx}>{note.data.text}</li>
-                  )
-                  })}
-                </ul>
-                <br/>
-                Duration: {this.state.review.item.report.duration}
-                <br/>
-                <Row>
+                {
+                  this.state.review.item.notes ? (
+                    <div>
+                      <b>Noted Chat</b> 
+                      < ul > {
+                        Object
+                          .keys(this.state.review.item.notes)
+                          .map((key, idx) => {
+                            const note = this.state.review.item.notes[key]
+                            return (
+                              <li key={idx}>{note.data.text}</li>
+                            )
+                          })
+                      } < /ul>
+                    <br/>
+                  </div>
+                  ) : null
+                }
+                
+
+                <b>Duration:</b> {this.state.review.item.report.duration}
+                <br/><br/>
+                <Row style={{position: 'relative', left: 50}}>
                   <Col span={12}>
-                    Discussion Efficiency
+                    <b>Discussion Efficiency</b>
                     <Progress type="dashboard" percent={Math.floor(this.state.review.item.report.discussionEfficiency * 100)} />
                   </Col>
                   <Col span={12}>
-                    Discussion Productivity
+                    <b>Discussion Productivity</b>
                     <Progress type="dashboard" percent={Math.floor(this.state.review.item.report.discussionProductivity * 100)} />
                   </Col>
                 </Row>

@@ -19,13 +19,13 @@ img {
 
 @-webkit-keyframes filter-animation {
   0% {
-    -webkit-filter: sepia(0) blur(5px);
+    -webkit-filter: grayscale(0) blur(5px);
   }
   50% {
-    -webkit-filter: sepia(2) blur(7px);
+    -webkit-filter: grayscale(2) blur(7px);
   }
   100% {
-    -webkit-filter: sepia(0) blur(5px);
+    -webkit-filter: grayscale(0) blur(5px);
   }
 }
 
