@@ -25,7 +25,7 @@ Simple Meeting Assistant summarized your team's chat logs in minutes. The app mo
 
 ## Technology 🚀 
 
-[![React logo](https://i.imgur.com/3p2nAv5.png)](https://reactjs.org/)  [![Redux](https://i.imgur.com/4iL4Pgy.png)](http://redux.js.org/) [![Google Function](https://i.imgur.com/YLEde1J.png)](https://cloud.google.com/functions/) [![Firebase logo](https://i.imgur.com/NKIYYUE.png)](https://firebase.google.com/) [![API AI](https://i.imgur.com/hQxDwMg.png)](https://api.ai/) [![IBM Watson](https://i.imgur.com/zIq6wuf.png)](https://www.ibm.com/watson/)
+[![React logo](https://i.imgur.com/3p2nAv5.png)](https://reactjs.org/)  [![Redux](https://i.imgur.com/4iL4Pgy.png)](http://redux.js.org/) [![Google Function](https://i.imgur.com/CPQmtBV.png)](https://cloud.google.com/functions/) [![Firebase logo](https://i.imgur.com/NKIYYUE.png)](https://firebase.google.com/) [![API AI](https://i.imgur.com/hQxDwMg.png)](https://api.ai/) [![IBM Watson](https://i.imgur.com/zIq6wuf.png)](https://www.ibm.com/watson/)
 
 
 ## Installation 🔧 
