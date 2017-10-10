@@ -9,7 +9,7 @@ module.exports = (data, userId) => {
   const { result: { parameters: { task, person } }, sessionId } = data
   
   if (task && person)
-    db.ref('users').once('value')
+    return db.ref('users').once('value')
     .then(snapshot => {    
       const keys = Object.keys(snapshot.val())
       const userNames = keys.map(key => snapshot.val()[key].name)
@@ -37,6 +37,11 @@ module.exports = (data, userId) => {
             })
           })
         }
+      } else {
+        return Promise.resolve({
+          userUndefined: true,
+          name: person
+        })
       }
     })
 }
