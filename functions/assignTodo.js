@@ -2,8 +2,8 @@ const admin = require('firebase-admin')
 const db = admin.database()
 const stringSimilarity = require('string-similarity')
 
-module.exports = (roomId, data) => {
-  const { result: { parameters: { task, person } } } = data
+module.exports = (data) => {
+  const { result: { parameters: { task, person } }, sessionId } = data
   
   if (task && person)
     db.ref('users').once('value')
@@ -16,7 +16,7 @@ module.exports = (roomId, data) => {
 
       if (bestMatch > 0.6) {
         const index = similarityScore.indexOf(bestMatch)
-        db.ref(`rooms/${roomId}/minnie/todo`).push({
+        db.ref(`rooms/${sessionId}/minnie/todo`).push({
           task,
           userId: keys[index],
           userName: userNames[index],

@@ -12,7 +12,7 @@ module.exports = payload => {
     roomId,
     chat: {
       user: {
-        id: sessionId
+        id: userId
       },
       data: {
         text: query
@@ -23,7 +23,7 @@ module.exports = payload => {
   const url = 'https://api.api.ai/v1/query?v=20150910'
   return axios.post(url, {
     query,
-    sessionId,
+    sessionId: roomId,
     timezone: new Date(),
     lang: 'en'
   }, {
@@ -33,8 +33,8 @@ module.exports = payload => {
   })
   .then(({data}) => {
     const actionHandlers = {
-      'assign_todo': () => assignTodo(roomId, data),
-      'assign_todo.person_confirm_yes': () => assignTodoConfirm(roomId, data),
+      'assign_todo': () => assignTodo(data),
+      'assign_todo.person_confirm_yes': () => assignTodoConfirm(data, userId),
       'Todo.Todo-cancel': () => cancelTodo(roomId),
       'default': () => {
         return {
