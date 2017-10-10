@@ -33,6 +33,8 @@ Simple Meeting Assistant summarized your team's chat logs in minutes. The app mo
     }
 </style>
 
+Screen Shot 2017-10-10 at 8.36.09 PM
+
 ![React logo](https://react-etc.net/files/2016-07/logo-578x270.png){:height="36px" width="36px"}
 
 
