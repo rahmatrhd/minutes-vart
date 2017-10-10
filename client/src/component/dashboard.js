@@ -16,7 +16,9 @@ import {
   Modal,
   Select,
   Checkbox,
-  Progress
+  Progress,
+  Popconfirm,
+  message
 } from 'antd'
 import { BrowserRouter, Link } from 'react-router-dom'
 import firebase from './firebaseConfig'
@@ -272,10 +274,10 @@ class Dashboard extends Component {
 
   deleteTask(task) {
     console.log('deleteTask')
-    if (task.user.userId === this.state.userId) {
-      firebase.database().ref(`/kanban/${task.taskId}`).remove()
-    } else {
+    if (task.user.userId !== this.state.userId) {
       alert('You are not authorized to edit this task')
+    } else {
+      firebase.database().ref(`/kanban/${task.taskId}`).remove()
     }
   }
 
@@ -395,7 +397,6 @@ class Dashboard extends Component {
                   NEW TASK
                 </Button>
 
-
                 <Modal
                   title="ADD NEW TASK"
                   visible={this.state.visible}
@@ -431,12 +432,13 @@ class Dashboard extends Component {
                                 <p style={{fontSize: '18px'}}>{back.task}</p>
                                 <p>Assign to: {back.user.name}</p><br />
                                   <div className="singlebutton">
-                                    <Button
-                                      onClick={() => this.deleteTask(back)}
-                                      type="danger"
-                                      shape="circle"
-                                      icon="delete">
-                                    </Button>
+                                    <Popconfirm placement="bottomRight" okType="danger" title='Are you sure delete this task?' onConfirm={() => this.deleteTask(back)} okText="Yes" cancelText="No">
+                                      <Button
+                                        type="danger"
+                                        shape="circle"
+                                        icon="delete">
+                                      </Button>
+                                    </Popconfirm>
                                     <Button
                                       onClick={() => this.toTodo(back)}
                                       type="dashed"
@@ -469,12 +471,13 @@ class Dashboard extends Component {
                                 type="dashed" shape="circle"
                                 icon="left-circle">
                                 </Button>
-                                <Button
-                                  onClick={() => this.deleteTask(td)}
-                                  type="danger"
-                                  shape="circle"
-                                  icon="delete">
-                                </Button>
+                                <Popconfirm placement="bottomRight" okType="danger" title='Are you sure delete this task?' onConfirm={() => this.deleteTask(td)} okText="Yes" cancelText="No">
+                                  <Button
+                                    type="danger"
+                                    shape="circle"
+                                    icon="delete">
+                                  </Button>
+                                </Popconfirm>
                                 <Button
                                 onClick={() => this.toOnProgress(td)}
                                 type="dashed" shape="circle"
@@ -506,12 +509,13 @@ class Dashboard extends Component {
                                   shape="circle"
                                   icon="left-circle">
                                 </Button>
-                                <Button
-                                  onClick={() => this.deleteTask(prog)}
-                                  type="danger"
-                                  shape="circle"
-                                  icon="delete">
-                                </Button>
+                                <Popconfirm placement="bottomRight" okType="danger" title="Are you sure delete this task?" onConfirm={() => this.deleteTask(prog)} okText="Yes" cancelText="No">
+                                  <Button
+                                    type="danger"
+                                    shape="circle"
+                                    icon="delete">
+                                  </Button>
+                                </Popconfirm>
                                 <Button
                                   onClick={() => this.toDone(prog)}
                                   type="dashed"
@@ -544,12 +548,13 @@ class Dashboard extends Component {
                                     shape="circle"
                                     icon="left-circle">
                                   </Button>
-                                  <Button
-                                    onClick={() => this.deleteTask(dn)}
-                                    type="danger"
-                                    shape="circle"
-                                    icon="delete">
-                                  </Button>
+                                  <Popconfirm placement="bottomRight" okType="danger" title="Are you sure delete this task?" onConfirm={() => this.deleteTask(dn)} okText="Yes" cancelText="No">
+                                    <Button
+                                      type="danger"
+                                      shape="circle"
+                                      icon="delete">
+                                    </Button>
+                                  </Popconfirm>
                                 </div>
                               </Card>
                               <br />
