@@ -215,9 +215,14 @@ class ChatRoom extends Component {
     await this.scrollToBottom()
     await this.listenUnrelevant()
   }
+
+  componentDidUpdate() {
+    this.scrollToBottom()
+    this.checkUnrelevant()
+  }
   
   scrollToBottom() {
-    if (this.state.roomStatus) this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
   }
 
   endDiscussion() {
@@ -241,7 +246,7 @@ class ChatRoom extends Component {
                   style={{
                     margin: 15, float: 'left'
                   }} />
-                  <h1 style={{float: 'right', marginRight: 10, marginTop: 10, color: 'white', overflowX: 'hidden'}}>{ this.state.topic }</h1>
+                  <h2 style={{float: 'right', marginRight: 10, marginTop: 10, color: 'white'}}>{ this.state.topic }</h2>
               </Link>
             </div>
             <div className='middletask'>
