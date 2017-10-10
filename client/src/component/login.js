@@ -66,7 +66,7 @@ class Login extends Component {
         position: 'relative',
         height: '100vh'
       }}>
-      <div className='blur' style={{
+      <div className='blur animated' style={{
         position: 'relative',
         height: '100vh',
         backgroundColor: 'rgba(255,255,255,0.5)',
