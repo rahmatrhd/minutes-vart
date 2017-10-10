@@ -218,7 +218,6 @@ class ChatRoom extends Component {
 
   componentDidUpdate() {
     this.scrollToBottom()
-    this.checkUnrelevant()
   }
   
   scrollToBottom() {
