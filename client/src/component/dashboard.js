@@ -27,6 +27,8 @@ import './dashboard.css'
 const { Content, Sider } = Layout
 const Panel = Collapse.Panel
 
+const { TextArea } = Input
+
 class Dashboard extends Component {
   constructor() {
     super()
@@ -395,15 +397,15 @@ class Dashboard extends Component {
 
 
                 <Modal
-                  title="Add New Task"
+                  title="ADD NEW TASK"
                   visible={this.state.visible}
                   onOk={(e) => this.addHandleOk(e)}
                   onCancel={() => this.addHandleCancel()}
                   cancelText="Cancel"
-                  okText="Ok"
+                  okText="Add Task"
                 >
                   <Form onSubmit={(e) => this.addHandleOk(e)} >
-                    <Input
+                    <TextArea rows={4}
                       onChange={(e) => this.addNewTaskChange(e)}
                       prefix={<Icon type="calendar" style={{ fontSize: 13 }} />} type="text" placeholder="New Task ..."
                       value={this.state.newTask}
