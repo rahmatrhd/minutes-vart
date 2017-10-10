@@ -6,7 +6,8 @@ import {
   Timeline,
   Card,
   Icon,
-  Table
+  Table,
+  notification
 } from 'antd'
 import { ChatFeed, Message } from 'react-chat-ui'
 import { BrowserRouter, Link } from 'react-router-dom'
@@ -53,7 +54,8 @@ class ChatRoom extends Component {
         done: [],
         onProgress: [],
         todo: []
-      }
+      },
+      unrelevant: 0
     }
   }
 
@@ -97,6 +99,22 @@ class ChatRoom extends Component {
         this.setState({ roomTask: tmp })
       }
     })
+  }
+
+  listenUnrelevant() {
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
+    ref.on('value', snapshot => {
+      this.setState({unrelevant: snapshot.val()})
+    })
+      console.log(this.state.unrelevant);
+  }
+
+  checkUnrelevant() {
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
+    if (this.state.unrelevant >= 10) {
+      openNotification()
+      ref.set(0)
+    }
   }
 
   fetchAllTodo() {
@@ -188,6 +206,7 @@ class ChatRoom extends Component {
         this.setState({ chatText: '' })
       })
     this.setState({ chatText: '' })
+    this.checkUnrelevant()
   }
 
   stateChangeListener() {
@@ -208,13 +227,11 @@ class ChatRoom extends Component {
     await this.getParticipantList()
     await this.fetchAllTask()
     await this.scrollToBottom()
+    await this.listenUnrelevant()
   }
   
   scrollToBottom() {
     if (this.state.roomStatus) this.messagesEnd.scrollIntoView({ behavior: "smooth" });
-  }
-  
-  componentDidMount() {
   }
 
   componentDidUpdate() {
@@ -427,5 +444,13 @@ class ChatRoom extends Component {
     )
   }
 }
+
+const openNotification = () => {
+  notification.open({
+    message: 'Out Off Topic',
+    description: 'The Discussion had been drifted from the original purpose of this meeting, please discuss things that related to the topic',
+    icon: <Icon type="smile-circle" style={{ color: '#108ee9' }} />
+  });
+};
 
 export default ChatRoom
