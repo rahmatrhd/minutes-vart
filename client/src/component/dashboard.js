@@ -430,6 +430,7 @@ class Dashboard extends Component {
                               <Card style={{}}>
                                 <p style={{fontSize: '18px'}}>{back.task}</p>
                                 <p>Assign to: {back.user.name}</p><br />
+                                {back.user.userId === this.state.userId ?
                                   <div className="singlebutton">
                                     <Button
                                       onClick={() => this.deleteTask(back)}
@@ -443,7 +444,8 @@ class Dashboard extends Component {
                                       shape="circle"
                                       icon="right-circle">
                                     </Button>
-                                  </div>
+                                  </div> : ''
+                                }
                               </Card>
                               <br />
                             </div>
@@ -463,6 +465,7 @@ class Dashboard extends Component {
                               <Card>
                                 <p style={{fontSize: '18px'}}>{td.task}</p>
                                 <p>Assign to: {td.user.name}</p><br />
+                                {td.user.userId === this.state.userId ? 
                                 <div className="wrapbutton">
                                 <Button
                                 onClick={() => this.toBackLog(td)}
@@ -480,7 +483,8 @@ class Dashboard extends Component {
                                 type="dashed" shape="circle"
                                 icon="right-circle">
                                 </Button>
-                                </div>
+                                </div> : ''
+                                }
                               </Card>
                               <br />
                             </div>
@@ -499,6 +503,7 @@ class Dashboard extends Component {
                               <Card>
                                 <p style={{fontSize: '18px'}}>{prog.task}</p>
                                 <p>Assign to: {prog.user.name}</p><br />
+                                {prog.user.userId === this.state.userId ? 
                                 <div className="wrapbutton">
                                 <Button
                                   onClick={() => this.toTodo(prog)}
@@ -518,7 +523,8 @@ class Dashboard extends Component {
                                   shape="circle"
                                   icon="right-circle">
                                 </Button>
-                                </div>
+                                </div> : ''
+                                }
                               </Card>
                               <br />
                             </div>
@@ -537,6 +543,7 @@ class Dashboard extends Component {
                               <Card>
                                 <p style={{fontSize: '18px'}}>{dn.task}</p>
                                 <p>Assign to: {dn.user.name}</p><br />
+                                {dn.user.userId === this.state.userId ? 
                                 <div className="singlebutton">
                                   <Button
                                     onClick={() => this.toOnProgress(dn)}
@@ -550,7 +557,8 @@ class Dashboard extends Component {
                                     shape="circle"
                                     icon="delete">
                                   </Button>
-                                </div>
+                                </div>: ''
+                                }
                               </Card>
                               <br />
                             </div>
