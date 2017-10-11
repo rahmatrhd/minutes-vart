@@ -248,60 +248,62 @@ checkUnrelevant() {
                   style={{
                     margin: 15, float: 'left'
                   }} />
-                  <h2 style={{float: 'right', marginRight: 10, marginTop: 10, color: 'white'}}>{ this.state.topic }</h2>
+                  <h1 style={{float: 'right', marginRight: 10, marginTop: 10, textShadow: '0px 0px 15px white'}}><b>{ this.state.topic }</b></h1>
               </Link>
             </div>
             <div className='middletask'>
-              <h1 style={{
-                color: 'white'
-              }}>MY TASK</h1>
-              <br />
-              <Timeline style={{ color: 'white' }}>
-                {
-                  this.state.usersTodoList.backlog.map((list, idx) => {
-                    return (
-                      <Timeline.Item
-                        key={idx}
-                        color='red'>
-                        {list.task}
-                      </Timeline.Item>
-                    )
-                  })
-                }
-                {
-                  this.state.usersTodoList.todo.map((list, idx) => {
-                    return (
-                      <Timeline.Item
-                        key={idx}
-                        color='orange'>
-                        {list.task}
-                      </Timeline.Item>
-                    )
-                  })
-                }
-                {
-                  this.state.usersTodoList.onProgress.map((list, idx) => {
-                    return (
-                      <Timeline.Item
-                        key={idx}
-                        color='blue'>
-                        {list.task}
-                      </Timeline.Item>
-                    )
-                  })
-                }
-                {
-                  this.state.usersTodoList.done.map((list, idx) => {
-                    return (
-                      <Timeline.Item
-                        key={idx}
-                        color='green'>
-                        {list.task}
-                      </Timeline.Item>
-                    )
-                  })
-                }
-              </Timeline>
+              <div style={{marginLeft: '20px'}}>
+                <h1 style={{
+                  color: 'white'
+                }}>MY TASK</h1>
+                <br />
+                <Timeline style={{ color: 'white' }}>
+                  {
+                    this.state.usersTodoList.backlog.map((list, idx) => {
+                      return (
+                        <Timeline.Item
+                          key={idx}
+                          color='red'>
+                          {list.task}
+                        </Timeline.Item>
+                      )
+                    })
+                  }
+                  {
+                    this.state.usersTodoList.todo.map((list, idx) => {
+                      return (
+                        <Timeline.Item
+                          key={idx}
+                          color='orange'>
+                          {list.task}
+                        </Timeline.Item>
+                      )
+                    })
+                  }
+                  {
+                    this.state.usersTodoList.onProgress.map((list, idx) => {
+                      return (
+                        <Timeline.Item
+                          key={idx}
+                          color='blue'>
+                          {list.task}
+                        </Timeline.Item>
+                      )
+                    })
+                  }
+                  {
+                    this.state.usersTodoList.done.map((list, idx) => {
+                      return (
+                        <Timeline.Item
+                          key={idx}
+                          color='green'>
+                          {list.task}
+                        </Timeline.Item>
+                      )
+                    })
+                  }
+                </Timeline>
+              </div>
             </div>
           </div>
           <div className='member'>
