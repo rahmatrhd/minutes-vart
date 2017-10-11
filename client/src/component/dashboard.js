@@ -1,4 +1,8 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
+
+import { userData } from '../actions/userAction'
+import { todoToStore } from '../actions/todoAction'
 
 import {
   Avatar,
@@ -112,7 +116,6 @@ class Dashboard extends Component {
   }
   
   modalHandleOk() {
-    // console.log(this.state.review.item.todo)
     axios.post(`https://us-central1-minutes-vart.cloudfunctions.net/submitReview`, {
       historyId: this.state.review.item.key,
       todo: this.state.review.item.todo
@@ -219,6 +222,11 @@ class Dashboard extends Component {
             todoList.backlog.push(backlog)
           }
         })
+        let payload = {
+          userId: this.state.userId,
+          todoList: list
+        }
+        this.props.todoToStore(payload)
         this.setState({ todoList: todoList })
       }
     })
@@ -334,7 +342,6 @@ class Dashboard extends Component {
             console.log('Registered');
           }
         })
-
         this.setState({
           username: user.displayName,
           email: user.email,
@@ -816,4 +823,18 @@ const customPanelStyle = {
   overflow: 'hidden'
 };
 
-export default Dashboard
+// export default Dashboard
+
+const mapStateToProps = state => {
+  return {
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    userData: payload => dispatch(userData(payload)),
+    todoToStore: payload => dispatch(todoToStore(payload))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard)
