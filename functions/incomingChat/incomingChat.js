@@ -8,16 +8,17 @@ module.exports = (req, res) => {
   const { roomId } = req.body
   db.ref(`rooms/${roomId}/topic`).once('value')
   .then(snapshot => {
-    const payload = req.body
-    payload.topic = snapshot.val()
+    const data = Object.assign({}, req.body, {topic: snapshot.val()})
     
     return Promise.all([
-      checkRelevant(req.body),
-      sendChatToAI(req.body)
+      checkRelevant(data),
+      sendChatToAI(data)
     ])
   })
   .then(results => {
     res.send(results[1])
   })
-  .catch(err => res.send(err))
+  .catch(err => {
+    res.send(err)
+  })
 }
