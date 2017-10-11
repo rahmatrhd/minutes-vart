@@ -704,10 +704,10 @@ class Dashboard extends Component {
                 <b>Tasks</b>
                 {
                   this.state.review.item.todo ?
-                  Object.keys(this.state.review.item.todo).map(key => {
+                  Object.keys(this.state.review.item.todo).map((key, idx) => {
                   const todo = this.state.review.item.todo[key]
                     return (
-                      <Col>
+                      <Col key="idx">
                         <Row gutter={4}>
                           <Col span={23}>
                             <Input.Group compact>
@@ -746,34 +746,47 @@ class Dashboard extends Component {
                   }) : null
                 }
                 <br/>
-
-                {
-                  this.state.review.item.notes ? (
-                    <div>
-                      <b>Noted Chat</b> 
-                      < ul > {
-                        Object
-                          .keys(this.state.review.item.notes)
-                          .map((key, idx) => {
-                            const note = this.state.review.item.notes[key]
-                            return (
-                              <li key={idx}>{note.data.text}</li>
-                            )
-                          })
-                      } < /ul>
-                    <br/>
-                  </div>
-                  ) : null
-                }
-                
-
+                <Collapse accordion>
+                  {
+                    this.state.review.item.notes ? (
+                      <Panel header='Noted Chat' key="1">
+                        <ul>
+                          {
+                            Object.keys(this.state.review.item.notes).map((key, idx) => {
+                              const note = this.state.review.item.notes[key]
+                              return (
+                                <li key={idx}>{ note.data.text }</li>
+                              )
+                            })
+                          }
+                        </ul>
+                      </Panel>
+                    ) : (
+                        <Panel header="Noted Chat" disabled></Panel>
+                      )
+                  }
+                  {
+                    this.state.review.item.report.relevantChat ? (
+                      <Panel header="Relevant Chat" key="2">
+                        <ul>
+                          {
+                            Object.keys(this.state.review.item.report.relevantChat).map((key, idx) => {
+                              const chat = this.state.review.item.report.relevantChat[key]
+                              return (
+                                <li key={idx}>{ chat.data.text }</li>
+                              )
+                            })
+                          }
+                        </ul>
+                      </Panel>
+                    ) : (
+                      <Panel header="Relevant Chat" disabled></Panel>
+                    )
+                  }
+                </Collapse>
                 <b>Duration:</b> {this.state.review.item.report.duration}
                 <br/><br/>
                 <Row style={{position: 'relative', left: 50}}>
-                  <Col span={12}>
-                    <b>Discussion Efficiency</b>
-                    <Progress type="dashboard" percent={Math.floor(this.state.review.item.report.discussionEfficiency * 100)} />
-                  </Col>
                   <Col span={12}>
                     <b>Discussion Productivity</b>
                     <Progress type="dashboard" percent={Math.floor(this.state.review.item.report.discussionProductivity * 100)} />
