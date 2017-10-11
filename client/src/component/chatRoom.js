@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
+
 import {
   Input,
   Button,
@@ -93,9 +95,9 @@ class ChatRoom extends Component {
     ref.on('value', snapshot => {
       this.setState({unrelevant: snapshot.val()})
     })
-      console.log('Num of irrelevant chat', this.state.unrelevant);
   }
-checkUnrelevant() {
+
+  checkUnrelevant() {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
     ref.on('value', snapshot => {
       if (snapshot.val() >= 6) {
@@ -105,7 +107,7 @@ checkUnrelevant() {
     })
   }
 
-  fetchAllTodo() {
+  fetchUsersTodo() {
     let ref = firebase.database().ref('/kanban')
     ref.on('value', snapshot => {
       if (snapshot.val() !== null) {
@@ -211,7 +213,7 @@ checkUnrelevant() {
     await this.stateChangeListener()
     await this.roomStatusChecker()
     await this.fetchAllMessages()
-    await this.fetchAllTodo()
+    await this.fetchUsersTodo()
     await this.getParticipantList()
     await this.fetchAllTask()
     await this.scrollToBottom()
@@ -446,4 +448,17 @@ const nameNotification = (name) => {
   });
 };
 
-export default ChatRoom
+// export default ChatRoom
+
+const mapStateToProps = state => {
+  return {
+    usersTodo: state.todoStore
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChatRoom)
