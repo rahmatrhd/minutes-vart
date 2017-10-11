@@ -17,12 +17,11 @@
 
 .discussion {
   grid-column: 2;
-  background-color: #2D587B;
+  background-color: rgba(156, 177, 191, 0.2);
   overflow: auto;
   height: 100vh;
   display: grid;
-  grid-template-rows: 1fr 5fr 5fr;
-  grid-gap: 10px;
+  grid-template-rows: 1fr 20fr 19fr;
 }
 
 .logo {
@@ -54,7 +53,6 @@ img {
 
 .info {
   grid-row: 1;
-  background: #9CB1BF;
   padding: 10px;
   display: grid;
   align-items: center;
@@ -62,14 +60,16 @@ img {
 }
 
 .active {
+  box-shadow: 0px 0px 25px #2D587B;
+  background-color: #2D587B;
   grid-row: 2;
   overflow: auto;
-  margin: 20px 20px
 }
 
 .history {
   grid-row: 3;
   overflow: auto;
+  background-color: #2D587B;
 }
 
 .userinfo {
