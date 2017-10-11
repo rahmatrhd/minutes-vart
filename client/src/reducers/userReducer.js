@@ -1,13 +1,20 @@
 const initState = {
-  id: '',
-  username: '',
-  email: ''
+  email: '',
+  photoURL: '',
+  userId: '',
+  username: ''
 }
 
 export default (state = initState, actions) => {
   switch (actions.type) {
-    case 'INPUT_USER':
-      return {...state, id: actions.payload.id, username: actions.payload.username, email: actions.payload.email}
+    case 'INPUT_USER_DATA':
+      return {
+        ...state,
+        email: actions.payload.email,
+        photoURL: actions.payload.photoURL,
+        userId: actions.payload.userId,
+        username: actions.payload.username
+      }
     default:
       return state
   }

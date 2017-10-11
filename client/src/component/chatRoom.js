@@ -1,4 +1,9 @@
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import React, { Component } from 'react';
+import axios from 'axios'
+import firebase from './firebaseConfig'
+
 import {
   Input,
   Button,
@@ -9,32 +14,12 @@ import {
   Table,
   notification
 } from 'antd'
-import { ChatFeed, Message } from 'react-chat-ui'
-import { BrowserRouter, Link } from 'react-router-dom'
-import firebase from './firebaseConfig'
-import axios from 'axios'
+import { ChatFeed } from 'react-chat-ui'
 
-import Bubble from './chattext'
 import './chatroom.css'
 
-const FormItem = Form.Item;
-const { Column, ColumnGroup } = Table;
+const { Column } = Table;
 
-const data = [
-  {
-    key: '1',
-    task: 'Wireframing',
-    user: 'Brown'
-  }, {
-    key: '2',
-    task: 'Layouting',
-    user: 'Green'
-  }, {
-    key: '3',
-    task: 'Create Server',
-    user: 'Black'
-  }
-];
 
 class ChatRoom extends Component {
   constructor() {
@@ -63,9 +48,25 @@ class ChatRoom extends Component {
     this.setState({ chatText: e.target.value })
   }
 
+  checkUnrelevant() {
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
+    ref.on('value', snapshot => {
+      if (snapshot.val() >= 6) {
+        openNotification()
+        ref.set(0)
+      }
+    })
+  }
+
   deleteMinnieTask(taskId) {
     console.log('Delete minnie task');
     firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/todo/${taskId}`).remove()
+  }
+
+  endDiscussion() {
+    const roomId = this.props.match.params.id
+    axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/closeDiscussion?room_id=${roomId}`)
+    this.props.history.push('/dashboard')
   }
 
   fetchAllMessages() {
@@ -74,7 +75,7 @@ class ChatRoom extends Component {
       if (snapshot.val() !== null) {
         let temp = []
         let messages = Object.entries(snapshot.val() || {})
-        messages.map(msg => {
+        messages.forEach(msg => {
           if (msg[1].id === this.state.userId) {
             msg[1].id = 0
           }
@@ -92,7 +93,7 @@ class ChatRoom extends Component {
       if (snapshot.val() !== null) {
         let tmp = []
         let todo = Object.entries(snapshot.val() || {})
-        todo.map(maps => {
+        todo.forEach(maps => {
           maps[1].key = maps[0]
           tmp.push(maps[1])
         })
@@ -101,23 +102,7 @@ class ChatRoom extends Component {
     })
   }
 
-  listenUnrelevant() {
-    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
-    ref.on('value', snapshot => {
-      this.setState({unrelevant: snapshot.val()})
-    })
-      console.log(this.state.unrelevant);
-  }
-
-  checkUnrelevant() {
-    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
-    if (this.state.unrelevant >= 10) {
-      openNotification()
-      ref.set(0)
-    }
-  }
-
-  fetchAllTodo() {
+  fetchUsersTodo() {
     let ref = firebase.database().ref('/kanban')
     ref.on('value', snapshot => {
       if (snapshot.val() !== null) {
@@ -128,7 +113,7 @@ class ChatRoom extends Component {
           onProgress: [],
           todo: []
         }
-        list.map(li => {
+        list.forEach(li => {
           if (li[1].status === 'done' && li[1].user.userId === this.state.userId) {
             let done = li[1]
             done.taskId = li[0]
@@ -157,9 +142,17 @@ class ChatRoom extends Component {
     ref.on('value', snapshot => {
       let longList = Object.entries(snapshot.val() || {})
       let temp = []
-      longList.map(list => {
-        temp.push(list[1])      })
+      longList.forEach(list => {
+        temp.push(list[1])
+      })
       this.setState({participants: temp.sort()})
+    })
+  }
+
+  listenUnrelevant() {
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
+    ref.on('value', snapshot => {
+      this.setState({ unrelevant: snapshot.val() })
     })
   }
 
@@ -169,21 +162,23 @@ class ChatRoom extends Component {
         roomStatus: snap.val() || {},
         topic: this.props.location.state.topic
       })
-
       if (!snap.val()) {
         this.setState({ roomStatus: snap.val() || {}})
         if (!this.state.roomStatus) {
           this.props.history.push('/dashboard')
         }
       }
-
     })
+  }
+
+  scrollToBottom() {
+    if (this.state.roomStatus) this.messagesEnd.scrollIntoView({ behavior: "smooth" })
   }
 
   sendChat(e) {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/chat`)
     ref.push().set({ id: this.state.userId, message: this.state.chatText, senderName: this.state.currentUser })
-    this.setState({ chatText: '' })
+    // this.setState({ chatText: '' })
     e.preventDefault()
     axios.post('https://us-central1-minutes-vart.cloudfunctions.net/incomingChat', {
       roomId: this.props.match.params.id,
@@ -202,11 +197,12 @@ class ChatRoom extends Component {
           'Content-Type': 'application/json'
         }
       })
-      .then(data => {
-        this.setState({ chatText: '' })
+      .then(({data}) => {
+        if (data.hasOwnProperty('userUndefined')) {
+          nameNotification(data.name)
+        }
       })
     this.setState({ chatText: '' })
-    this.checkUnrelevant()
   }
 
   stateChangeListener() {
@@ -219,34 +215,23 @@ class ChatRoom extends Component {
     })
   }
 
+
+  // --------------------------------------------------------------------------
+
+  componentDidUpdate() {
+    this.scrollToBottom()
+  }
+
   componentWillMount = async () => {
     await this.stateChangeListener()
     await this.roomStatusChecker()
     await this.fetchAllMessages()
-    await this.fetchAllTodo()
+    await this.fetchUsersTodo()
     await this.getParticipantList()
     await this.fetchAllTask()
     await this.scrollToBottom()
     await this.listenUnrelevant()
-  }
-  
-  scrollToBottom() {
-    if (this.state.roomStatus) this.messagesEnd.scrollIntoView({ behavior: "smooth" });
-  }
-
-  componentDidUpdate() {
-    this.scrollToBottom();
-  }
-
-  scrollToBottom() {
-    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
-  }
-  
-  endDiscussion() {
-    const roomId = this.props.match.params.id
-    axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/closeDiscussion?room_id=${roomId}`)
-    // firebase.database().ref(`/rooms/${this.props.match.params.id}`).remove()
-    // this.props.history.push('/dashboard')
+    await this.checkUnrelevant()
   }
 
   render() {
@@ -263,60 +248,62 @@ class ChatRoom extends Component {
                   style={{
                     margin: 15, float: 'left'
                   }} />
-                  <h1 style={{float: 'right', marginRight: 10, marginTop: 10, color: 'white', overflowX: 'hidden'}}>{ this.state.topic }</h1>
+                  <h1 style={{float: 'right', marginRight: 10, marginTop: 10, textShadow: '0px 0px 15px white'}}><b>{ this.state.topic }</b></h1>
               </Link>
             </div>
             <div className='middletask'>
-              <h1 style={{
-                color: 'white'
-              }}>MY TASK</h1>
-              <br />
-              <Timeline style={{ color: 'white' }}>
-                {
-                  this.state.usersTodoList.backlog.map((list, idx) => {
-                    return (
-                      <Timeline.Item
-                        key={idx}
-                        color='red'>
-                        {list.task}
-                      </Timeline.Item>
-                    )
-                  })
-                }
-                {
-                  this.state.usersTodoList.todo.map((list, idx) => {
-                    return (
-                      <Timeline.Item
-                        key={idx}
-                        color='orange'>
-                        {list.task}
-                      </Timeline.Item>
-                    )
-                  })
-                }
-                {
-                  this.state.usersTodoList.onProgress.map((list, idx) => {
-                    return (
-                      <Timeline.Item
-                        key={idx}
-                        color='blue'>
-                        {list.task}
-                      </Timeline.Item>
-                    )
-                  })
-                }
-                {
-                  this.state.usersTodoList.done.map((list, idx) => {
-                    return (
-                      <Timeline.Item
-                        key={idx}
-                        color='green'>
-                        {list.task}
-                      </Timeline.Item>
-                    )
-                  })
-                }
-              </Timeline>
+              <div style={{marginLeft: '20px'}}>
+                <h1 style={{
+                  color: 'white'
+                }}>MY TASK</h1>
+                <br />
+                <Timeline style={{ color: 'white' }}>
+                  {
+                    this.state.usersTodoList.backlog.map((list, idx) => {
+                      return (
+                        <Timeline.Item
+                          key={idx}
+                          color='red'>
+                          {list.task}
+                        </Timeline.Item>
+                      )
+                    })
+                  }
+                  {
+                    this.state.usersTodoList.todo.map((list, idx) => {
+                      return (
+                        <Timeline.Item
+                          key={idx}
+                          color='orange'>
+                          {list.task}
+                        </Timeline.Item>
+                      )
+                    })
+                  }
+                  {
+                    this.state.usersTodoList.onProgress.map((list, idx) => {
+                      return (
+                        <Timeline.Item
+                          key={idx}
+                          color='blue'>
+                          {list.task}
+                        </Timeline.Item>
+                      )
+                    })
+                  }
+                  {
+                    this.state.usersTodoList.done.map((list, idx) => {
+                      return (
+                        <Timeline.Item
+                          key={idx}
+                          color='green'>
+                          {list.task}
+                        </Timeline.Item>
+                      )
+                    })
+                  }
+                </Timeline>
+              </div>
             </div>
           </div>
           <div className='member'>
@@ -453,4 +440,25 @@ const openNotification = () => {
   });
 };
 
-export default ChatRoom
+const nameNotification = (name) => {
+  notification.open({
+    message: `No user name ${name}`,
+    description: `You've assigned a task to an unknown user, please invite said user to Minutes App`,
+    icon: <Icon type="frown-circle" style={{ color: '#108ee9' }} />
+  });
+};
+
+// export default ChatRoom
+
+const mapStateToProps = state => {
+  return {
+    usersTodo: state.todoStore
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChatRoom)

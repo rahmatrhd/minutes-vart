@@ -9,8 +9,6 @@ module.exports = (req, res) => {
   .then(() => {
     db.ref(`rooms/${roomId}`).once('value')
     .then(snapshot => {
-      console.log('inside then')
-      
       const data = Object.assign({}, snapshot.val())
       const { 
         topic = {},
@@ -32,17 +30,15 @@ module.exports = (req, res) => {
       const chatArr = Object.keys(chat).map(key => chat[key])
       const relevantChatArr = Object.keys(relevantChat).map(key => relevantChat[key])
       const notesArr = Object.keys(notes).map(key => notes[key])
-      console.log('consts', participantArr, chatArr, relevantChatArr, notesArr)
           
       // duration
       const duration = new Duration(Date.now() - timestamp)
       const durationString = `${duration.getHours}:${duration.getMinutes}`
-      console.log('duration', duration, durationString)
       
       // user participation rate
       let hashUserRelevantChat = {} // hash table
       relevantChatArr.forEach(chat => {
-        hashUserRelevantChat[chat.user.id] = hashUserRelevantChat[chat.user.id] ? hashUserRelevantChat[chat.user.id] + 1 : 1
+      hashUserRelevantChat[chat.user.id] = hashUserRelevantChat[chat.user.id] ? hashUserRelevantChat[chat.user.id] + 1 : 1
       })
       
       const userParticipationRate = participantArr.map(user => ({
@@ -50,7 +46,6 @@ module.exports = (req, res) => {
         name: user.name,
         score: hashUserRelevantChat[user.id] / relevantChatArr.length || 0
       }))
-      console.log('hashUserRelevantChat', hashUserRelevantChat, userParticipationRate)
       
       //user contribution rate
       let hashUserNotes = {}
@@ -63,7 +58,6 @@ module.exports = (req, res) => {
         name: user.name,
         score: hashUserNotes[user.id] / notesArr.length || 0
       }))
-      console.log('hashUserNotes', hashUserNotes, userContributionRate)
       
       //user focusness
       let hashUserChat = {}
@@ -76,39 +70,16 @@ module.exports = (req, res) => {
         name: user.name,
         score: hashUserRelevantChat[user.id] / hashUserChat[user.id] || 0
       }))
-      console.log('hashUserChat', hashUserChat, userFocusness)
       
       // discussion efficiency
       const discussionEfficiency = relevantChatArr.length / chatArr.length
       
       // discussion productivity rate (per hour)
       const discussionProductivity = discussionEfficiency / duration.getTotalHours
-      console.log('discussion', discussionEfficiency, discussionProductivity)
       
       Object.keys(todo).forEach(key => {
         todo[key].status = true
       })
-      console.log('data.minnie.todo', todo)
-      console.log('result', {
-        notes: notes,
-        participant: participant,
-        report: {
-          duration: durationString,
-          userParticipationRate: arrToObj(userParticipationRate),
-          userContributionRate: arrToObj(userContributionRate),
-          userFocusness: arrToObj(userFocusness),
-          discussionEfficiency: discussionEfficiency,
-          discussionProductivity: discussionProductivity,
-          relevantChat: relevantChat
-        },
-        timestamp: Date.now(),
-        status: false,
-        todo: todo,
-        topic: {
-          text: topic.text || ''
-        }
-      })
-        
       db.ref('history').push({
         notes: notes,
         participant: participant,
@@ -129,9 +100,7 @@ module.exports = (req, res) => {
         }
       })
       .then(() => {
-        console.log('before delete rooms')
         db.ref(`rooms/${roomId}`).set(null)
-        console.log('res.send')
         res.send(true)
       })
     })

@@ -1,8 +1,10 @@
-import React, {Component} from 'react'
-// import {Button, Layout} from 'antd'
+import { connect } from 'react-redux'
+import React, { Component } from 'react'
 
 import firebase from './firebaseConfig'
 import './login.css'
+
+import { userData } from '../actions/userAction'
 
 class Login extends Component {
 
@@ -38,6 +40,13 @@ class Login extends Component {
       if (user) {
         console.log('Logged')
         console.log(user)
+        let payload = {
+          email: user.email,
+          photoURL: user.photoURL,
+          userId: user.uid,
+          username: user.displayName
+        }
+        this.props.userData(payload)
         let ref = firebase.database().ref('/users')
         ref.once('value', snapshot => {
           let checker = snapshot.hasChild(user.uid)
@@ -66,7 +75,7 @@ class Login extends Component {
         position: 'relative',
         height: '100vh'
       }}>
-      <div className='blur' style={{
+      <div className='blur animated' style={{
         position: 'relative',
         height: '100vh',
         backgroundColor: 'rgba(255,255,255,0.5)',
@@ -103,4 +112,19 @@ class Login extends Component {
   }
 }
 
-export default Login
+// export default Login
+
+const mapStateToProps = state => {
+  console.log('login>state>> ', state)
+  return {
+    inBaruPercobaan: state.userStore
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    userData: payload => dispatch(userData(payload))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login)

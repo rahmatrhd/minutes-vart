@@ -1,6 +1,4 @@
-body {
 
-}
 .blur {
   background-image: url('https://back-2-front.co.uk/wp-content/uploads/2015/08/Team-Meeting.jpg');
   background-size: cover;
@@ -13,6 +11,22 @@ img {
   filter: drop-shadow(0px 0px 10px white);
 }
 /* Shared */
+.animated {
+  -webkit-animation: filter-animation 5s infinite;
+}
+
+@-webkit-keyframes filter-animation {
+  0% {
+    -webkit-filter: grayscale(0) blur(5px);
+  }
+  50% {
+    -webkit-filter: grayscale(2) blur(7px);
+  }
+  100% {
+    -webkit-filter: grayscale(0) blur(5px);
+  }
+}
+
 
 .loginBtn {
   box-sizing: border-box;

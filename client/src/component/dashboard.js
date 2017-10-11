@@ -1,35 +1,34 @@
+import { connect } from 'react-redux'
+import axios from 'axios'
+import firebase from './firebaseConfig'
 import React, { Component } from 'react';
+
+import { userData } from '../actions/userAction'
+import { todoToStore } from '../actions/todoAction'
 
 import {
   Avatar,
   Button,
   Card,
+  Checkbox,
   Col,
   Collapse,
   Form,
   Icon,
   Input,
   Layout,
-  Row,
-  Tag,
-  Spin,
   Modal,
-  Select,
-  Checkbox,
-  Progress,
   Popconfirm,
-  message
+  Progress,
+  Row,
+  Select,
+  Tag
 } from 'antd'
-import { BrowserRouter, Link } from 'react-router-dom'
-import firebase from './firebaseConfig'
-import axios from 'axios'
 
 import './dashboard.css'
 
-const { Content, Sider } = Layout
-const Panel = Collapse.Panel
-
 const { TextArea } = Input
+const Panel = Collapse.Panel
 
 class Dashboard extends Component {
   constructor() {
@@ -78,14 +77,29 @@ class Dashboard extends Component {
       visible: false
     }
   }
+
+  addNewTask() {
+    console.log('addNewTask')
+    const key = firebase.database().ref(`/kanban`).push().key
+    firebase.database().ref(`/kanban/${key}`).set({
+      status: 'backlog',
+      task: this.state.newTask,
+      taskId: key,
+      user: {
+        name: this.state.username,
+        userId: this.state.userId
+      }
+    })
+    this.setState({ newTask: '' })
+  }
   
   addNewTaskChange(e) {
     this.setState({newTask: e.target.value})
   }
 
-  addTaskModal(item) {
+  addHandleCancel() {
     this.setState({
-      visible: true
+      visible: false
     })
   }
 
@@ -97,53 +111,9 @@ class Dashboard extends Component {
     this.addNewTask()
   }
 
-  addHandleCancel() {
+  addTaskModal(item) {
     this.setState({
-      visible: false
-    })
-  }
-
-  reviewModal(item) {
-    console.log(item)
-    this.setState({
-      review: {
-        visibleModal: true,
-        item
-      }
-    })
-  }
-  
-  modalHandleOk() {
-    console.log(this.state.review.item.todo)
-    axios.post(`https://us-central1-minutes-vart.cloudfunctions.net/submitReview`, {
-      historyId: this.state.review.item.key,
-      todo: this.state.review.item.todo
-    })
-    .then(() => {
-      this.setState({
-        review: {
-          ...this.state.review,
-          visibleModal: false
-        }
-      })
-    })
-  }
-  
-  modalHandleCancel() {
-    this.setState({
-      review: {
-        ...this.state.review,
-        visibleModal: false
-      }
-    })
-  }
-  
-  getAllUsers() {
-    firebase.database().ref('users').once('value')
-    .then(snapshot => {
-      this.setState({
-        users: snapshot.val()
-      })
+      visible: true
     })
   }
 
@@ -151,7 +121,7 @@ class Dashboard extends Component {
     e.preventDefault();
     axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/watsonNLU?text=${this.state.topicTitle}`)
     .then(({ data }) => {
-      console.log(data.error)
+      // console.log(data.error)
       if (data.error) {
         alert('Room\'s name should be descriptive and written in English' )
       } else {
@@ -170,17 +140,24 @@ class Dashboard extends Component {
     })
   }
 
+  deleteTask(task) {
+    console.log('deleteTask')
+    if (task.user.userId !== this.state.userId) {
+      alert('You are not authorized to edit this task')
+    } else {
+      firebase.database().ref(`/kanban/${task.taskId}`).remove()
+    }
+  }
+
   getAllRooms() {
     let ref = firebase.database().ref('/rooms')
     ref.on('value', snapshot => {
       let temp = []
       let list = Object.entries(snapshot.val()) || {}
-      list.map(li => {
-        let participant = li[1].participant ? Object.entries(li[1].participant) : [['', {name: 'Kagak ada orangnya'}]]
-        // let participant = li[1].participant ? Object.entries(li[1].participant) : []
-        console.log(participant)
+      list.forEach(li => {
+        let participant = li[1].participant ? Object.entries(li[1].participant) : []
         let participants = []
-        participant.map(ind => {
+        participant.forEach(ind => {
           participants.push(ind[1].name)
         })
         temp.push({
@@ -189,7 +166,22 @@ class Dashboard extends Component {
           topic: li[1].topic.text.toUpperCase() || undefined
         })
       })
-      this.setState({ roomList: temp })
+      this.setState({ roomList: temp.reverse() })
+    })
+  }
+
+  getAllSummary() {
+    let sum = firebase.database().ref('/history')
+    sum.on('value', snapshot => {
+      if (snapshot.val() !== null) {
+        let summary = []
+        let listSummary = Object.entries(snapshot.val())
+        listSummary.forEach(summ => {
+          summ[1].key = summ[0]
+          summary.push(summ[1])
+        })
+        this.setState({ summaryList: summary })
+      }
     })
   }
 
@@ -204,7 +196,7 @@ class Dashboard extends Component {
           onProgress: [],
           todo: []
         }
-        list.map(li => {
+        list.forEach(li => {
           if (li[1].status === 'done') {
             let done = li[1]
             done.taskId = li[0]
@@ -223,62 +215,109 @@ class Dashboard extends Component {
             todoList.backlog.push(backlog)
           }
         })
+        let payload = {
+          userId: this.state.userId,
+          todoList: list
+        }
+        this.props.todoToStore(payload)
         this.setState({ todoList: todoList })
       }
     })
   }
 
-  getAllSummary() {
-    let sum = firebase.database().ref('/history')
-    sum.on('value', snapshot => {
-      if (snapshot.val() !== null) {
-        let summary = []
-        let listSummary = Object.entries(snapshot.val())
-        listSummary.map(summ => {
-          summ[1].key = summ[0]
-          summary.push(summ[1])
+  getAllUsers() {
+    firebase.database().ref('users').once('value')
+      .then(snapshot => {
+        this.setState({
+          users: snapshot.val()
         })
-        this.setState({ summaryList: summary })
-      }
-    })
+      })
   }
 
-  topicTitleChange(e) {
-    this.setState({ topicTitle: e.target.value })
+  judulHistory(title) {
+    return `Topic : ${title.toUpperCase()}`
   }
 
   logout() {
     console.log('Logout')
     firebase.auth().signOut()
+    .then(() => {
+      console.log('signed out')
+    })
+  }
+
+  modalHandleCancel() {
+    this.setState({
+      review: {
+        ...this.state.review,
+        visibleModal: false
+      }
+    })
+  }
+
+  modalHandleOk() {
+    axios.post(`https://us-central1-minutes-vart.cloudfunctions.net/submitReview`, {
+      historyId: this.state.review.item.key,
+      todo: this.state.review.item.todo
+    })
       .then(() => {
-        console.log('signed out')
+        this.setState({
+          review: {
+            ...this.state.review,
+            visibleModal: false
+          }
+        })
       })
   }
 
-  // --------------------------- kanbans---------------------------
-
-  addNewTask() {
-    console.log('name', this.state.username)
-    const key = firebase.database().ref(`/kanban`).push().key
-    firebase.database().ref(`/kanban/${key}`).set({
-      status: 'backlog',
-      task: this.state.newTask,
-      taskId: key,
-      user: {
-        name: this.state.username,
-        userId: this.state.userId
-      }
+  paketJoin(roomId, topic) {
+    console.log('Join room: ', topic)
+    let ref = firebase.database().ref(`/rooms/${roomId}/participant/${this.state.userId}`)
+    ref.set({
+      name: this.state.username,
+      id: this.state.userId
     })
-    this.setState({newTask: ''})
+    // this.props.history.push(`/chatroom/${roomId}`)
+    this.props.history.push({
+      pathname: `/chatroom/${roomId}`,
+      state: { topic: topic }
+    })
   }
 
-  deleteTask(task) {
-    console.log('deleteTask')
-    if (task.user.userId !== this.state.userId) {
-      alert('You are not authorized to edit this task')
-    } else {
-      firebase.database().ref(`/kanban/${task.taskId}`).remove()
-    }
+  reviewModal(item) {
+    this.setState({
+      review: {
+        visibleModal: true,
+        item
+      }
+    })
+  }
+
+  stateChangeListener() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        console.log('Authenticated User: ', user)
+        let ref = firebase.database().ref('/users')
+        ref.once('value', snap => {
+          let regist = snap.hasChild(user.uid)
+          if (!regist) {
+            console.log('Not Registered. Register first.')
+            // this.logout()
+            this.props.history.push('/')
+          } else {
+            console.log('Registered');
+          }
+        })
+        this.setState({
+          username: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          userId: user.uid
+        })
+      } else {
+        this.props.history.push('/')
+      }
+    })
   }
 
   toBackLog(task) {
@@ -287,7 +326,7 @@ class Dashboard extends Component {
       task.status = 'backlog'
       firebase.database().ref(`/kanban/${task.taskId}`).set(task)
     } else {
-      alert ('You are not authorized to edit this task')
+      alert('You are not authorized to edit this task')
     }
   }
 
@@ -297,7 +336,7 @@ class Dashboard extends Component {
       task.status = 'todo'
       firebase.database().ref(`/kanban/${task.taskId}`).set(task)
     } else {
-      alert ('You are not authorized to edit this task')
+      alert('You are not authorized to edit this task')
     }
   }
 
@@ -321,59 +360,21 @@ class Dashboard extends Component {
     }
   }
 
-  // --------------------------- kanbans---------------------------
-
-  stateChangeListener() {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        console.log(user)
-
-        let ref = firebase.database().ref('/users')
-        ref.once('value', snap => {
-          let regist = snap.hasChild(user.uid)
-          if (!regist) {
-            console.log('Not Registered. Register first.')
-            // this.logout()
-            this.props.history.push('/')
-          }
-        })
-
-        this.setState({
-          username: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-          userId: user.uid
-        })
-      } else {
-        this.props.history.push('/')
-      }
-    })
+  topicTitleChange(e) {
+    this.setState({ topicTitle: e.target.value })
   }
 
-  componentWillMount() {
-    this.stateChangeListener()
+  // --------------------------------------------------------------------------
+
+  componentDidMount() {
     this.getAllTodo()
     this.getAllRooms()
     this.getAllSummary()
     this.getAllUsers()
   }
 
-  paketJoin(roomId, topic) {
-    console.log('kirim paket')
-    let ref = firebase.database().ref(`/rooms/${roomId}/participant/${this.state.userId}`)
-    ref.set({
-      name: this.state.username,
-      id: this.state.userId
-    })
-    // this.props.history.push(`/chatroom/${roomId}`)
-    this.props.history.push({
-      pathname: `/chatroom/${roomId}`,
-      state: {topic: topic}
-    })
-  }
-
-  judulHistory(title) {
-    return `Topic : ${title.toUpperCase()}`
+  componentWillMount() {
+    this.stateChangeListener()
   }
 
   render() {
@@ -421,7 +422,7 @@ class Dashboard extends Component {
               }}>
                 <Row gutter={5}>
                   <Col span={6}>
-                    <Card title="BACK LOG" bordered={false} style={{backgroundColor: 'rgba(255,0,0, 0.5)'}}>
+                    <Card title="BACK LOG" bordered={false} style={{backgroundColor: 'rgba(255,0,0, 0.5)', boxShadow: '0px 0px 10px red'}}>
                       {
                         this.state.todoList.backlog.map((back, idx) => {
                           return (
@@ -429,21 +430,26 @@ class Dashboard extends Component {
                               <Card style={{}}>
                                 <p style={{fontSize: '18px'}}>{back.task}</p>
                                 <p>Assign to: {back.user.name}</p><br />
-                                  <div className="singlebutton">
-                                    <Popconfirm placement="bottomRight" okType="danger" title='Are you sure delete this task?' onConfirm={() => this.deleteTask(back)} okText="Yes" cancelText="No">
+                                {
+                                  this.state.userId === back.user.userId ? (
+                                    <div className="singlebutton">
+                                      <Popconfirm placement="bottomRight" okType="danger" title='Are you sure delete this task?' onConfirm={() => this.deleteTask(back)} okText="Yes" cancelText="No">
+                                        <Button
+                                          type="danger"
+                                          shape="circle"
+                                          icon="delete">
+                                        </Button>
+                                      </Popconfirm>
                                       <Button
-                                        type="danger"
+                                        onClick={() => this.toTodo(back)}
+                                        type="dashed"
                                         shape="circle"
-                                        icon="delete">
+                                        icon="right-circle">
                                       </Button>
-                                    </Popconfirm>
-                                    <Button
-                                      onClick={() => this.toTodo(back)}
-                                      type="dashed"
-                                      shape="circle"
-                                      icon="right-circle">
-                                    </Button>
-                                  </div>
+                                    </div>
+                                  ) :
+                                  null
+                                }
                               </Card>
                               <br />
                             </div>
@@ -452,38 +458,39 @@ class Dashboard extends Component {
                       }
                     </Card>
                   </Col>
-
-
                   <Col span={6}>
-                    <Card title="TO-DO" bordered={false} style={{backgroundColor: 'rgba(255,165,0, 0.5)'}}>
+                    <Card title="TO-DO" bordered={false} style={{backgroundColor: 'rgba(255,165,0, 0.5)', boxShadow: '0px 0px 10px orange'}}>
                       {
                         this.state.todoList.todo.map((td, idx) => {
-                          console.log('td', td.user.userId)
-                          console.log(this.state.userId === td.user.userId)
                           return (
                             <div key={idx}>
                               <Card>
                                 <p style={{fontSize: '18px'}}>{td.task}</p>
                                 <p>Assign to: {td.user.name}</p><br />
-                                <div className="wrapbutton">
-                                <Button
-                                onClick={() => this.toBackLog(td)}
-                                type="dashed" shape="circle"
-                                icon="left-circle">
-                                </Button>
-                                <Popconfirm placement="bottomRight" okType="danger" title='Are you sure delete this task?' onConfirm={() => this.deleteTask(td)} okText="Yes" cancelText="No">
-                                  <Button
-                                    type="danger"
-                                    shape="circle"
-                                    icon="delete">
-                                  </Button>
-                                </Popconfirm>
-                                <Button
-                                onClick={() => this.toOnProgress(td)}
-                                type="dashed" shape="circle"
-                                icon="right-circle">
-                                </Button>
-                                </div>
+                                {
+                                  this.state.userId === td.user.userId ? (
+                                    <div className="wrapbutton">
+                                      <Button
+                                        onClick={() => this.toBackLog(td)}
+                                        type="dashed" shape="circle"
+                                        icon="left-circle">
+                                      </Button>
+                                      <Popconfirm placement="bottomRight" okType="danger" title='Are you sure delete this task?' onConfirm={() => this.deleteTask(td)} okText="Yes" cancelText="No">
+                                        <Button
+                                          type="danger"
+                                          shape="circle"
+                                          icon="delete">
+                                        </Button>
+                                      </Popconfirm>
+                                      <Button
+                                        onClick={() => this.toOnProgress(td)}
+                                        type="dashed" shape="circle"
+                                        icon="right-circle">
+                                      </Button>
+                                    </div>
+                                  ) :
+                                  null
+                                }
                               </Card>
                               <br />
                             </div>
@@ -492,9 +499,8 @@ class Dashboard extends Component {
                       }
                     </Card>
                   </Col>
-
                   <Col span={6}>
-                    <Card title="ON PROGRESS" bordered={false} style={{backgroundColor: 'rgba(0,0,255, 0.5)'}}>
+                    <Card title="ON PROGRESS" bordered={false} style={{backgroundColor: 'rgba(0,0,255, 0.5)', boxShadow: '0px 0px 10px blue'}}>
                       {
                         this.state.todoList.onProgress.map((prog, idx) => {
                           return (
@@ -502,27 +508,32 @@ class Dashboard extends Component {
                               <Card>
                                 <p style={{fontSize: '18px'}}>{prog.task}</p>
                                 <p>Assign to: {prog.user.name}</p><br />
-                                <div className="wrapbutton">
-                                <Button
-                                  onClick={() => this.toTodo(prog)}
-                                  type="dashed"
-                                  shape="circle"
-                                  icon="left-circle">
-                                </Button>
-                                <Popconfirm placement="bottomRight" okType="danger" title="Are you sure delete this task?" onConfirm={() => this.deleteTask(prog)} okText="Yes" cancelText="No">
-                                  <Button
-                                    type="danger"
-                                    shape="circle"
-                                    icon="delete">
-                                  </Button>
-                                </Popconfirm>
-                                <Button
-                                  onClick={() => this.toDone(prog)}
-                                  type="dashed"
-                                  shape="circle"
-                                  icon="right-circle">
-                                </Button>
-                                </div>
+                                {
+                                  this.state.userId === prog.user.userId ? (
+                                    <div className="wrapbutton">
+                                      <Button
+                                        onClick={() => this.toTodo(prog)}
+                                        type="dashed"
+                                        shape="circle"
+                                        icon="left-circle">
+                                      </Button>
+                                      <Popconfirm placement="bottomRight" okType="danger" title="Are you sure delete this task?" onConfirm={() => this.deleteTask(prog)} okText="Yes" cancelText="No">
+                                        <Button
+                                          type="danger"
+                                          shape="circle"
+                                          icon="delete">
+                                        </Button>
+                                      </Popconfirm>
+                                      <Button
+                                        onClick={() => this.toDone(prog)}
+                                        type="dashed"
+                                        shape="circle"
+                                        icon="right-circle">
+                                      </Button>
+                                    </div>
+                                  ) :
+                                  null
+                                }
                               </Card>
                               <br />
                             </div>
@@ -531,9 +542,8 @@ class Dashboard extends Component {
                       }
                     </Card>
                   </Col>
-
                   <Col span={6}>
-                    <Card title="DONE" bordered={false} style={{backgroundColor: 'rgba(0,128,0, 0.5)'}}>
+                    <Card title="DONE" bordered={false} style={{backgroundColor: 'rgba(0,128,0, 0.5)', boxShadow: '0px 0px 10px green'}}>
                       {
                         this.state.todoList.done.map((dn, idx) => {
                           return (
@@ -541,21 +551,26 @@ class Dashboard extends Component {
                               <Card>
                                 <p style={{fontSize: '18px'}}>{dn.task}</p>
                                 <p>Assign to: {dn.user.name}</p><br />
-                                <div className="singlebutton">
-                                  <Button
-                                    onClick={() => this.toOnProgress(dn)}
-                                    type="dashed"
-                                    shape="circle"
-                                    icon="left-circle">
-                                  </Button>
-                                  <Popconfirm placement="bottomRight" okType="danger" title="Are you sure delete this task?" onConfirm={() => this.deleteTask(dn)} okText="Yes" cancelText="No">
-                                    <Button
-                                      type="danger"
-                                      shape="circle"
-                                      icon="delete">
-                                    </Button>
-                                  </Popconfirm>
-                                </div>
+                                {
+                                  this.state.userId === dn.user.userId ? (
+                                    <div className="singlebutton">
+                                      <Button
+                                        onClick={() => this.toOnProgress(dn)}
+                                        type="dashed"
+                                        shape="circle"
+                                        icon="left-circle">
+                                      </Button>
+                                      <Popconfirm placement="bottomRight" okType="danger" title="Are you sure delete this task?" onConfirm={() => this.deleteTask(dn)} okText="Yes" cancelText="No">
+                                        <Button
+                                          type="danger"
+                                          shape="circle"
+                                          icon="delete">
+                                        </Button>
+                                      </Popconfirm>
+                                    </div>
+                                  ) :
+                                  null
+                                }
                               </Card>
                               <br />
                             </div>
@@ -564,7 +579,6 @@ class Dashboard extends Component {
                       }
                     </Card>
                   </Col>
-
                 </Row>
               </div>
             </div>
@@ -587,42 +601,44 @@ class Dashboard extends Component {
               </div>
             </div>
             <div className='active'>
-              <h1 style={{color: 'white'}}>Discussion List</h1>
-              <Form onSubmit={(e) => this.createRoom(e)}>
-                <Input
-                  size='large'
-                  value={this.state.topicTitle}
-                  onChange={e => this.topicTitleChange(e)}
-                  placeholder="Add Room Name..." style={{width: '70%', marginRight: 10}}/> 
-                  <Button icon="plus" size='large' htmlType='submit'>Add Discussion</Button>
-              </Form>
-              <br />
-              <br />
-              {
-                this.state.roomList.map((room, idx) => {
-                  return (
-                    <Card
-                      key={idx}
-                      title={room.topic}
-                      extra={<a onClick={(e) => this.paketJoin(room.roomId, room.topic)}> Join </a>}
-                      style={{
-                        marginBottom: '10px',
-                        marginRight: '10px',
-                        background: '#2D587B'
-                      }}>
-                      {
-                        room.participants.map((orang, i) => {
-                          return (
-                            <Tag key={i}>
-                              {orang}
-                            </Tag>
-                          )
-                        })
-                      }
-                    </Card>
-                  )
-                })
-              }
+              <div style={{margin: '20px'}}>
+                <h1 style={{color: 'white'}}>Discussion List</h1>
+                <Form onSubmit={(e) => this.createRoom(e)}>
+                  <Input
+                    size='large'
+                    value={this.state.topicTitle}
+                    onChange={e => this.topicTitleChange(e)}
+                    placeholder="Add Room Name..." style={{width: '65%', marginRight: 10}}/> 
+                    <Button icon="plus" htmlType='submit'>Add Discussion</Button>
+                </Form>
+                <br />
+                <br />
+                {
+                  this.state.roomList.map((room, idx) => {
+                    return (
+                      <Card
+                        key={idx}
+                        title={room.topic}
+                        extra={<a onClick={(e) => this.paketJoin(room.roomId, room.topic)}> Join </a>}
+                        style={{
+                          marginBottom: '10px',
+                          marginRight: '10px',
+                          background: '#2D587B'
+                        }}>
+                        {
+                          room.participants.map((orang, i) => {
+                            return (
+                              <Tag key={i}>
+                                {orang}
+                              </Tag>
+                            )
+                          })
+                        }
+                      </Card>
+                    )
+                  })
+                }
+              </div>
             </div>
             <div className='history'>
               <h1 style={{color: 'white', marginLeft: 20}}>Discussion History List</h1>
@@ -631,103 +647,119 @@ class Dashboard extends Component {
                   return (
                     <Panel
                       header={this.judulHistory(item.topic.text)}
-                      key="1"
                       style={customPanelStyle}
                       key={item.key}
                     >
-                      
                       <div>
                         {new Date(item.timestamp).toLocaleString()}
                       </div>
                       <div>
-                        {Object.keys(item.participant).map(key => <Tag>{item.participant[key].name}</Tag>)}
+                        {
+                          Object.keys(item.participant).forEach((key, i) => {
+                            /* eslint-disable no-unused-expressions */
+                            <Tag key={i}>{item.participant[key].name}</Tag>
+                          })
+                        }
                       </div>
                       <div><br />
                         {!item.status ? <Button type="primary" onClick={() => this.reviewModal(item)}>Review</Button> : ''} 
                       </div>
                     </Panel>
                   )
-                }) : <Spin size="large" />}
+                }) : null}
               </Collapse>
               <Modal
-                title={this.state.review.item.topic.text}
+                title={this.state.review.item.topic.text.toUpperCase()}
                 visible={this.state.review.visibleModal}
                 onOk={() => this.modalHandleOk()}
                 onCancel={() => this.modalHandleCancel()}
                 okText="Submit"
                 cancelText="Cancel"
               >
-                Tasks
-                {Object.keys(this.state.review.item.todo).map(key => {
+                <b>Tasks</b>
+                {
+                  this.state.review.item.todo ?
+                  Object.keys(this.state.review.item.todo).map(key => {
                   const todo = this.state.review.item.todo[key]
-                  return (
-                    <Col>
-                      <Row gutter={4}>
-                        <Col span={23}>
-                          <Input.Group compact>
-                            <Select 
-                              labelInValue
-                              style={{ width: '30%' }}
-                              defaultValue={{key: todo.userId}}
+                    return (
+                      <Col>
+                        <Row gutter={4}>
+                          <Col span={23}>
+                            <Input.Group compact>
+                              <Select 
+                                labelInValue
+                                style={{ width: '30%' }}
+                                defaultValue={{key: todo.userId}}
+                                onChange={(e) => {
+                                  // eslint-disable-next-line
+                                  this.state.review.item.todo[key].userId = e.key
+                                  // eslint-disable-next-line
+                                  this.state.review.item.todo[key].userName = e.label
+                                  this.forceUpdate()
+                                }}
+                              >
+                                {Object.keys(this.state.users).map((id, i) => (
+                                  <Select.Option value={id} key={i}>{this.state.users[id].name}</Select.Option>
+                                ))}
+                              </Select>
+                              <Input style={{ width: '70%' }} defaultValue={todo.task} />
+                            </Input.Group>
+                          </Col>
+                          <Col span={1}>
+                            <Checkbox 
+                              checked={todo.status}
                               onChange={(e) => {
-                                this.state.review.item.todo[key].userId = e.key
-                                this.state.review.item.todo[key].userName = e.label
+                                // eslint-disable-next-line
+                                this.state.review.item.todo[key].status = e.target.checked
                                 this.forceUpdate()
                               }}
-                            >
-                              {Object.keys(this.state.users).map(id => (
-                                <Select.Option value={id} >{this.state.users[id].name}</Select.Option>
-                              ))}
-                            </Select>
-                            <Input style={{ width: '70%' }} defaultValue={todo.task} />
-                          </Input.Group>
-                        </Col>
-                        <Col span={1}>
-                          <Checkbox 
-                            checked={todo.status}
-                            onChange={(e) => {
-                              this.state.review.item.todo[key].status = e.target.checked
-                              this.forceUpdate()
-                            }}
-                          />
-                        </Col>
-                      </Row>
-                    </Col>
-                  )
-                })}
-                <br/>
-                
-                Noted Chat
-                <ul>
-                  {Object.keys(this.state.review.item.notes).map(key => {
-                    const note = this.state.review.item.notes[key]
-                    return (
-                      <li>{note.data.text}</li>
+                            />
+                          </Col>
+                        </Row>
+                      </Col>
                     )
-                  })}
-                </ul>
+                  }) : null
+                }
                 <br/>
+
+                {
+                  this.state.review.item.notes ? (
+                    <div>
+                      <b>Noted Chat</b> 
+                      < ul > {
+                        Object
+                          .keys(this.state.review.item.notes)
+                          .map((key, idx) => {
+                            const note = this.state.review.item.notes[key]
+                            return (
+                              <li key={idx}>{note.data.text}</li>
+                            )
+                          })
+                      } < /ul>
+                    <br/>
+                  </div>
+                  ) : null
+                }
                 
-                Duration: {this.state.review.item.report.duration}
-                <br/>
-                
-                <Row>
+
+                <b>Duration:</b> {this.state.review.item.report.duration}
+                <br/><br/>
+                <Row style={{position: 'relative', left: 50}}>
                   <Col span={12}>
-                    Discussion Efficiency
+                    <b>Discussion Efficiency</b>
                     <Progress type="dashboard" percent={Math.floor(this.state.review.item.report.discussionEfficiency * 100)} />
                   </Col>
                   <Col span={12}>
-                    Discussion Productivity
+                    <b>Discussion Productivity</b>
                     <Progress type="dashboard" percent={Math.floor(this.state.review.item.report.discussionProductivity * 100)} />
                   </Col>
                 </Row>
                 <br/>
-                
                 User Participation Rate
-                {Object.keys(this.state.review.item.report.userParticipationRate).map(key => {
+                {Object.keys(this.state.review.item.report.userParticipationRate).map((key, idx) => {
                   const user = this.state.review.item.report.userParticipationRate[key]
                   return (
-                    <Row>
+                    <Row key={idx}>
                       <Col span={4}>
                         {user.name}
                       </Col>
@@ -738,12 +770,11 @@ class Dashboard extends Component {
                   )
                 })}
                 <br/>
-                
                 User Contribution Rate
-                {Object.keys(this.state.review.item.report.userContributionRate).map(key => {
+                {Object.keys(this.state.review.item.report.userContributionRate).map((key, idx) => {
                   const user = this.state.review.item.report.userContributionRate[key]
                   return (
-                    <Row>
+                    <Row key={idx}>
                       <Col span={4}>
                         {user.name}
                       </Col>
@@ -754,12 +785,11 @@ class Dashboard extends Component {
                   )
                 })}
                 <br/>
-                
                 User Focusness
-                {Object.keys(this.state.review.item.report.userFocusness).map(key => {
+                {Object.keys(this.state.review.item.report.userFocusness).map((key, idx) => {
                   const user = this.state.review.item.report.userFocusness[key]
                   return (
-                    <Row>
+                    <Row key={idx}>
                       <Col span={4}>
                         {user.name}
                       </Col>
@@ -786,4 +816,18 @@ const customPanelStyle = {
   overflow: 'hidden'
 };
 
-export default Dashboard
+// export default Dashboard
+
+const mapStateToProps = state => {
+  return {
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    userData: payload => dispatch(userData(payload)),
+    todoToStore: payload => dispatch(todoToStore(payload))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard)
