@@ -1,5 +1,8 @@
-import React, { Component } from 'react';
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
+import React, { Component } from 'react';
+import axios from 'axios'
+import firebase from './firebaseConfig'
 
 import {
   Input,
@@ -12,16 +15,9 @@ import {
   notification
 } from 'antd'
 import { ChatFeed } from 'react-chat-ui'
-// import { ChatFeed, Message } from 'react-chat-ui'
-import { Link } from 'react-router-dom'
-import firebase from './firebaseConfig'
-import axios from 'axios'
 
-// import Bubble from './chattext'
 import './chatroom.css'
 
-// const FormItem = Form.Item;
-// const { Column, ColumnGroup } = Table;
 const { Column } = Table;
 
 
@@ -52,9 +48,25 @@ class ChatRoom extends Component {
     this.setState({ chatText: e.target.value })
   }
 
+  checkUnrelevant() {
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
+    ref.on('value', snapshot => {
+      if (snapshot.val() >= 6) {
+        openNotification()
+        ref.set(0)
+      }
+    })
+  }
+
   deleteMinnieTask(taskId) {
     console.log('Delete minnie task');
     firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/todo/${taskId}`).remove()
+  }
+
+  endDiscussion() {
+    const roomId = this.props.match.params.id
+    axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/closeDiscussion?room_id=${roomId}`)
+    this.props.history.push('/dashboard')
   }
 
   fetchAllMessages() {
@@ -86,23 +98,6 @@ class ChatRoom extends Component {
           tmp.push(maps[1])
         })
         this.setState({ roomTask: tmp })
-      }
-    })
-  }
-
-  listenUnrelevant() {
-    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
-    ref.on('value', snapshot => {
-      this.setState({unrelevant: snapshot.val()})
-    })
-  }
-
-  checkUnrelevant() {
-    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
-    ref.on('value', snapshot => {
-      if (snapshot.val() >= 6) {
-        openNotification()
-        ref.set(0)
       }
     })
   }
@@ -154,6 +149,13 @@ class ChatRoom extends Component {
     })
   }
 
+  listenUnrelevant() {
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
+    ref.on('value', snapshot => {
+      this.setState({ unrelevant: snapshot.val() })
+    })
+  }
+
   roomStatusChecker() {
     firebase.database().ref(`/rooms/${this.props.match.params.id}/status`).on('value', snap => {
       this.setState({
@@ -167,6 +169,10 @@ class ChatRoom extends Component {
         }
       }
     })
+  }
+
+  scrollToBottom() {
+    if (this.state.roomStatus) this.messagesEnd.scrollIntoView({ behavior: "smooth" })
   }
 
   sendChat(e) {
@@ -209,6 +215,13 @@ class ChatRoom extends Component {
     })
   }
 
+
+  // --------------------------------------------------------------------------
+
+  componentDidUpdate() {
+    this.scrollToBottom()
+  }
+
   componentWillMount = async () => {
     await this.stateChangeListener()
     await this.roomStatusChecker()
@@ -219,21 +232,6 @@ class ChatRoom extends Component {
     await this.scrollToBottom()
     await this.listenUnrelevant()
     await this.checkUnrelevant()
-  }
-
-  componentDidUpdate() {
-    this.scrollToBottom()
-  }
-  
-  scrollToBottom() {
-    if (this.state.roomStatus) this.messagesEnd.scrollIntoView({ behavior: "smooth" })
-  }
-
-  endDiscussion() {
-    const roomId = this.props.match.params.id
-    axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/closeDiscussion?room_id=${roomId}`)
-    // firebase.database().ref(`/rooms/${this.props.match.params.id}`).remove()
-    // this.props.history.push('/dashboard')
   }
 
   render() {

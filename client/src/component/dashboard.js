@@ -1,5 +1,7 @@
-import React, { Component } from 'react';
 import { connect } from 'react-redux'
+import axios from 'axios'
+import firebase from './firebaseConfig'
+import React, { Component } from 'react';
 
 import { userData } from '../actions/userAction'
 import { todoToStore } from '../actions/todoAction'
@@ -22,16 +24,11 @@ import {
   Select,
   Tag
 } from 'antd'
-// import { BrowserRouter, Link } from 'react-router-dom'
-import firebase from './firebaseConfig'
-import axios from 'axios'
 
 import './dashboard.css'
 
-// const { Content, Sider } = Layout
-const Panel = Collapse.Panel
-
 const { TextArea } = Input
+const Panel = Collapse.Panel
 
 class Dashboard extends Component {
   constructor() {
@@ -80,14 +77,29 @@ class Dashboard extends Component {
       visible: false
     }
   }
+
+  addNewTask() {
+    console.log('addNewTask')
+    const key = firebase.database().ref(`/kanban`).push().key
+    firebase.database().ref(`/kanban/${key}`).set({
+      status: 'backlog',
+      task: this.state.newTask,
+      taskId: key,
+      user: {
+        name: this.state.username,
+        userId: this.state.userId
+      }
+    })
+    this.setState({ newTask: '' })
+  }
   
   addNewTaskChange(e) {
     this.setState({newTask: e.target.value})
   }
 
-  addTaskModal(item) {
+  addHandleCancel() {
     this.setState({
-      visible: true
+      visible: false
     })
   }
 
@@ -99,52 +111,9 @@ class Dashboard extends Component {
     this.addNewTask()
   }
 
-  addHandleCancel() {
+  addTaskModal(item) {
     this.setState({
-      visible: false
-    })
-  }
-
-  reviewModal(item) {
-    // console.log(item)
-    this.setState({
-      review: {
-        visibleModal: true,
-        item
-      }
-    })
-  }
-  
-  modalHandleOk() {
-    axios.post(`https://us-central1-minutes-vart.cloudfunctions.net/submitReview`, {
-      historyId: this.state.review.item.key,
-      todo: this.state.review.item.todo
-    })
-    .then(() => {
-      this.setState({
-        review: {
-          ...this.state.review,
-          visibleModal: false
-        }
-      })
-    })
-  }
-  
-  modalHandleCancel() {
-    this.setState({
-      review: {
-        ...this.state.review,
-        visibleModal: false
-      }
-    })
-  }
-  
-  getAllUsers() {
-    firebase.database().ref('users').once('value')
-    .then(snapshot => {
-      this.setState({
-        users: snapshot.val()
-      })
+      visible: true
     })
   }
 
@@ -171,6 +140,15 @@ class Dashboard extends Component {
     })
   }
 
+  deleteTask(task) {
+    console.log('deleteTask')
+    if (task.user.userId !== this.state.userId) {
+      alert('You are not authorized to edit this task')
+    } else {
+      firebase.database().ref(`/kanban/${task.taskId}`).remove()
+    }
+  }
+
   getAllRooms() {
     let ref = firebase.database().ref('/rooms')
     ref.on('value', snapshot => {
@@ -189,6 +167,21 @@ class Dashboard extends Component {
         })
       })
       this.setState({ roomList: temp.reverse() })
+    })
+  }
+
+  getAllSummary() {
+    let sum = firebase.database().ref('/history')
+    sum.on('value', snapshot => {
+      if (snapshot.val() !== null) {
+        let summary = []
+        let listSummary = Object.entries(snapshot.val())
+        listSummary.forEach(summ => {
+          summ[1].key = summ[0]
+          summary.push(summ[1])
+        })
+        this.setState({ summaryList: summary })
+      }
     })
   }
 
@@ -232,100 +225,73 @@ class Dashboard extends Component {
     })
   }
 
-  getAllSummary() {
-    let sum = firebase.database().ref('/history')
-    sum.on('value', snapshot => {
-      if (snapshot.val() !== null) {
-        let summary = []
-        let listSummary = Object.entries(snapshot.val())
-        listSummary.forEach(summ => {
-          summ[1].key = summ[0]
-          summary.push(summ[1])
+  getAllUsers() {
+    firebase.database().ref('users').once('value')
+      .then(snapshot => {
+        this.setState({
+          users: snapshot.val()
         })
-        this.setState({ summaryList: summary })
-      }
-    })
+      })
   }
 
-  topicTitleChange(e) {
-    this.setState({ topicTitle: e.target.value })
+  judulHistory(title) {
+    return `Topic : ${title.toUpperCase()}`
   }
 
   logout() {
     console.log('Logout')
     firebase.auth().signOut()
+    .then(() => {
+      console.log('signed out')
+    })
+  }
+
+  modalHandleCancel() {
+    this.setState({
+      review: {
+        ...this.state.review,
+        visibleModal: false
+      }
+    })
+  }
+
+  modalHandleOk() {
+    axios.post(`https://us-central1-minutes-vart.cloudfunctions.net/submitReview`, {
+      historyId: this.state.review.item.key,
+      todo: this.state.review.item.todo
+    })
       .then(() => {
-        console.log('signed out')
+        this.setState({
+          review: {
+            ...this.state.review,
+            visibleModal: false
+          }
+        })
       })
   }
 
-  // --------------------------- kanbans---------------------------
+  paketJoin(roomId, topic) {
+    console.log('Join room: ', topic)
+    let ref = firebase.database().ref(`/rooms/${roomId}/participant/${this.state.userId}`)
+    ref.set({
+      name: this.state.username,
+      id: this.state.userId
+    })
+    // this.props.history.push(`/chatroom/${roomId}`)
+    this.props.history.push({
+      pathname: `/chatroom/${roomId}`,
+      state: { topic: topic }
+    })
+  }
 
-  addNewTask() {
-    console.log('addNewTask')
-    const key = firebase.database().ref(`/kanban`).push().key
-    firebase.database().ref(`/kanban/${key}`).set({
-      status: 'backlog',
-      task: this.state.newTask,
-      taskId: key,
-      user: {
-        name: this.state.username,
-        userId: this.state.userId
+  reviewModal(item) {
+    this.setState({
+      review: {
+        visibleModal: true,
+        item
       }
     })
-    this.setState({newTask: ''})
   }
-
-  deleteTask(task) {
-    console.log('deleteTask')
-    if (task.user.userId !== this.state.userId) {
-      alert('You are not authorized to edit this task')
-    } else {
-      firebase.database().ref(`/kanban/${task.taskId}`).remove()
-    }
-  }
-
-  toBackLog(task) {
-    console.log('toBackLog')
-    if (task.user.userId === this.state.userId) {
-      task.status = 'backlog'
-      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
-    } else {
-      alert ('You are not authorized to edit this task')
-    }
-  }
-
-  toTodo(task) {
-    console.log('toTodo')
-    if (task.user.userId === this.state.userId) {
-      task.status = 'todo'
-      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
-    } else {
-      alert ('You are not authorized to edit this task')
-    }
-  }
-
-  toOnProgress(task) {
-    console.log('toOnProgress')
-    if (task.user.userId === this.state.userId) {
-      task.status = 'onProgress'
-      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
-    } else {
-      alert('You are not authorized to edit this task')
-    }
-  }
-
-  toDone(task) {
-    console.log('toDone')
-    if (task.user.userId === this.state.userId) {
-      task.status = 'done'
-      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
-    } else {
-      alert('You are not authorized to edit this task')
-    }
-  }
-
-  // --------------------------- kanbans---------------------------
 
   stateChangeListener() {
     firebase.auth().onAuthStateChanged(user => {
@@ -354,33 +320,61 @@ class Dashboard extends Component {
     })
   }
 
-  componentWillMount() {
-    this.stateChangeListener()
+  toBackLog(task) {
+    console.log('toBackLog')
+    if (task.user.userId === this.state.userId) {
+      task.status = 'backlog'
+      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    } else {
+      alert('You are not authorized to edit this task')
+    }
   }
-  
-  componentDidMount(){
+
+  toTodo(task) {
+    console.log('toTodo')
+    if (task.user.userId === this.state.userId) {
+      task.status = 'todo'
+      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    } else {
+      alert('You are not authorized to edit this task')
+    }
+  }
+
+  toOnProgress(task) {
+    console.log('toOnProgress')
+    if (task.user.userId === this.state.userId) {
+      task.status = 'onProgress'
+      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    } else {
+      alert('You are not authorized to edit this task')
+    }
+  }
+
+  toDone(task) {
+    console.log('toDone')
+    if (task.user.userId === this.state.userId) {
+      task.status = 'done'
+      firebase.database().ref(`/kanban/${task.taskId}`).set(task)
+    } else {
+      alert('You are not authorized to edit this task')
+    }
+  }
+
+  topicTitleChange(e) {
+    this.setState({ topicTitle: e.target.value })
+  }
+
+  // --------------------------------------------------------------------------
+
+  componentDidMount() {
     this.getAllTodo()
     this.getAllRooms()
     this.getAllSummary()
     this.getAllUsers()
   }
 
-  paketJoin(roomId, topic) {
-    console.log('Join room: ', topic)
-    let ref = firebase.database().ref(`/rooms/${roomId}/participant/${this.state.userId}`)
-    ref.set({
-      name: this.state.username,
-      id: this.state.userId
-    })
-    // this.props.history.push(`/chatroom/${roomId}`)
-    this.props.history.push({
-      pathname: `/chatroom/${roomId}`,
-      state: {topic: topic}
-    })
-  }
-
-  judulHistory(title) {
-    return `Topic : ${title.toUpperCase()}`
+  componentWillMount() {
+    this.stateChangeListener()
   }
 
   render() {
@@ -404,7 +398,6 @@ class Dashboard extends Component {
                   size='large'>
                   NEW TASK
                 </Button>
-
                 <Modal
                   title="ADD NEW TASK"
                   visible={this.state.visible}

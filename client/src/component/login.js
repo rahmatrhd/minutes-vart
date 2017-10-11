@@ -1,6 +1,5 @@
-import React, {Component} from 'react'
 import { connect } from 'react-redux'
-// import {Button, Layout} from 'antd'
+import React, { Component } from 'react'
 
 import firebase from './firebaseConfig'
 import './login.css'
