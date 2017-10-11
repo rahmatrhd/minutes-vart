@@ -18,15 +18,16 @@ module.exports = (req, res) => {
 					name: todo[key].userName
 				}
 			})
-			.then(() => {
-				resolve(true)
-			})
+			.then(() => resolve(taskId))
+			.catch(err => reject(err))
 		})
 	})
 	
 	Promise.all(promises)
 	.then(results => {
-		db.ref(`history/${historyId}`).update({status: true})
+		return db.ref(`history/${historyId}`).update({status: true})
+	})
+	.then(() => {
 		res.send(true)
 	})
 	.catch(err => res.send(err))

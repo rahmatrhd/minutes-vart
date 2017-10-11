@@ -1,8 +1,7 @@
 const functions = require('firebase-functions')
 const axios = require('axios')
 
-const assignTodo = require('./assignTodo')
-const assignTodoConfirm = require('./assignTodoConfirm')
+const assignTodo = require('./actionHandlers/assignTodo')
 
 const TOKEN = functions.config().api_ai.dev_token
 
@@ -14,14 +13,14 @@ module.exports = payload => {
         id: userId
       },
       data: {
-        text: query
+        text
       }
     }
   } = payload
   
-  const url = 'https://api.api.ai/v1/query?v=20150910'
+  const url = 'https://api.dialogflow.com/v1/query?v=20150910'
   return axios.post(url, {
-    query,
+    query: text,
     sessionId: roomId,
     timezone: new Date(),
     lang: 'en'
@@ -31,17 +30,15 @@ module.exports = payload => {
     }
   })
   .then(({data}) => {
+    
     const actionHandlers = {
       'assign_todo': () => assignTodo(data),
-      'assign_todo.person_confirm_yes': () => assignTodoConfirm(data, userId),
-      'default': () => {
-        return {
-          result: null
-        }
-      }
+      'assign_todo.person_confirm_yes': () => assignTodo(data, userId),
+      'default': () => Promise.resolve(null)
     }
     
     const action = !actionHandlers[data.result.action] ? 'default' : data.result.action
+    
     return actionHandlers[action]()
   })
 }
