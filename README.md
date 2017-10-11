@@ -32,7 +32,15 @@ Simple Meeting Assistant summarized your team's chat logs in minutes. The app mo
 
 ## Installation 🔧 
 
-
+    /functions
+    npm install
+    
+    /clients
+    npm install
+    
+    npm start
+    
+    
 ## License 🔗 
 Copyright © 2017 [Rahmat](https://github.com/rama841) - [Ahfa](https://github.com/ahmad-fajar) - [Vega](https://github.com/PDVega) - [Tama](https://github.com/tamastro)
 Licensed under the MIT license.
