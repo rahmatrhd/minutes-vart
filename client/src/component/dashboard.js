@@ -1,6 +1,7 @@
 import { connect } from 'react-redux'
 import axios from 'axios'
 import firebase from './firebaseConfig'
+import moment from 'moment'
 import React, { Component } from 'react';
 
 import { userData } from '../actions/userAction'
@@ -676,7 +677,7 @@ class Dashboard extends Component {
                       key={item.key}
                     >
                       <div>
-                        {new Date(item.timestamp).toLocaleString()}
+                        {moment.unix(item.timestamp / 1000).locale('id').format('LLL')}
                       </div>
                       <div>
                         {
@@ -785,6 +786,8 @@ class Dashboard extends Component {
                   }
                 </Collapse>
                 <b>Duration:</b> {this.state.review.item.report.duration}
+                <br/>
+                <b>Meeting Date:</b> { moment.unix(this.state.review.item.timestamp / 1000).locale('id').format('LLL') }
                 <br/><br/>
                 <Row style={{position: 'relative', left: 50}}>
                   <Col span={12}>
@@ -793,7 +796,7 @@ class Dashboard extends Component {
                   </Col>
                 </Row>
                 <br/>
-                User Participation Rate
+                <b>User Participation Rate</b>
                 {Object.keys(this.state.review.item.report.userParticipationRate).map((key, idx) => {
                   const user = this.state.review.item.report.userParticipationRate[key]
                   return (
@@ -808,7 +811,7 @@ class Dashboard extends Component {
                   )
                 })}
                 <br/>
-                User Contribution Rate
+                <b>User Contribution Rate</b>
                 {Object.keys(this.state.review.item.report.userContributionRate).map((key, idx) => {
                   const user = this.state.review.item.report.userContributionRate[key]
                   return (
@@ -823,7 +826,7 @@ class Dashboard extends Component {
                   )
                 })}
                 <br/>
-                User Focusness
+                <b>User Focusness</b>
                 {Object.keys(this.state.review.item.report.userFocusness).map((key, idx) => {
                   const user = this.state.review.item.report.userFocusness[key]
                   return (
