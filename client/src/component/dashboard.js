@@ -186,7 +186,7 @@ class Dashboard extends Component {
           topic: li[1].topic.text.toUpperCase() || undefined
         })
       })
-      this.setState({ roomList: temp })
+      this.setState({ roomList: temp.reverse() })
     })
   }
 
@@ -665,7 +665,7 @@ class Dashboard extends Component {
                 }) : null}
               </Collapse>
               <Modal
-                title={this.state.review.item.topic.text}
+                title={this.state.review.item.topic.text.toUpperCase()}
                 visible={this.state.review.visibleModal}
                 onOk={() => this.modalHandleOk()}
                 onCancel={() => this.modalHandleCancel()}
