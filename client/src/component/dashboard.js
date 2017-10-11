@@ -1,4 +1,10 @@
+import { connect } from 'react-redux'
+import axios from 'axios'
+import firebase from './firebaseConfig'
 import React, { Component } from 'react';
+
+import { userData } from '../actions/userAction'
+import { todoToStore } from '../actions/todoAction'
 
 import {
   Avatar,
@@ -23,13 +29,12 @@ import firebase from './firebaseConfig'
 import axios from 'axios'
 import {Scrollbars} from 'react-custom-scrollbars';
 
-import './dashboard.css'
 
-// const { Content, Sider } = Layout
-const Panel = Collapse.Panel
+import './dashboard.css'
 
 const { TextArea } = Input
 const FormItem = Form.Item;
+const Panel = Collapse.Panel
 
 class Dashboard extends Component {
   constructor() {
@@ -80,14 +85,29 @@ class Dashboard extends Component {
       helMessage: ''
     }
   }
+
+  addNewTask() {
+    console.log('addNewTask')
+    const key = firebase.database().ref(`/kanban`).push().key
+    firebase.database().ref(`/kanban/${key}`).set({
+      status: 'backlog',
+      task: this.state.newTask,
+      taskId: key,
+      user: {
+        name: this.state.username,
+        userId: this.state.userId
+      }
+    })
+    this.setState({ newTask: '' })
+  }
   
   addNewTaskChange(e) {
     this.setState({newTask: e.target.value})
   }
 
-  addTaskModal(item) {
+  addHandleCancel() {
     this.setState({
-      visible: true
+      visible: false
     })
   }
 
@@ -99,53 +119,9 @@ class Dashboard extends Component {
     this.addNewTask()
   }
 
-  addHandleCancel() {
+  addTaskModal(item) {
     this.setState({
-      visible: false
-    })
-  }
-
-  reviewModal(item) {
-    console.log(item)
-    this.setState({
-      review: {
-        visibleModal: true,
-        item
-      }
-    })
-  }
-  
-  modalHandleOk() {
-    console.log(this.state.review.item.todo)
-    axios.post(`https://us-central1-minutes-vart.cloudfunctions.net/submitReview`, {
-      historyId: this.state.review.item.key,
-      todo: this.state.review.item.todo
-    })
-    .then(() => {
-      this.setState({
-        review: {
-          ...this.state.review,
-          visibleModal: false
-        }
-      })
-    })
-  }
-  
-  modalHandleCancel() {
-    this.setState({
-      review: {
-        ...this.state.review,
-        visibleModal: false
-      }
-    })
-  }
-  
-  getAllUsers() {
-    firebase.database().ref('users').once('value')
-    .then(snapshot => {
-      this.setState({
-        users: snapshot.val()
-      })
+      visible: true
     })
   }
 
@@ -154,7 +130,7 @@ class Dashboard extends Component {
     this.setState({validate: 'validating'})
     axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/watsonNLU?text=${this.state.topicTitle}`)
     .then(({ data }) => {
-      console.log(data.error)
+      // console.log(data.error)
       if (data.error) {
         this.setState({validate: 'error', helpMessage: 'Room\'s name should be descriptive and written in English'})
       } else {
@@ -173,6 +149,15 @@ class Dashboard extends Component {
     })
   }
 
+  deleteTask(task) {
+    console.log('deleteTask')
+    if (task.user.userId !== this.state.userId) {
+      alert('You are not authorized to edit this task')
+    } else {
+      firebase.database().ref(`/kanban/${task.taskId}`).remove()
+    }
+  }
+
   getAllRooms() {
     let ref = firebase.database().ref('/rooms')
     ref.on('value', snapshot => {
@@ -180,7 +165,6 @@ class Dashboard extends Component {
       let list = Object.entries(snapshot.val()) || {}
       list.forEach(li => {
         let participant = li[1].participant ? Object.entries(li[1].participant) : []
-        console.log(participant)
         let participants = []
         participant.forEach(ind => {
           participants.push(ind[1].name)
@@ -192,6 +176,21 @@ class Dashboard extends Component {
         })
       })
       this.setState({ roomList: temp.reverse() })
+    })
+  }
+
+  getAllSummary() {
+    let sum = firebase.database().ref('/history')
+    sum.on('value', snapshot => {
+      if (snapshot.val() !== null) {
+        let summary = []
+        let listSummary = Object.entries(snapshot.val())
+        listSummary.forEach(summ => {
+          summ[1].key = summ[0]
+          summary.push(summ[1])
+        })
+        this.setState({ summaryList: summary })
+      }
     })
   }
 
@@ -229,62 +228,109 @@ class Dashboard extends Component {
         todoList.done.reverse()
         todoList.todo.reverse()
         todoList.onProgress.reverse()
+        let payload = {
+          userId: this.state.userId,
+          todoList: list
+        }
+        this.props.todoToStore(payload)
         this.setState({ todoList: todoList })
       }
     })
   }
 
-  getAllSummary() {
-    let sum = firebase.database().ref('/history')
-    sum.on('value', snapshot => {
-      if (snapshot.val() !== null) {
-        let summary = []
-        let listSummary = Object.entries(snapshot.val())
-        listSummary.forEach(summ => {
-          summ[1].key = summ[0]
-          summary.push(summ[1])
+  getAllUsers() {
+    firebase.database().ref('users').once('value')
+      .then(snapshot => {
+        this.setState({
+          users: snapshot.val()
         })
-        this.setState({ summaryList: summary })
-      }
-    })
+      })
   }
 
-  topicTitleChange(e) {
-    this.setState({ topicTitle: e.target.value })
+  judulHistory(title) {
+    return `Topic : ${title.toUpperCase()}`
   }
 
   logout() {
     console.log('Logout')
     firebase.auth().signOut()
+    .then(() => {
+      console.log('signed out')
+    })
+  }
+
+  modalHandleCancel() {
+    this.setState({
+      review: {
+        ...this.state.review,
+        visibleModal: false
+      }
+    })
+  }
+
+  modalHandleOk() {
+    axios.post(`https://us-central1-minutes-vart.cloudfunctions.net/submitReview`, {
+      historyId: this.state.review.item.key,
+      todo: this.state.review.item.todo
+    })
       .then(() => {
-        console.log('signed out')
+        this.setState({
+          review: {
+            ...this.state.review,
+            visibleModal: false
+          }
+        })
       })
   }
 
-  // --------------------------- kanbans---------------------------
-
-  addNewTask() {
-    console.log('name', this.state.username)
-    const key = firebase.database().ref(`/kanban`).push().key
-    firebase.database().ref(`/kanban/${key}`).set({
-      status: 'backlog',
-      task: this.state.newTask,
-      taskId: key,
-      user: {
-        name: this.state.username,
-        userId: this.state.userId
-      }
+  paketJoin(roomId, topic) {
+    console.log('Join room: ', topic)
+    let ref = firebase.database().ref(`/rooms/${roomId}/participant/${this.state.userId}`)
+    ref.set({
+      name: this.state.username,
+      id: this.state.userId
     })
-    this.setState({newTask: ''})
+    // this.props.history.push(`/chatroom/${roomId}`)
+    this.props.history.push({
+      pathname: `/chatroom/${roomId}`,
+      state: { topic: topic }
+    })
   }
 
-  deleteTask(task) {
-    console.log('deleteTask')
-    if (task.user.userId !== this.state.userId) {
-      alert('You are not authorized to edit this task')
-    } else {
-      firebase.database().ref(`/kanban/${task.taskId}`).remove()
-    }
+  reviewModal(item) {
+    this.setState({
+      review: {
+        visibleModal: true,
+        item
+      }
+    })
+  }
+
+  stateChangeListener() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        console.log('Authenticated User: ', user)
+        let ref = firebase.database().ref('/users')
+        ref.once('value', snap => {
+          let regist = snap.hasChild(user.uid)
+          if (!regist) {
+            console.log('Not Registered. Register first.')
+            // this.logout()
+            this.props.history.push('/')
+          } else {
+            console.log('Registered');
+          }
+        })
+        this.setState({
+          username: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          userId: user.uid
+        })
+      } else {
+        this.props.history.push('/')
+      }
+    })
   }
 
   toBackLog(task) {
@@ -293,7 +339,7 @@ class Dashboard extends Component {
       task.status = 'backlog'
       firebase.database().ref(`/kanban/${task.taskId}`).set(task)
     } else {
-      alert ('You are not authorized to edit this task')
+      alert('You are not authorized to edit this task')
     }
   }
 
@@ -303,7 +349,7 @@ class Dashboard extends Component {
       task.status = 'todo'
       firebase.database().ref(`/kanban/${task.taskId}`).set(task)
     } else {
-      alert ('You are not authorized to edit this task')
+      alert('You are not authorized to edit this task')
     }
   }
 
@@ -327,60 +373,21 @@ class Dashboard extends Component {
     }
   }
 
-  // --------------------------- kanbans---------------------------
-
-  stateChangeListener() {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        console.log('Authenticated User: ', user)
-        let ref = firebase.database().ref('/users')
-        ref.once('value', snap => {
-          let regist = snap.hasChild(user.uid)
-          if (!regist) {
-            console.log('Not Registered. Register first.')
-            // this.logout()
-            this.props.history.push('/')
-          } else {
-            console.log('Registered');
-          }
-        })
-
-        this.setState({
-          username: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-          userId: user.uid
-        })
-      } else {
-        this.props.history.push('/')
-      }
-    })
+  topicTitleChange(e) {
+    this.setState({ topicTitle: e.target.value })
   }
 
-  componentWillMount() {
-    this.stateChangeListener()
+  // --------------------------------------------------------------------------
+
+  componentDidMount() {
     this.getAllTodo()
     this.getAllRooms()
     this.getAllSummary()
     this.getAllUsers()
   }
 
-  paketJoin(roomId, topic) {
-    console.log('kirim paket')
-    let ref = firebase.database().ref(`/rooms/${roomId}/participant/${this.state.userId}`)
-    ref.set({
-      name: this.state.username,
-      id: this.state.userId
-    })
-    // this.props.history.push(`/chatroom/${roomId}`)
-    this.props.history.push({
-      pathname: `/chatroom/${roomId}`,
-      state: {topic: topic}
-    })
-  }
-
-  judulHistory(title) {
-    return `Topic : ${title.toUpperCase()}`
+  componentWillMount() {
+    this.stateChangeListener()
   }
 
   render() {
@@ -404,7 +411,6 @@ class Dashboard extends Component {
                   size='large'>
                   NEW TASK
                 </Button>
-
                 <Modal
                   title="ADD NEW TASK"
                   visible={this.state.visible}
@@ -838,4 +844,18 @@ const customPanelStyle = {
   overflow: 'hidden'
 };
 
-export default Dashboard
+// export default Dashboard
+
+const mapStateToProps = state => {
+  return {
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    userData: payload => dispatch(userData(payload)),
+    todoToStore: payload => dispatch(todoToStore(payload))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard)

@@ -1,4 +1,9 @@
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import React, { Component } from 'react';
+import axios from 'axios'
+import firebase from './firebaseConfig'
+
 import {
   Input,
   Button,
@@ -16,11 +21,8 @@ import {Scrollbars} from 'react-custom-scrollbars';
 import firebase from './firebaseConfig'
 import axios from 'axios'
 
-// import Bubble from './chattext'
 import './chatroom.css'
 
-// const FormItem = Form.Item;
-// const { Column, ColumnGroup } = Table;
 const { Column } = Table;
 
 
@@ -51,9 +53,26 @@ class ChatRoom extends Component {
     this.setState({ chatText: e.target.value })
   }
 
+  checkUnrelevant() {
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
+    ref.on('value', snapshot => {
+      if (snapshot.val() >= 6) {
+        openNotification()
+        ref.set(0)
+      }
+    })
+  }
+
   deleteMinnieTask(taskId) {
     console.log('Delete minnie task');
     firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/todo/${taskId}`).remove()
+  }
+
+  endDiscussion() {
+    console.log('End Discussion')
+    const roomId = this.props.match.params.id
+    axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/closeDiscussion?room_id=${roomId}`)
+    this.props.history.push('/dashboard')
   }
 
   fetchAllMessages() {
@@ -89,24 +108,7 @@ class ChatRoom extends Component {
     })
   }
 
-  listenUnrelevant() {
-    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
-    ref.on('value', snapshot => {
-      this.setState({unrelevant: snapshot.val()})
-    })
-      console.log(this.state.unrelevant);
-  }
-checkUnrelevant() {
-    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
-    ref.on('value', snapshot => {
-      if (snapshot.val() >= 6) {
-        openNotification()
-        ref.set(0)
-      }
-    })
-  }
-
-  fetchAllTodo() {
+  fetchUsersTodo() {
     let ref = firebase.database().ref('/kanban')
     ref.on('value', snapshot => {
       if (snapshot.val() !== null) {
@@ -153,6 +155,13 @@ checkUnrelevant() {
     })
   }
 
+  listenUnrelevant() {
+    let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
+    ref.on('value', snapshot => {
+      this.setState({ unrelevant: snapshot.val() })
+    })
+  }
+
   roomStatusChecker() {
     firebase.database().ref(`/rooms/${this.props.match.params.id}/status`).on('value', snap => {
       this.setState({
@@ -166,6 +175,10 @@ checkUnrelevant() {
         }
       }
     })
+  }
+
+  scrollToBottom() {
+    if (this.state.roomStatus) this.messagesEnd.scrollIntoView({ behavior: "smooth" })
   }
 
   sendChat(e) {
@@ -208,31 +221,23 @@ checkUnrelevant() {
     })
   }
 
+
+  // --------------------------------------------------------------------------
+
+  componentDidUpdate() {
+    this.scrollToBottom()
+  }
+
   componentWillMount = async () => {
     await this.stateChangeListener()
     await this.roomStatusChecker()
     await this.fetchAllMessages()
-    await this.fetchAllTodo()
+    await this.fetchUsersTodo()
     await this.getParticipantList()
     await this.fetchAllTask()
     await this.scrollToBottom()
     await this.listenUnrelevant()
     await this.checkUnrelevant()
-  }
-
-  componentDidUpdate() {
-    this.scrollToBottom()
-  }
-  
-  scrollToBottom() {
-    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
-  }
-
-  endDiscussion() {
-    const roomId = this.props.match.params.id
-    axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/closeDiscussion?room_id=${roomId}`)
-    // firebase.database().ref(`/rooms/${this.props.match.params.id}`).remove()
-    // this.props.history.push('/dashboard')
   }
 
   render() {
@@ -455,4 +460,17 @@ const nameNotification = (name) => {
   });
 };
 
-export default ChatRoom
+// export default ChatRoom
+
+const mapStateToProps = state => {
+  return {
+    usersTodo: state.todoStore
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChatRoom)
