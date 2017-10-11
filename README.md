@@ -1,7 +1,7 @@
 # Minutes App [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
 > Your time is worth every second.
 
-[![Build Status](https://api.travis-ci.org/travis-ci/travis-web.svg?branch=daily-cron)](https://nodejs.org/en/)
+[![build status](https://img.shields.io/travis/reactjs/react-redux/master.svg?style=flat-square)](https://travis-ci.org/rama841/minutes-vart)
 [![Build Status](https://img.shields.io/david/expressjs/express.svg)]()
 [![MIT License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/MIT)
 [![Coverage](https://img.shields.io/codecov/c/github/codecov/example-python/master.svg)]()
