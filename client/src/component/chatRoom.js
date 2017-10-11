@@ -64,6 +64,7 @@ class ChatRoom extends Component {
   }
 
   endDiscussion() {
+    console.log('End Discussion')
     const roomId = this.props.match.params.id
     axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/closeDiscussion?room_id=${roomId}`)
     this.props.history.push('/dashboard')
