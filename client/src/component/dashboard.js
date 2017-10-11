@@ -24,10 +24,16 @@ import {
   Select,
   Tag
 } from 'antd'
+// import { BrowserRouter, Link } from 'react-router-dom'
+import firebase from './firebaseConfig'
+import axios from 'axios'
+import {Scrollbars} from 'react-custom-scrollbars';
+
 
 import './dashboard.css'
 
 const { TextArea } = Input
+const FormItem = Form.Item;
 const Panel = Collapse.Panel
 
 class Dashboard extends Component {
@@ -74,7 +80,9 @@ class Dashboard extends Component {
       userId: '',
       username: '',
       users: {},
-      visible: false
+      visible: false,
+      validate: '',
+      helMessage: ''
     }
   }
 
@@ -119,11 +127,12 @@ class Dashboard extends Component {
 
   createRoom(e) {
     e.preventDefault();
+    this.setState({validate: 'validating'})
     axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/watsonNLU?text=${this.state.topicTitle}`)
     .then(({ data }) => {
       // console.log(data.error)
       if (data.error) {
-        alert('Room\'s name should be descriptive and written in English' )
+        this.setState({validate: 'error', helpMessage: 'Room\'s name should be descriptive and written in English'})
       } else {
         let ref = firebase.database().ref(`/rooms/`)
         let roomData = {
@@ -135,7 +144,7 @@ class Dashboard extends Component {
           timestamp: Date.now()
         }
         ref.push().set(roomData)
-        this.setState({ topicTitle: '' })
+        this.setState({ topicTitle: '', validate: ''})
       }
     })
   }
@@ -215,6 +224,10 @@ class Dashboard extends Component {
             todoList.backlog.push(backlog)
           }
         })
+        todoList.backlog.reverse()
+        todoList.done.reverse()
+        todoList.todo.reverse()
+        todoList.onProgress.reverse()
         let payload = {
           userId: this.state.userId,
           todoList: list
@@ -417,6 +430,7 @@ class Dashboard extends Component {
               </div>
             </div>
             <div className='kanbancontent'>
+          <Scrollbars autoHide >
               <div style={{
                 padding: '20px'
               }}>
@@ -581,6 +595,7 @@ class Dashboard extends Component {
                   </Col>
                 </Row>
               </div>
+              </Scrollbars>
             </div>
           </div>
           <div className='discussion'>
@@ -601,15 +616,24 @@ class Dashboard extends Component {
               </div>
             </div>
             <div className='active'>
+          <Scrollbars autoHide >
               <div style={{margin: '20px'}}>
                 <h1 style={{color: 'white'}}>Discussion List</h1>
-                <Form onSubmit={(e) => this.createRoom(e)}>
+                <Form onSubmit={(e) => this.createRoom(e)} layout='inline'>
+                      <FormItem
+                      hasFeedback
+                      validateStatus = {this.state.validate}
+                      help = {this.state.helpMessage}
+                    >
                   <Input
                     size='large'
                     value={this.state.topicTitle}
                     onChange={e => this.topicTitleChange(e)}
-                    placeholder="Add Room Name..." style={{width: '65%', marginRight: 10}}/> 
+                    placeholder="Add Room Name..."/> 
+                    </FormItem>
+                    <FormItem>
                     <Button icon="plus" htmlType='submit'>Add Discussion</Button>
+                    </FormItem>
                 </Form>
                 <br />
                 <br />
@@ -639,8 +663,11 @@ class Dashboard extends Component {
                   })
                 }
               </div>
+              </Scrollbars>
             </div>
             <div className='history'>
+              
+          <Scrollbars autoHide >
               <h1 style={{color: 'white', marginLeft: 20}}>Discussion History List</h1>
               <Collapse bordered={false} className='collapse'>
                 {this.state.summaryList ? this.state.summaryList.map(item => {
@@ -800,6 +827,7 @@ class Dashboard extends Component {
                   )
                 })}
               </Modal>
+              </Scrollbars>
             </div>
           </div>
         </Layout>
