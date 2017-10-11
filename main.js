@@ -11,7 +11,7 @@ function createWindow() {
   win = new BrowserWindow({width: 960, height: 540, icon: path.join(__dirname, 'assets/favicon.png')})
 
   // and load the index.html of the app.
-  win.loadURL('http://localhost:3000')
+  win.loadURL('https://minutes-vart.firebaseapp.com/')
 
   // Open the DevTools. 
   // win

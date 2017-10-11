@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
+
 import {
   Input,
   Button,
@@ -93,9 +95,9 @@ class ChatRoom extends Component {
     ref.on('value', snapshot => {
       this.setState({unrelevant: snapshot.val()})
     })
-      console.log('Num of irrelevant chat', this.state.unrelevant);
   }
-checkUnrelevant() {
+
+  checkUnrelevant() {
     let ref = firebase.database().ref(`/rooms/${this.props.match.params.id}/minnie/unrelevantChat`)
     ref.on('value', snapshot => {
       if (snapshot.val() >= 6) {
@@ -105,7 +107,7 @@ checkUnrelevant() {
     })
   }
 
-  fetchAllTodo() {
+  fetchUsersTodo() {
     let ref = firebase.database().ref('/kanban')
     ref.on('value', snapshot => {
       if (snapshot.val() !== null) {
@@ -211,7 +213,7 @@ checkUnrelevant() {
     await this.stateChangeListener()
     await this.roomStatusChecker()
     await this.fetchAllMessages()
-    await this.fetchAllTodo()
+    await this.fetchUsersTodo()
     await this.getParticipantList()
     await this.fetchAllTask()
     await this.scrollToBottom()
@@ -248,60 +250,62 @@ checkUnrelevant() {
                   style={{
                     margin: 15, float: 'left'
                   }} />
-                  <h2 style={{float: 'right', marginRight: 10, marginTop: 10, color: 'white'}}>{ this.state.topic }</h2>
+                  <h1 style={{float: 'right', marginRight: 10, marginTop: 10, textShadow: '0px 0px 15px white'}}><b>{ this.state.topic }</b></h1>
               </Link>
             </div>
             <div className='middletask'>
-              <h1 style={{
-                color: 'white'
-              }}>MY TASK</h1>
-              <br />
-              <Timeline style={{ color: 'white' }}>
-                {
-                  this.state.usersTodoList.backlog.map((list, idx) => {
-                    return (
-                      <Timeline.Item
-                        key={idx}
-                        color='red'>
-                        {list.task}
-                      </Timeline.Item>
-                    )
-                  })
-                }
-                {
-                  this.state.usersTodoList.todo.map((list, idx) => {
-                    return (
-                      <Timeline.Item
-                        key={idx}
-                        color='orange'>
-                        {list.task}
-                      </Timeline.Item>
-                    )
-                  })
-                }
-                {
-                  this.state.usersTodoList.onProgress.map((list, idx) => {
-                    return (
-                      <Timeline.Item
-                        key={idx}
-                        color='blue'>
-                        {list.task}
-                      </Timeline.Item>
-                    )
-                  })
-                }
-                {
-                  this.state.usersTodoList.done.map((list, idx) => {
-                    return (
-                      <Timeline.Item
-                        key={idx}
-                        color='green'>
-                        {list.task}
-                      </Timeline.Item>
-                    )
-                  })
-                }
-              </Timeline>
+              <div style={{marginLeft: '20px'}}>
+                <h1 style={{
+                  color: 'white'
+                }}>MY TASK</h1>
+                <br />
+                <Timeline style={{ color: 'white' }}>
+                  {
+                    this.state.usersTodoList.backlog.map((list, idx) => {
+                      return (
+                        <Timeline.Item
+                          key={idx}
+                          color='red'>
+                          {list.task}
+                        </Timeline.Item>
+                      )
+                    })
+                  }
+                  {
+                    this.state.usersTodoList.todo.map((list, idx) => {
+                      return (
+                        <Timeline.Item
+                          key={idx}
+                          color='orange'>
+                          {list.task}
+                        </Timeline.Item>
+                      )
+                    })
+                  }
+                  {
+                    this.state.usersTodoList.onProgress.map((list, idx) => {
+                      return (
+                        <Timeline.Item
+                          key={idx}
+                          color='blue'>
+                          {list.task}
+                        </Timeline.Item>
+                      )
+                    })
+                  }
+                  {
+                    this.state.usersTodoList.done.map((list, idx) => {
+                      return (
+                        <Timeline.Item
+                          key={idx}
+                          color='green'>
+                          {list.task}
+                        </Timeline.Item>
+                      )
+                    })
+                  }
+                </Timeline>
+              </div>
             </div>
           </div>
           <div className='member'>
@@ -446,4 +450,17 @@ const nameNotification = (name) => {
   });
 };
 
-export default ChatRoom
+// export default ChatRoom
+
+const mapStateToProps = state => {
+  return {
+    usersTodo: state.todoStore
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChatRoom)

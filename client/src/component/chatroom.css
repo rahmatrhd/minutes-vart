@@ -1,12 +1,17 @@
+body {
+  background-image: url('https://www.briantracy.com/blog/wp-content/uploads/2012/05/run-an-effective-meeting-effective-meeting-management.jpg');
+  background-size: cover;
+}
+
 .wrapper {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
+  z-index: 1;
 }
 
 .task {
   grid-column: 1;
   height: 100vh;
-  background: #184169;
   display: grid;
   grid-template-rows: 3fr 2fr;
 }
@@ -23,7 +28,7 @@
 .minnie {
   grid-column: 3;
   height: 100vh;
-  background: #184169;
+  background-color: rgba(156, 177, 191, 0.2);
   overflow: auto;
   display: grid;
   grid-template-rows: 14fr 1fr;
@@ -50,21 +55,19 @@
 
 .member {
   grid-row: 2;
-  background: #2D587B;
   overflow: auto;
   justify-items: center
 }
 
 .toptask {
   grid-row: 1;
-  background: #2D587B;
 }
 
 .middletask {
   grid-row: 2;
   overflow: auto;
+  background-color: rgba(24, 65, 105, 0.5);
   justify-self: stretch;
-  margin-left: 20px
 }
 
 .end {

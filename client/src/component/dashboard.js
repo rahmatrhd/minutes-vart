@@ -1,4 +1,8 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
+
+import { userData } from '../actions/userAction'
+import { todoToStore } from '../actions/todoAction'
 
 import {
   Avatar,
@@ -112,7 +116,6 @@ class Dashboard extends Component {
   }
   
   modalHandleOk() {
-    // console.log(this.state.review.item.todo)
     axios.post(`https://us-central1-minutes-vart.cloudfunctions.net/submitReview`, {
       historyId: this.state.review.item.key,
       todo: this.state.review.item.todo
@@ -185,7 +188,7 @@ class Dashboard extends Component {
           topic: li[1].topic.text.toUpperCase() || undefined
         })
       })
-      this.setState({ roomList: temp })
+      this.setState({ roomList: temp.reverse() })
     })
   }
 
@@ -219,6 +222,11 @@ class Dashboard extends Component {
             todoList.backlog.push(backlog)
           }
         })
+        let payload = {
+          userId: this.state.userId,
+          todoList: list
+        }
+        this.props.todoToStore(payload)
         this.setState({ todoList: todoList })
       }
     })
@@ -334,7 +342,6 @@ class Dashboard extends Component {
             console.log('Registered');
           }
         })
-
         this.setState({
           username: user.displayName,
           email: user.email,
@@ -601,42 +608,44 @@ class Dashboard extends Component {
               </div>
             </div>
             <div className='active'>
-              <h1 style={{color: 'white'}}>Discussion List</h1>
-              <Form onSubmit={(e) => this.createRoom(e)}>
-                <Input
-                  size='large'
-                  value={this.state.topicTitle}
-                  onChange={e => this.topicTitleChange(e)}
-                  placeholder="Add Room Name..." style={{width: '70%', marginRight: 10}}/> 
-                  <Button icon="plus" size='large' htmlType='submit'>Add Discussion</Button>
-              </Form>
-              <br />
-              <br />
-              {
-                this.state.roomList.map((room, idx) => {
-                  return (
-                    <Card
-                      key={idx}
-                      title={room.topic}
-                      extra={<a onClick={(e) => this.paketJoin(room.roomId, room.topic)}> Join </a>}
-                      style={{
-                        marginBottom: '10px',
-                        marginRight: '10px',
-                        background: '#2D587B'
-                      }}>
-                      {
-                        room.participants.map((orang, i) => {
-                          return (
-                            <Tag key={i}>
-                              {orang}
-                            </Tag>
-                          )
-                        })
-                      }
-                    </Card>
-                  )
-                })
-              }
+              <div style={{margin: '20px'}}>
+                <h1 style={{color: 'white'}}>Discussion List</h1>
+                <Form onSubmit={(e) => this.createRoom(e)}>
+                  <Input
+                    size='large'
+                    value={this.state.topicTitle}
+                    onChange={e => this.topicTitleChange(e)}
+                    placeholder="Add Room Name..." style={{width: '65%', marginRight: 10}}/> 
+                    <Button icon="plus" htmlType='submit'>Add Discussion</Button>
+                </Form>
+                <br />
+                <br />
+                {
+                  this.state.roomList.map((room, idx) => {
+                    return (
+                      <Card
+                        key={idx}
+                        title={room.topic}
+                        extra={<a onClick={(e) => this.paketJoin(room.roomId, room.topic)}> Join </a>}
+                        style={{
+                          marginBottom: '10px',
+                          marginRight: '10px',
+                          background: '#2D587B'
+                        }}>
+                        {
+                          room.participants.map((orang, i) => {
+                            return (
+                              <Tag key={i}>
+                                {orang}
+                              </Tag>
+                            )
+                          })
+                        }
+                      </Card>
+                    )
+                  })
+                }
+              </div>
             </div>
             <div className='history'>
               <h1 style={{color: 'white', marginLeft: 20}}>Discussion History List</h1>
@@ -667,7 +676,7 @@ class Dashboard extends Component {
                 }) : null}
               </Collapse>
               <Modal
-                title={this.state.review.item.topic.text}
+                title={this.state.review.item.topic.text.toUpperCase()}
                 visible={this.state.review.visibleModal}
                 onOk={() => this.modalHandleOk()}
                 onCancel={() => this.modalHandleCancel()}
@@ -814,4 +823,18 @@ const customPanelStyle = {
   overflow: 'hidden'
 };
 
-export default Dashboard
+// export default Dashboard
+
+const mapStateToProps = state => {
+  return {
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    userData: payload => dispatch(userData(payload)),
+    todoToStore: payload => dispatch(todoToStore(payload))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard)
