@@ -42,7 +42,9 @@ Simple Meeting Assistant summarized your team's chat logs in minutes. The app mo
     
     
 ## License 🔗 
-Copyright © 2017 [Rahmat](https://github.com/rama841) - [Ahfa](https://github.com/ahmad-fajar) - [Vega](https://github.com/PDVega) - [Tama](https://github.com/tamastro)
-Licensed under the MIT license.
 
 [![CC0](https://licensebuttons.net/p/zero/1.0/88x31.png)](https://creativecommons.org/publicdomain/zero/1.0/)
+
+
+Copyright © 2017 [Rahmat](https://github.com/rama841) - [Ahfa](https://github.com/ahmad-fajar) - [Vega](https://github.com/PDVega) - [Tama](https://github.com/tamastro)
+Licensed under the MIT license.
