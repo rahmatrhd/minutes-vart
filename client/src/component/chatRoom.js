@@ -255,6 +255,8 @@ class ChatRoom extends Component {
               </Link>
             </div>
             <div className='middletask'>
+
+            <Scrollbars autoHide >
               <div style={{marginLeft: '20px'}}>
                 <h1 style={{
                   color: 'white'
@@ -307,6 +309,7 @@ class ChatRoom extends Component {
                   }
                 </Timeline>
               </div>
+              </Scrollbars>
             </div>
           </div>
           <div className='member'>
