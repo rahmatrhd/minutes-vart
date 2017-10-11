@@ -3,11 +3,13 @@ body {
   background-size: cover;
 }
 
+
 .wrapper {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
   z-index: 1;
 }
+
 
 .task {
   grid-column: 1;
@@ -23,6 +25,10 @@ body {
   justify-items: stretch;
   display: grid;
   grid-template-rows: auto 40px
+}
+
+.chatbox::-webkit-scrollbar {
+  background: #000;
 }
 
 .minnie {

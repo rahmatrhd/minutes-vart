@@ -12,6 +12,7 @@ import {
 import { ChatFeed } from 'react-chat-ui'
 // import { ChatFeed, Message } from 'react-chat-ui'
 import { Link } from 'react-router-dom'
+import {Scrollbars} from 'react-custom-scrollbars';
 import firebase from './firebaseConfig'
 import axios from 'axios'
 
@@ -236,7 +237,7 @@ checkUnrelevant() {
 
   render() {
     return (
-      <div className='wrapper'>
+      <div className='wrapper' id="style-1">
         <div className='task'>
           <div className='innertask'>
             <div className='toptask'>
@@ -307,6 +308,7 @@ checkUnrelevant() {
             </div>
           </div>
           <div className='member'>
+            <Scrollbars autoHide >
             {
               this.state.participants.map((member, idx) => {
                 return (
@@ -325,9 +327,11 @@ checkUnrelevant() {
                 )
               })
             }
+            </Scrollbars>
           </div>
         </div>
         <div className='chatbox'>
+          <Scrollbars autoHide >
           <div
             className='chattext'
             style={{
@@ -361,6 +365,7 @@ checkUnrelevant() {
                 this.messagesEnd = el;
               }}></div>
           </div>
+          </Scrollbars>
           <div className='chatinput'>
             <Form onSubmit={(e) => this.sendChat(e)}>
               <Input
@@ -383,6 +388,7 @@ checkUnrelevant() {
           </div>
         </div>
         <div className='minnie'>
+          <Scrollbars autoHide >
           <div className='content'>
             <h1
               style={{
@@ -416,6 +422,7 @@ checkUnrelevant() {
               />
             </Table>
           </div>
+          </Scrollbars>
           <div className='end'>
             <Button
               onClick={() => this.endDiscussion()}
