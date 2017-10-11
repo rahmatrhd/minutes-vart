@@ -18,9 +18,8 @@ module.exports = (data, userId) => {
   } = data
   
   if (task && person)
-    return db.ref('users').once('value')
+    db.ref('users').once('value')
     .then(snapshot => {
-      console.log('taskperson', task, person)
       const keys = Object.keys(snapshot.val())
       const userNames = keys.map(key => snapshot.val()[key].name) // array of user's name
 
@@ -58,4 +57,7 @@ module.exports = (data, userId) => {
         })
       }
     })
+    .catch(err => Promise.reject(err))
+  else
+    return Promise.resolve(null)
 }

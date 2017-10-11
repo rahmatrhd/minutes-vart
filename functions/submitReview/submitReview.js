@@ -25,10 +25,8 @@ module.exports = (req, res) => {
 	
 	Promise.all(promises)
 	.then(results => {
-		return db.ref(`history/${historyId}`).update({status: true})
-	})
-	.then(() => {
-		res.send(true)
+		db.ref(`history/${historyId}`).update({status: true})
+		.then(() => res.send(results))
 	})
 	.catch(err => res.send(err))
 }

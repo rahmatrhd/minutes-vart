@@ -6,7 +6,7 @@ const assignTodo = require('./actionHandlers/assignTodo')
 const TOKEN = functions.config().api_ai.dev_token
 
 module.exports = payload => {
-  const { 
+  const {
     roomId,
     chat: {
       user: {
@@ -19,7 +19,7 @@ module.exports = payload => {
   } = payload
   
   const url = 'https://api.dialogflow.com/v1/query?v=20150910'
-  return axios.post(url, {
+  axios.post(url, {
     query: text,
     sessionId: roomId,
     timezone: new Date(),
@@ -39,6 +39,7 @@ module.exports = payload => {
     
     const action = !actionHandlers[data.result.action] ? 'default' : data.result.action
     
-    return actionHandlers[action]()
+    return Promise.resolve(actionHandlers[action]())
   })
+  .catch(err => Promise.reject(err))
 }

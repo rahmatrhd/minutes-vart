@@ -20,7 +20,7 @@ module.exports = (req, res) => {
     else
       res.send({
         text: req.query.text,
-        categories: response.categories
+        categories: response.categories || []
       })
   })
 }

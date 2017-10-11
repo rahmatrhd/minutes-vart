@@ -18,10 +18,10 @@ module.exports = payload => {
   } = payload
 
   const apiUrl = `https://us-central1-minutes-vart.cloudfunctions.net/watsonNLU?text=${text}` 
-  return axios.get(apiUrl)
+  axios.get(apiUrl)
   .then(({ data }) => {
     //object to array
-    const parseTopic = Object.keys(topic.categories).map(key => topic.categories[key])
+    const parseTopic = Object.keys(topic.categories || {}).map(key => topic.categories[key])
     
     topicCategories = parseTopic.map(category => category.label) // topic: array of category label
     
@@ -63,4 +63,5 @@ module.exports = payload => {
       return Promise.resolve(null)
     }
   })
+  .catch(err => Promise.reject(err))
 }

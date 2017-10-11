@@ -53,8 +53,6 @@ module.exports = payload => {
     timestamp: Date.now(),
     status: false,
     todo: todo,
-    topic: {
-      text: topic.text || ''
-    }
+    topic: topic
   }
 }
