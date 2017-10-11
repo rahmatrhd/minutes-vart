@@ -25,8 +25,6 @@ import {
   Tag
 } from 'antd'
 // import { BrowserRouter, Link } from 'react-router-dom'
-import firebase from './firebaseConfig'
-import axios from 'axios'
 import {Scrollbars} from 'react-custom-scrollbars';
 
 

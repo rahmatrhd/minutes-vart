@@ -16,10 +16,7 @@ import {
 } from 'antd'
 import { ChatFeed } from 'react-chat-ui'
 // import { ChatFeed, Message } from 'react-chat-ui'
-import { Link } from 'react-router-dom'
-import {Scrollbars} from 'react-custom-scrollbars';
-import firebase from './firebaseConfig'
-import axios from 'axios'
+import {Scrollbars} from 'react-custom-scrollbars'
 
 import './chatroom.css'
 
