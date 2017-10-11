@@ -25,7 +25,7 @@ Simple Meeting Assistant summarized your team's chat logs in minutes. The app mo
 
 ## Technology 🚀 
 
-[![React logo](https://i.imgur.com/3p2nAv5.png)](https://reactjs.org/)  [![Redux](https://i.imgur.com/4iL4Pgy.png)](http://redux.js.org/) [![Google Function](https://i.imgur.com/CPQmtBV.png)](https://cloud.google.com/functions/) [![Firebase logo](https://i.imgur.com/NKIYYUE.png)](https://firebase.google.com/) [![API AI](https://i.imgur.com/hQxDwMg.png)](https://dialogflow.com/) 
+[![React logo](https://i.imgur.com/3p2nAv5.png)](https://reactjs.org/)  [![Redux](https://i.imgur.com/4iL4Pgy.png)](http://redux.js.org/) [![Google Function](https://i.imgur.com/CPQmtBV.png)](https://cloud.google.com/functions/) [![Firebase logo](https://i.imgur.com/NKIYYUE.png)](https://firebase.google.com/) [![API AI](https://i.imgur.com/hQxDwMg.png)](https://dialogflow.com/) [![OAuth](https://i.imgur.com/tAYC6pB.png)](https://oauth.net/2/)
 
 [![NodeJS](https://i.imgur.com/18cE459.png)](https://nodejs.org/en/) [![IBM Watson](https://i.imgur.com/zIq6wuf.png)](https://www.ibm.com/watson/) [![Electron](https://i.imgur.com/R7HpUuB.png)](https://electron.atom.io/) [![Mocha Chai](https://i.imgur.com/8trAoE5.png)](http://chaijs.com/)
 
