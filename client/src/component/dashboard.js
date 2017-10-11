@@ -161,7 +161,7 @@ class Dashboard extends Component {
     let ref = firebase.database().ref('/rooms')
     ref.on('value', snapshot => {
       let temp = []
-      let list = Object.entries(snapshot.val()) || {}
+      let list = Object.entries(snapshot.val() || {}) 
       list.forEach(li => {
         let participant = li[1].participant ? Object.entries(li[1].participant) : []
         let participants = []
