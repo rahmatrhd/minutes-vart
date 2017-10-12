@@ -18,7 +18,7 @@ module.exports = (data, userId) => {
   } = data
   
   if (task && person)
-    db.ref('users').once('value')
+    return db.ref('users').once('value')
     .then(snapshot => {
       const keys = Object.keys(snapshot.val())
       const userNames = keys.map(key => snapshot.val()[key].name) // array of user's name
@@ -28,10 +28,10 @@ module.exports = (data, userId) => {
 
       if (bestMatch > 0.6) {
         const index = similarityScore.indexOf(bestMatch)
-        
+        console.log('best')
         // if userId exist and match with assignedTo (keys[index]) OR no userId provided
         if ((userId && (userId == keys[index])) || !userId) {
-          
+          console.log('halo')
           if (userId)
             axios.delete(`https://api.dialogflow.com/v1/contexts/pre-todo-assigntoperson-followup?sessionId=${sessionId}`, {
               headers: {
@@ -48,9 +48,11 @@ module.exports = (data, userId) => {
             timestamp: Date.now()
           })
         } else {
+          console.log('resulve null')
           return Promise.resolve(null)
         }
       } else {
+        console.log('userUndefined')
         return Promise.resolve({
           userUndefined: true,
           name: person

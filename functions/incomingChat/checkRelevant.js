@@ -30,7 +30,7 @@ module.exports = payload => {
     
     let bestMatch = 0
     
-    if (data.categories.length > 0) {
+    if (dataCategories.length > 0) {
       let similiarityArr = []
       
       topicCategories.forEach(topicLabel => {
@@ -60,7 +60,7 @@ module.exports = payload => {
       })
       
     } else {
-      return Promise.resolve(null)
+      return null
     }
   })
   .catch(err => Promise.reject(err))

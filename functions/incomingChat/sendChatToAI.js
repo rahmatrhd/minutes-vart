@@ -19,7 +19,7 @@ module.exports = payload => {
   } = payload
   
   const url = 'https://api.dialogflow.com/v1/query?v=20150910'
-  axios.post(url, {
+  return axios.post(url, {
     query: text,
     sessionId: roomId,
     timezone: new Date(),
@@ -39,7 +39,7 @@ module.exports = payload => {
     
     const action = !actionHandlers[data.result.action] ? 'default' : data.result.action
     
-    return Promise.resolve(actionHandlers[action]())
+    return actionHandlers[action]()
   })
   .catch(err => Promise.reject(err))
 }

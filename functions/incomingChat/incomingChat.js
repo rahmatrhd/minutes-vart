@@ -16,6 +16,7 @@ module.exports = (req, res) => {
     ])
   })
   .then(results => {
+    console.log('results', results)
     res.send(results[1])
   })
   .catch(err => {
