@@ -251,7 +251,7 @@ class ChatRoom extends Component {
                   style={{
                     margin: 15, float: 'left'
                   }} />
-                  <h1 style={{float: 'right', marginRight: 10, marginTop: 10, textShadow: '0px 0px 15px white'}}><b>{ this.state.topic }</b></h1>
+                  <h1 style={{float: 'right', marginRight: 10, marginTop: 10, textShadow: '0px 0px 5px white', color: 'white'}}><b>{ this.state.topic }</b></h1>
               </Link>
             </div>
             <div className='middletask'>
@@ -353,7 +353,7 @@ class ChatRoom extends Component {
               // JSON: Custom bubble styles
               bubbleStyles={{
                 text: {
-                  fontSize: 12
+                  fontSize: 18
                 },
                 chatbubble: {
                   borderRadius: 10,
