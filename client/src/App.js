@@ -1,7 +1,10 @@
-import React, {Component} from 'react';
-import {BrowserRouter as Router, Route} from 'react-router-dom'
+import React, { Component } from 'react'
 import store from './store'
-import {Provider} from 'react-redux'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import { LocaleProvider } from 'antd'
+
+import enUS from 'antd/lib/locale-provider/en_US'
 
 import ChatRoom from './component/chatRoom'
 import Dashboard from './component/dashboard'
@@ -12,16 +15,18 @@ import './App.css'
 class App extends Component {
   render() {
     return (
-      <Provider store={store}>
-        <Router>
-          <div className= 'app'>
-            <Route exact path='/' component={Login} />
-            <Route exact path='/chatroom/:id' component={ChatRoom} />
-            <Route exact path='/dashboard' component={Dashboard} />
-          </div>
-        </Router>
-      </Provider>
-    );
+      <LocaleProvider locale={enUS}>
+        <Provider store={store}>
+          <Router>
+            <div className= 'app'>
+              <Route exact path='/' component={Login} />
+              <Route exact path='/chatroom/:id' component={ChatRoom} />
+              <Route exact path='/dashboard' component={Dashboard} />
+            </div>
+          </Router>
+        </Provider>
+      </LocaleProvider>
+    )
   }
 }
 
