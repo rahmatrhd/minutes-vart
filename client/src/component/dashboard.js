@@ -1,6 +1,8 @@
 import { connect } from 'react-redux'
 import axios from 'axios'
 import firebase from './firebaseConfig'
+import functions from 'firebase-functions'
+import admin from 'firebase-admin'
 import moment from 'moment'
 import React, { Component } from 'react';
 
@@ -30,6 +32,8 @@ import {Scrollbars} from 'react-custom-scrollbars';
 
 
 import './dashboard.css'
+
+admin.initializeApp(functions.config().firebase)
 
 const { TextArea } = Input
 const FormItem = Form.Item;
@@ -118,6 +122,22 @@ class Dashboard extends Component {
     this.addNewTask()
   }
 
+  pushNotification() {
+    if(window.Notification && Notification.permission !== 'granted') {
+      Notification.requestPermission()
+    }
+    if(window.Notification && Notification.permission == 'granted') {
+      // firebase.database().ref(`/rooms/-KwiGXOqgIGPycPIMPJC/chat/`).onCreate('value', snapshot => {
+      //   console.log(snapshot.val())
+      // })
+      functions.database.ref(`/rooms/{roomsId}/chat/`).onCreate(event => {
+        console.log(event.data.val())
+      })
+    }
+    
+
+  }
+
   addTaskModal(item) {
     this.setState({
       visible: true
@@ -129,7 +149,7 @@ class Dashboard extends Component {
     this.setState({validate: 'validating'})
     axios.get(`https://us-central1-minutes-vart.cloudfunctions.net/watsonNLU?text=${this.state.topicTitle}`)
     .then(({ data }) => {
-      // console.log(data.error)
+      console.log(data)
       if (data.error) {
         this.setState({validate: 'error', helpMessage: 'Room\'s name should be descriptive and written in English'})
       } else {
@@ -137,7 +157,7 @@ class Dashboard extends Component {
         let roomData = {
           status: true,
           topic: {
-            categories: data.categories,
+            categories: data.categories || 'fcuk',
             text: this.state.topicTitle
           },
           timestamp: Date.now()
@@ -383,6 +403,7 @@ class Dashboard extends Component {
     this.getAllRooms()
     this.getAllSummary()
     this.getAllUsers()
+    this.pushNotification()
   }
 
   componentWillMount() {

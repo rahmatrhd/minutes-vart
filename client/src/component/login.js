@@ -13,12 +13,12 @@ class Login extends Component {
     var provider = new firebase.auth.GoogleAuthProvider()
     provider.addScope('https://www.googleapis.com/auth/userinfo.email')
     provider.addScope('https://www.googleapis.com/auth/userinfo.profile')
-    firebase.auth().signInWithRedirect(provider).then(result => {
+    firebase.auth().signInWithPopup(provider).then(result => {
       console.log('username>> ', result.user.displayName)
       console.log('email>> ', result.user.email)
       console.log('photoURL>> ', result.user.photoURL)
     })
-    .catch(e => {
+    .catch(e => {                                                                                                                                                                                           
       console.log('Gagal login pakai Gmail')
       console.log(e)
     })
