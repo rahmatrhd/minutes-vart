@@ -1,10 +1,9 @@
-# Minutes App [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
+# Minutes App [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/rama841/minutes-vart)
 > Your time is worth every second.
 
 [![build status](https://img.shields.io/travis/reactjs/react-redux/master.svg?style=flat-square)](https://travis-ci.org/rama841/minutes-vart)
 [![Build Status](https://img.shields.io/david/expressjs/express.svg)]()
 [![MIT License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/MIT)
-[![Coverage](https://img.shields.io/codecov/c/github/codecov/example-python/master.svg)]()
 [![Create App](https://img.shields.io/github/issues/detail/last-update/badges/shields/979.svg)]()
 [![Coverity](https://img.shields.io/coverity/ondemand/streams/STREAM.svg)]()
 [![Rating](https://img.shields.io/chrome-web-store/stars/nimelepbpejjlbmoobocpfnjhihnpked.svg)]()
