@@ -5,7 +5,6 @@
 [![Build Status](https://img.shields.io/david/expressjs/express.svg)]()
 [![MIT License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/MIT)
 [![Create App](https://img.shields.io/github/issues/detail/last-update/badges/shields/979.svg)]()
-[![Coverity](https://img.shields.io/coverity/ondemand/streams/STREAM.svg)]()
 [![Rating](https://img.shields.io/chrome-web-store/stars/nimelepbpejjlbmoobocpfnjhihnpked.svg)]()
 
 Simple Meeting Assistant summarized your team's chat logs in minutes. The app monitors the group's chats, creates tasks automatically based on the chat log, reminds and gives notification if the discussion is out of topic.
